@@ -48,8 +48,12 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
     const { name, email, password, role, formClass, subjects, classes, qualification, otherQualification } = req.body;
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
-    // Generate a random staff ID (for example, between 1000 and 9999)
-    const staffId = Math.floor(Math.random() * 9000) + 1000;
+   // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
+   const currentYear = new Date().getFullYear();
+   const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
+   const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
+   const staffId = `IHMISS${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
+
 
     // Check if the email already exists
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
@@ -71,8 +75,8 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
             }
 
             // Build the SQL query based on the role
-            const columns = ['name', 'email', 'password', 'role', 'qualification', 'other_qualification', 'profile_picture', 'staff_id'];
-            const values = [name, email, hashedPassword, role, qualification, otherQualification, profilePicture, staffId];
+            const columns = ['name', 'email', 'password', 'role', 'qualification', 'profile_picture', 'staff_id'];
+            const values = [name, email, hashedPassword, role, qualification,  profilePicture, staffId];
 
             if (role === 'form_master') {
                 columns.push('formClass');  // Include formClass if role is 'form_master'
@@ -113,7 +117,7 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
                     insertItems('teacher_classes', classes)
                 ])
                 .then(() => {
-                    res.json({ success: true, message: 'Teacher registered successfully.' });
+                    res.json({ success: true, message: 'Teacher registered successfully.', staffId: staffId });
                 })
                 .catch(err => {
                     console.error('Error inserting subjects or classes:', err);

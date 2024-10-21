@@ -40,7 +40,7 @@ document.getElementById("teacherSignupForm").addEventListener("submit", async fu
         const result = await response.json();
 
         if (response.ok) {
-            alert("Signup successful!");
+            alert(`Signup successful! Your staff ID is: ${result.staffId}`);
             // Optionally redirect to another page after successful signup
             window.location.href = "/login"; // Update this as necessary
         } else {
@@ -65,20 +65,6 @@ document.getElementById('role').addEventListener('change', function () {
         classSelection.style.display = 'none'; // Hide class selection
         formClassInput.required = false; // Remove required
     }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const qualificationSelect = document.getElementById('qualification');
-    const otherQualificationInput = document.getElementById('otherQualification');
-
-    qualificationSelect.addEventListener('change', function() {
-        if (qualificationSelect.value === 'Others') {
-            otherQualificationInput.style.display = 'block'; // Show the input
-        } else {
-            otherQualificationInput.style.display = 'none'; // Hide the input
-            otherQualificationInput.value = ''; // Clear the input if hidden
-        }
-    });
 });
 
 // Back-to-top button functionality
