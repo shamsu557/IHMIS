@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="login.css"> 
+</head>
+<body>
+  <div class="container">
+    <form action="/login" method="POST" class="border p-4 shadow-sm rounded">
+      <h2 class="text-center mb-4">Login</h2>
+      <div class="form-group">
+        <input type="text" name="identifier" class="form-control" placeholder="Email" required>
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+      </div>
+      <input type="hidden" name="redirectTo" id="redirectTo" value="">
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+      <p class="text-center">
+        <a href="password_reset.html">Forgot your password?</a>
+      </p>
+    </form>
+  </div><br><br>
+ <!-- Footer -->
+ <div class="footer bg-light mt-5">
+  <div class="row text-center py-3">
+    <div class="col-md-4">
+      <p><strong>Imam Hafsin Model International School</strong></p>
+      <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+      <p>Email: imamhafsin@gmail.com</p>
+      <p>Phone: 08030999939939399</p>
+    </div>
+    <div class="col-md-4">
+      <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+        <i class="fab fa-facebook"></i> Facebook
+      </a>
+      <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+        <i class="fab fa-instagram"></i> Instagram
+      </a>
+      <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+        <i class="fab fa-twitter"></i> Twitter
+      </a>
+      <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </a>
+    </div>
+    <div class="col-md-4">
+      <p>&copy; IHMIS 2024</p>
+      <p>All rights reserved.</p>
+    </div>
+  </div>
+</div>
+<!-- Back to top button -->
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+  <!-- Bootstrap JS, Popper.js, and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ <script src="login.js"></script>
+</body>
+</html>
