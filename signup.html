@@ -34,16 +34,18 @@
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <!-- Role selection: Teacher or Form Master -->
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="" disabled selected>Select Role</option>
-                                    <option value="teacher">Teacher</option>
-                                    <option value="form_master">Form Master</option>
-                                </select>
-                            </div>
-                            
+                           <!-- Role selection: Teacher or Form Master -->
+<div class="mb-3">
+    <label for="role" class="form-label">Role</label>
+    <select class="form-select" id="role" name="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Senior Master">Senior Master</option>
+        <option value="Form Master">Form Master</option>
+    </select>
+</div>
+
+         
                             <div class="mb-3" id="class-selection" style="display: none;">
                                 <label for="class" class="form-label">Class (Form Master)</label>
                                 <select class="form-select" id="formClass" name="formClass">

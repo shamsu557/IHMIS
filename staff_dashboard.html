@@ -245,12 +245,11 @@
               <div class="id-card">
                   <div class="modal-header-content">
                       <img src="logo.jpg" alt="School Logo" class="id-card-logo">
-                      <h5 class="modal-title">CompuTech Nexus Academy</h5>
-                      <h6 class="modal-title">Staff ID Card</h6>
+                      <h6 class="modal-title">Imam Hafsin Model International School <br>622, Yakasai Street, Tal'udu G/Kaya<br>Gwale L.G.A, Kano State, Nigeria. </h6>
+                      <h5 class="modal-title" style="text-decoration: underline;">Staff ID Card</h5>
                   </div>
                   <img id="modal-teacher-profile-picture" src="default-profile.png" alt="Profile Picture" class="profile-picture mb-3">
                   <h5 class="card-title" id="modal-teacher-name">Welcome</h5>
-                  <p><strong>Email:</strong> <span id="modal-teacher-email"></span></p>
                   <p><strong>Staff ID:</strong> <span id="modal-teacher-staff-id"></span></p>
                   <p><strong>Qualification:</strong> <span id="modal-teacher-qualification"></span></p>
                   <p><strong>Role:</strong> <span id="modal-teacher-role"></span></p>
@@ -261,10 +260,11 @@
               <!-- Back of ID Card -->
               <div class="id-card-back">
                   <h5>Usage Policy</h5>
-                  <p>This ID card is issued to staff members for identification purposes at CompuTech Nexus Academy. It remains the property of the academy and must be surrendered upon request. The card is non-transferable and should only be used by the authorized individual. For security reasons, it must be signed upon receipt. If found, please return it to:</p>
-                  <p>CompuTech Nexus Academy<br>32 Km, Maiduguri Road, Gano 2 Primary School<br>Dawakin Kudu L.G.A, Kano State, Nigeria.</p>
-                  <p>Contact Numbers: 08030909793, 08033643018, 09123754300</p>
-                  <p>Email: <a href="mailto:1440shamsusabo@gmail.com">1440shamsusabo@gmail.com</a></p>
+                  <p>This ID card is issued to staff members for identification purposes at Imam Hafsin Model International School. It remains the property of the school and must be surrendered upon request. The card is non-transferable and should only be used by the authorized individual. For security reasons, it must be signed upon receipt. If found, please return it to:</p>
+                  <p>Imam Hafsin Model International School<br>622, Yakasai Street, Tal'udu G/Kaya<br>Gwale L.G.A, Kano State, Nigeria.</p>
+                  <p>Contact:</p>
+                  <p>08030999939939399</p>
+                  <p><a href="mailto:1440shamsusabo@gmail.com">imamhafsin@gmail.com</a></p>
               </div>
           </div>
           <div class="modal-footer">
@@ -330,7 +330,6 @@
             document.getElementById('teacher-profile-picture').src = teacher.profile_picture || 'default-profile.png';
              // Populate the ID card modal with teacher details
              document.getElementById('modal-teacher-name').innerText = teacher.name;
-                document.getElementById('modal-teacher-email').innerText = teacher.email;
                 document.getElementById('modal-teacher-staff-id').innerText = teacher.staff_id;
                 document.getElementById('modal-teacher-qualification').innerText = teacher.qualification;
                 document.getElementById('modal-teacher-role').innerText = teacher.role;
