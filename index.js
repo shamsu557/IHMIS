@@ -7,7 +7,13 @@ const fs = require('fs');
 const multer = require('multer'); // Add multer for file handling
 const app = express();
 const saltRounds = 10; // Define salt rounds for bcrypt hashing
+const session = require('express-session');
 
+app.use(session({
+    secret: 'a45A7ZMpVby14qNkWxlSwYGaSUv1d64x', // Replace with your secret key
+    resave: false,
+    saveUninitialized: true,
+  }));
 
 // Middleware to parse incoming request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,10 +45,30 @@ app.get('/signup', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
-app.get('/staff_dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'staff_dashboard.html'));
+
+
+// Route to serve staff_dashboard.html
+app.get('/staff_dashboard', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'staff_dashboard.html')); // Adjust the path as necessary
 });
 
+// API route to fetch teacher details
+app.get('/api/teacher-details', isAuthenticated, (req, res) => {
+    const teacherId = req.session.teacher.id;
+    const query = 'SELECT * FROM teachers WHERE id = ?';
+
+    db.query(query, [teacherId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error.' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Teacher not found.' });
+        }
+
+        const teacher = results[0]; // Get the first (and likely only) result
+        res.json(teacher);
+    });
+});
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
     const { name, email, password, role, formClass, subjects, classes, qualification, otherQualification } = req.body;
@@ -128,41 +154,77 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
     });
 });
 
-// Login route
+// Middleware to check if the user is logged in
+function isAuthenticated(req, res, next) {
+    if (req.session.loggedin) {
+        next(); // User is authenticated, proceed to the next middleware or route handler
+    } else {
+        res.redirect('/login'); // Redirect to the login page if not authenticated
+    }
+}
+
+  
+  // API endpoint to handle login (POST request)
 app.post('/login', (req, res) => {
     const { emailOrStaffId, password } = req.body;
 
-    // Check if input is email or staff_id
-    const isStaffId = !isNaN(emailOrStaffId);
-
-    const query = isStaffId
-        ? 'SELECT * FROM teachers WHERE staff_id = ?'
-        : 'SELECT * FROM teachers WHERE email = ?';
+    // Determine if the identifier is email or staff_id
+    const isEmail = emailOrStaffId.includes('@');
+    
+    const query = isEmail
+      ? 'SELECT * FROM teachers WHERE email = ?'
+      : 'SELECT * FROM teachers WHERE staff_id = ?';
 
     db.query(query, [emailOrStaffId], (err, results) => {
         if (err) {
             return res.status(500).json({ message: 'Database error.' });
         }
+
+        // Check if a user was found
         if (results.length === 0) {
             return res.status(401).json({ message: 'Invalid email/staff ID or password.' });
         }
 
         const teacher = results[0];
 
-        // Compare passwords
+        // Compare passwords using bcrypt
         bcrypt.compare(password, teacher.password, (err, match) => {
             if (err) {
                 return res.status(500).json({ message: 'Error comparing passwords.' });
             }
+
             if (!match) {
                 return res.status(401).json({ message: 'Invalid email/staff ID or password.' });
             }
 
             // Successful login
-            res.json({ redirectTo: '/staff_dashboard' });
+            req.session.loggedin = true;
+            req.session.teacher = teacher; // Store teacher details in session
+            res.json({ loggedin: true });
         });
     });
 });
+
+  // API endpoint to fetch teacher session details
+  app.get('/session', isAuthenticated, (req, res) => {
+    const teacher = req.session.teacher;
+    if (teacher) {
+      res.json({
+        loggedin: true,
+        teacher: {
+          name: teacher.name,
+          email: teacher.email,
+          qualification: teacher.qualification,
+          role: teacher.role,
+          formClass: teacher.formClass,
+          profile_picture: teacher.profile_picture,
+        },
+      });
+    } else {
+      res.status(403).json({ loggedin: false });
+    }
+  });
+  
 
 // Forgot password endpoint
 app.post('/forgot-password', (req, res) => {
@@ -218,6 +280,17 @@ app.post('/reset-password', (req, res) => {
     });
 });
 
+
+// API endpoint to handle logout
+app.post('/logout', isAuthenticated, (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+  
 // Server listening on port
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
