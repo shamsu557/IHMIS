@@ -58,7 +58,7 @@ document.getElementById('role').addEventListener('change', function () {
     const classSelection = document.getElementById('class-selection');
     const formClassInput = document.getElementById('formClass');
     
-    if (this.value === 'form_master') {
+    if (this.value === 'Form Master') {
         classSelection.style.display = 'block'; // Show class selection
         formClassInput.required = true; // Make it required
     } else {

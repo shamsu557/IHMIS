@@ -158,26 +158,6 @@
     </style>
 </head>
 <body>
-  <script>
-    window.onload = function() {
-         // Prevent back button after logout
-         if (!window.performance || window.performance.navigation.type === 2) {
-             window.location.href = '/login';
-         }
-     };
- 
-     // Check session expiration periodically
-     setInterval(function() {
-         fetch('/checkSession')
-             .then(response => response.json())
-             .then(data => {
-                 if (!data.loggedIn) {
-                     alert('Session expired. Please log in again.');
-                     window.location.href = '/staffLogin';
-                 }
-             });
-     }, 1 * 60 * 1000); // Check every 1 minutes
-   </script>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand ml-5 pl-5" href="#">
       <img src="logo.jpg" alt="Logo" height="30" class="mr-2"> Staff Dashboard
@@ -204,7 +184,7 @@
           
           <!-- Logout -->
           <li class="nav-item">
-              <a class="nav-link ml-5" href="#" id="logout">Logout</a>
+              <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
           </li>
       </ul>
   </div>
@@ -343,27 +323,11 @@
     // Call the function to fetch teacher details when the page loads
     window.onload = fetchTeacherDetails;
 
-    // Function to handle logout
-    async function handleLogout() {
-        try {
-            const response = await fetch('/logout', { method: 'POST' }); // Adjust your logout route and method as needed
-            if (response.ok) {
-                // Redirect to the login page or homepage after successful logout
-                window.location.href = '/login'; // Change the redirection URL to the appropriate login page
-            } else {
-                throw new Error('Logout failed');
-            }
-        } catch (error) {
-            console.error('Error logging out:', error);
-        }
-    }
+    function logout() {
+  window.location.href = '/logout'; // Redirect to admin logout route
+}
 
-    // Attach the logout function to the logout button
-    document.getElementById('logout').addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default link behavior
-        handleLogout();
-    });
- 
+
     // Back to top button functionality
     window.onscroll = function() { scrollFunction() };
 
@@ -379,8 +343,18 @@
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
     }
-
  
+    
+function preventBackNavigation() {
+    window.history.pushState(null, document.title, window.location.href);
+    window.addEventListener('popstate', function(event) {
+        window.history.pushState(null, document.title, window.location.href);
+    });
+}
+
+// Call this function on the staff_dashboard page
+preventBackNavigation();
+
  </script>
 </body>
 </html>

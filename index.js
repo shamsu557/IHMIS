@@ -12,7 +12,11 @@ const session = require('express-session');
 app.use(session({
     secret: 'a45A7ZMpVby14qNkWxlSwYGaSUv1d64x', // Replace with your secret key
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: { 
+      httpOnly: true,
+      maxAge:   60 * 60 * 1000 // 1 year session expiration
+    }
   }));
 
 // Middleware to parse incoming request bodies
@@ -49,6 +53,7 @@ app.get('/login', (req, res) => {
 
 // Route to serve staff_dashboard.html
 app.get('/staff_dashboard', isAuthenticated, (req, res) => {
+    res.set('Cache-Control', 'no-store'); // Prevent caching
     res.sendFile(path.join(__dirname, 'staff_dashboard.html')); // Adjust the path as necessary
 });
 
@@ -188,6 +193,7 @@ app.post('/login', (req, res) => {
         const teacher = results[0];
 
         // Compare passwords using bcrypt
+     
         bcrypt.compare(password, teacher.password, (err, match) => {
             if (err) {
                 return res.status(500).json({ message: 'Error comparing passwords.' });
@@ -224,6 +230,28 @@ app.post('/login', (req, res) => {
       res.status(403).json({ loggedin: false });
     }
   });
+  
+ // Check session status
+app.get('/checkSession', (req, res) => {
+    if (req.session && req.session.loggedin) {
+      // If the session is active, return that the user is logged in
+      res.json({ loggedin: true, user: req.session.teacher }); // Optionally send user info
+    } else {
+      // If the session has expired or user is not logged in, return false
+      res.json({ loggedin: false });
+    }
+  });
+  
+  // Middleware to check if the user is authenticated
+  function isAuthenticated(req, res, next) {
+    if (req.session && req.session.loggedin) {
+      return next(); // User is authenticated
+    } else {
+      // User is not authenticated, redirect to login page
+      return res.redirect('/login');
+    }
+  }
+  
   
 
 // Forgot password endpoint
@@ -280,19 +308,18 @@ app.post('/reset-password', (req, res) => {
     });
 });
 
-
-// API endpoint to handle logout
-app.post('/logout', isAuthenticated, (req, res) => {
+app.get('/logout', (req, res) => {
     req.session.destroy(err => {
-      if (err) {
-        return res.status(500).json({ message: 'Logout failed' });
-      }
-      res.json({ message: 'Logged out successfully' });
+        if (err) {
+            return res.redirect('/staff_dashboard'); // Redirect back to dashboard if there's an error
+        }
+        res.clearCookie('connect.sid'); // Clear the cookie
+        res.redirect('/login'); // Redirect to login
     });
-  });
-  
+});
+
 // Server listening on port
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
