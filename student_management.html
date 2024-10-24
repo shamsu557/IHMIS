@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Management</title>
+  <title>Staff Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    /* Hide the student management section initially */
+    #student-management {
+      display: none;
+    }
+    .container {
+      max-width: 550px;
+    }
+    ul {
+    list-style-type: none; /* Removes bullet points */
+    padding: 0;           /* Optional: removes default padding */
+    margin: 0;            /* Optional: removes default margin */
+}
+.navbar-nav {
+      margin: auto;
+    }
+    .navbar-brand {
+    margin-left: 15px !important; /* Removes any left margin */
+    padding-left: 5px !important; /* Removes any left padding */
+    display: flex; /* Aligns image and text horizontally */
+    align-items: center; /* Vertically centers the content */
+}
+
+.navbar-brand img {
+    margin-right: 10px; /* Optional: adds space between the logo and text */
+}
+
+.navbar {
+    padding-left: 0; /* Ensures the navbar itself doesn't push content */
+}
+
+    .footer {
+  background: #f8f9fa;
+  color: #343a40;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  flex-direction: column;  /* Stack items vertically */
+}
+
+.footer .row {
+  width: 100%; /* Ensure row takes up the full width */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically if necessary */
+  margin: 0;
+}
+
+.footer .col {
+  padding: 0;
+  text-align: center; /* Ensure content in columns is centered */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer i {
+  font-size: 24px;
+}
+    #myBtn {
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  right: 30px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  background-color: rgb(210, 210, 233);
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+    
+  </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand ml-5 pl-5" href="#">
+            <img src="logo.jpg" alt="Logo" height="30" class="mr-2"> Staff Dashboard
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Student Management -->
+                <li  class="nav-item">
+                    <a class="nav-link ml-5" href="staff_dashboard.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ml-5" href="student_management.html">Students Management</a>
+                </li>
+                <!-- Result Management -->
+                <li class="nav-item">
+                    <a class="nav-link ml-5" href="#">Results Management</a>
+                </li>
+                
+                <!-- Download ID Card -->
+                <li class="nav-item">
+                  <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Download ID Card</a>
+              </li>
+                
+                <!-- Logout -->
+                <li class="nav-item">
+                    <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+      </nav>
+      
+      
+  <div class="container mt-5 mt-4 border p-4 shadow-sm rounded">
+    <h2 class="text-center ">Student Management</h2>
+    <form id="master-login-form" class="mt-4">
+      <div class="form-group">
+        <label for="masterIdOrEmail">Staff ID or Email</label>
+        <input type="text" class="form-control" id="masterIdOrEmail" placeholder="Enter Staff ID or Email" required>
+      </div>
+      <div class="form-group">
+        <label for="masterPassword">Password</label>
+        <input type="password" class="form-control" id="masterPassword" placeholder="Enter Password" required>
+      </div>
+      <button type="submit" class="btn btn-success btn-block">Login as Form Master or Senior Master</button>
+      <div id="error-message" class="text-danger mt-2" style="display: none;"></div>
+    </form>
+
+    <!-- Student Management Section (Initially Hidden) -->
+    <div id="student-management" class="mt-5 text-center">
+      <p>Welcome to the student management portal. Here you can:</p>
+      <ul>
+        <li>Add students</li>
+        <li>Edit student information</li>
+        <li>View existing students</li>
+      </ul>
+      <button class="btn btn-primary" onclick="window.location.href='add.html'">Add Student</button>
+      <button class="btn btn-warning">Edit Student</button>
+      <button class="btn btn-info">View Students</button>
+    </div>
+  </div>
+  <br><br>
+  <!-- Footer -->
+ <div class="footer bg-light mt-5">
+    <div class="row text-center py-3">
+      <div class="col-md-4">
+        <p><strong>Imam Hafsin Model International School</strong></p>
+        <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+        <p>Email: imamhafsin@gmail.com</p>
+        <p>Phone: 08030999939939399</p>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-instagram"></i> Instagram
+        </a>
+        <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+      <div class="col-md-4">
+        <p>&copy; IHMIS 2024</p>
+        <p>All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+  <!-- Back to top button -->
+  <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+  
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Handle login form submission
+    document.getElementById('master-login-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      // Get the entered credentials
+      const enteredStaffIdOrEmail = document.getElementById('masterIdOrEmail').value;
+      const enteredPassword = document.getElementById('masterPassword').value;
+
+      // Send login request to the server using AJAX (fetch)
+      fetch('/master-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          staffIdOrEmail: enteredStaffIdOrEmail,
+          password: enteredPassword
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Hide the login form and show the student management section
+          document.getElementById('master-login-form').style.display = 'none';
+          document.getElementById('error-message').style.display = 'none';
+          document.getElementById('student-management').style.display = 'block';
+        } else {
+          // Show error message
+          document.getElementById('error-message').textContent = data.message;
+          document.getElementById('error-message').style.display = 'block';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('error-message').textContent = 'Something went wrong. Please try again.';
+        document.getElementById('error-message').style.display = 'block';
+      });
+    });
+    function logout() {
+  window.location.href = '/logout'; // Redirect to admin logout route
+}
+
+
+    // Back to top button functionality
+    window.onscroll = function() { scrollFunction() };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("myBtn").style.display = "block";
+        } else {
+            document.getElementById("myBtn").style.display = "none";
+        }
+    }
+
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+ 
+  </script>
+</body>
+</html>

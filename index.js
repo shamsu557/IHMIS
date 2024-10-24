@@ -318,6 +318,109 @@ app.get('/logout', (req, res) => {
     });
 });
 
+// POST route to handle Form Master/Senior Master login
+app.post('/master-login', (req, res) => {
+    const { staffIdOrEmail, password } = req.body;
+  
+    // Query to find the teacher by staff ID or email
+    const sql = `SELECT * FROM teachers WHERE staff_id = ? OR email = ?`;
+    
+    db.query(sql, [staffIdOrEmail, staffIdOrEmail], (err, result) => {
+      if (err) throw err;
+  
+      if (result.length > 0) {
+        const teacher = result[0];
+  
+        // Check the role: Only form master or senior master can proceed
+        if (teacher.role === 'Form Master' || teacher.role === 'Senior Master') {
+          // Compare passwords
+          bcrypt.compare(password, teacher.password, (err, isMatch) => {
+            if (err) throw err;
+  
+            if (isMatch) {
+              // Password matched, send success response
+              res.json({ success: true });
+            } else {
+              // Incorrect password
+              res.status(401).json({ success: false, message: 'Incorrect password' });
+            }
+          });
+        } else {
+          // User is not a form master or senior master
+          res.status(403).json({ success: false, message: 'Access denied. You are not a Form Master or Senior Master.' });
+        }
+      } else {
+        // Staff ID or email not found
+        res.status(404).json({ success: false, message: 'Staff ID or email not found' });
+      }
+    });
+  });
+
+  
+   // Endpoint to add student
+app.post('/add-student', upload.single('studentPicture'), (req, res) => {
+    const studentID = req.body.studentID;
+    const firstname = req.body.firstname;
+    const surname = req.body.surname;
+    const othername = req.body.othername;
+    const studentClass = req.body.class;
+    const guardianPhone = req.body.guardianPhone;
+    const studentPicture = req.file.filename; // File name stored in the server
+
+    // Check for duplicate student
+    const checkDuplicateQuery = 'SELECT * FROM students WHERE firstname = ? AND class = ? AND guardianPhone = ?';
+    const checkValues = [firstname, studentClass, guardianPhone];
+
+    db.query(checkDuplicateQuery, checkValues, (err, results) => {
+        if (err) {
+            console.error('Error checking for duplicate student:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+
+        // If a student already exists with the same firstname, class, and guardianPhone
+        if (results.length > 0) {
+            return res.status(409).json({ success: false, message: 'Student already exists' });
+        }
+
+        // Insert student data into students table
+        const insertStudentQuery = 'INSERT INTO students (studentID, firstname, surname, othername, class, guardianPhone, studentPicture) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const studentValues = [studentID, firstname, surname, othername, studentClass, guardianPhone, studentPicture];
+
+        db.query(insertStudentQuery, studentValues, (err, result) => {
+            if (err) {
+                console.error('Error inserting student:', err);
+                return res.status(500).json({ success: false, message: 'Database error' });
+            }
+
+            // Now handle subjects
+            const subjects = JSON.parse(req.body.subjects);
+            const subjectInsertQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
+
+            const subjectPromises = subjects.map(subjectName => {
+                return new Promise((resolve, reject) => {
+                    db.query(subjectInsertQuery, [studentID, subjectName], (err, result) => {
+                        if (err) {
+                            console.error('Error inserting subject:', err);
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+            });
+
+            // Wait for all subject insertions to complete
+            Promise.all(subjectPromises)
+                .then(() => {
+                    res.json({ success: true, message: 'Student added successfully' });
+                })
+                .catch(err => {
+                    res.status(500).json({ success: false, message: 'Error inserting subjects' });
+                });
+        });
+    });
+});
+
 // Server listening on port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

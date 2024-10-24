@@ -7,9 +7,25 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <style>
-        .navbar-nav {
+       .navbar-nav {
       margin: auto;
     }
+    .navbar-brand {
+    margin-left: 15px !important; /* Removes any left margin */
+    padding-left: 5px !important; /* Removes any left padding */
+    display: flex; /* Aligns image and text horizontally */
+    align-items: center; /* Vertically centers the content */
+}
+
+
+.navbar-brand img {
+    margin-right: 10px; /* Optional: adds space between the logo and text */
+}
+
+.navbar {
+    padding-left: 0; /* Ensures the navbar itself doesn't push content */
+}
+
 
     .modal-header-content {
       text-align: center;
@@ -168,8 +184,11 @@
   <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
           <!-- Student Management -->
+          <li  class="nav-item">
+            <a class="nav-link ml-5" href="staff_dashboard.html">Home</a>
+        </li>
           <li class="nav-item">
-              <a class="nav-link ml-5" href="#">Students Management</a>
+              <a class="nav-link ml-5" href="student_management.html">Students Management</a>
           </li>
           
           <!-- Result Management -->
