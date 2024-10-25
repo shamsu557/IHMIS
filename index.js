@@ -308,6 +308,7 @@ app.post('/reset-password', (req, res) => {
     });
 });
 
+
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
@@ -421,7 +422,92 @@ app.post('/add-student', upload.single('studentPicture'), (req, res) => {
     });
 });
 
-// Server listening on port
+
+// Endpoint to get classes
+app.get('/api/getClasses', (req, res) => {
+    const query = 'SELECT DISTINCT class FROM students'; // Replace with your actual table name
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching classes:', err);
+            return res.status(500).send('Server Error');
+        }
+        const classes = results.map(row => row.class);
+        res.json(classes);
+    });
+});
+
+// Endpoint to get students by class
+app.post('/api/getStudents', (req, res) => {
+    const { class: className } = req.body;
+    const query = 'SELECT * FROM students WHERE class = ?'; // Replace with your actual table name
+    db.query(query, [className], (err, results) => {
+        if (err) {
+            console.error('Error fetching students:', err);
+            return res.status(500).send('Server Error');
+        }
+        res.json(results);
+    });
+});
+
+// DELETE student endpoint
+app.delete('/api/deleteStudent/:studentID', (req, res) => {
+    const studentID = req.params.studentID;
+    const { staffEmailOrID, password } = req.body;
+
+    const checkStaffQuery = `
+        SELECT * FROM teachers
+        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
+    `;
+
+    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
+        if (err) {
+            console.error('Error verifying staff:', err);
+            return res.status(500).json({ message: 'Error verifying staff credentials' });
+        }
+
+        if (staffResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        }
+
+        const staff = staffResults[0];
+
+        // Ensure staff password exists and appears hashed
+        if (!staff.password || !staff.password.startsWith('$2')) {
+            return res.status(500).json({ message: 'Error: Invalid password format in the database' });
+        }
+
+        bcrypt.compare(password, staff.password, (err, isMatch) => {
+            if (err) {
+                console.error('Error comparing passwords:', err);
+                return res.status(500).json({ message: 'Error verifying password' });
+            }
+
+            // If passwords do not match, return a 403 status with a message
+            if (!isMatch) {
+                return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
+            }
+
+            // Proceed to delete the student
+            db.query('DELETE FROM students WHERE studentID = ?', [studentID], (err, result) => {
+                if (err) {
+                    console.error('Error deleting student:', err);
+                    return res.status(500).json({ message: 'Error deleting student' });
+                }
+
+                // If no rows were affected, the student was not found
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ message: 'Student not found' });
+                }
+
+                res.json({ message: 'Student deleted successfully' });
+            });
+        });
+    });
+});
+
+
+
+//server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

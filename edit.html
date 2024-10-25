@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Class and Students</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .center-container {
+            max-width: 600px;
+            margin: auto; /* Centers the container */
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-container mt-5">
+        <h1 class="text-center">Select Class and View Students</h1>
+
+        <div class="form-group">
+            <label for="class-selection">Class:</label>
+            <select id="class-selection" name="class" class="form-control" required>
+                <option value="" selected disabled>Select Class</option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
+
+        <h2 class="mt-4">Students in Selected Class:</h2>
+        <ul id="student-list" class="list-unstyled">
+            <!-- List of students will be populated here -->
+        </ul>
+        
+        <!-- Back button -->
+        <button class="btn btn-primary btn-block" onclick="goBack()">Back</button>
+        
+        <!-- Modal for Staff ID/Email and Password Confirmation -->
+        <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" onclick="$('#confirmation-modal').hide();" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please enter your Staff ID or Email and Password:</p>
+                        <input type="text" id="staff-email-input" class="form-control" placeholder="Staff ID or Email">
+                        <input type="password" id="staff-password-input" class="form-control" placeholder="Password">
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirm-delete" type="button" class="btn btn-danger">Confirm</button>
+                        <button id="cancel-delete" type="button" class="btn btn-secondary" onclick="$('#confirmation-modal').hide();">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let studentToDelete = null; // Store the student to be deleted
+
+        // Function to load class options
+        function loadClassOptions() {
+            $.ajax({
+                url: '/api/getClasses',
+                method: 'GET',
+                success: function(classes) {
+                    const classSelection = $('#class-selection');
+                    classSelection.empty();
+                    classSelection.append('<option value="" selected disabled>Select Class</option>');
+                    classes.forEach(c => {
+                        classSelection.append(`<option value="${c}">${c}</option>`);
+                    });
+                },
+                error: function(err) {
+                    alert('Error loading classes. Please check the console for details.');
+                    console.error('Error loading classes:', err);
+                }
+            });
+        }
+
+        // Back button functionality
+        function goBack() {
+            window.history.back();
+        }
+
+        // Function to load students in the selected class
+        function loadStudents(className) {
+            $.ajax({
+                url: '/api/getStudents',
+                method: 'POST',
+                data: JSON.stringify({ class: className }),
+                contentType: 'application/json',
+                success: function(students) {
+                    const studentList = $('#student-list');
+                    studentList.empty();
+                    if (students.length > 0) {
+                        students.forEach(student => {
+                            studentList.append(`
+                            <li>
+                                ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
+                                <div class="action-buttons">
+                                    <button class="edit-btn" data-id="${student.studentID}">Edit</button>
+                                    <button class="delete-btn" data-id="${student.studentID}">Delete</button>
+                                </div>
+                            </li>
+                            `);
+                        });
+                    } else {
+                        studentList.append('<li>No students found in this class.</li>');
+                    }
+                },
+                error: function(err) {
+                    alert('Error loading students. Please check the console for details.');
+                    console.error('Error loading students:', err);
+                }
+            });
+        }
+
+        // Handle delete button click
+        $(document).on('click', '.delete-btn', function() {
+            const studentId = $(this).data('id');
+            studentToDelete = studentId; // Store the student ID to delete
+            $('#confirmation-modal').show(); // Show the modal
+        });
+
+        // Confirm delete
+        $('#confirm-delete').click(function() {
+            const confirmationInput = $('#staff-email-input').val();
+            const passwordInput = $('#staff-password-input').val(); // Ensure you have a password input field
+            if (confirmationInput && passwordInput) {
+                deleteStudent(studentToDelete, confirmationInput, passwordInput); // Pass password too
+            } else {
+                alert('Please enter your Staff ID/Email and Password.');
+            }
+        });
+
+        // Function to delete student
+        function deleteStudent(studentId, staffEmailOrID, password) {
+            $.ajax({
+                url: `/api/deleteStudent/${studentId}`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ staffEmailOrID, password }),
+                success: function(response) {
+                    alert(response.message);
+                    $('#confirmation-modal').hide();
+                    loadStudents($('#class-selection').val()); // Reload the students
+                },
+                error: function(error) {
+                    alert(error.responseJSON.message); // Show any error messages from the backend
+                }
+            });
+        }
+
+        // Document ready function
+        $(document).ready(function() {
+            loadClassOptions(); // Load class options on page load
+
+            $('#view-students').click(function() {
+                const selectedClass = $('#class-selection').val();
+                if (selectedClass) {
+                    loadStudents(selectedClass); // Load students
+                } else {
+                    alert('Please select a class first.');
+                }
+            });
+
+            // Cancel delete
+            $('#cancel-delete').click(function() {
+                $('#confirmation-modal').hide(); // Hide the modal
+                studentToDelete = null; // Reset the student to delete
+            });
+        });
+    </script>
+</body>
+</html>
