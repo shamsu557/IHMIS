@@ -25,20 +25,34 @@ db.connect((err) => {
 module.exports = db;
 
 
-// // -- Create students table 
+// -- Create students table 
 // CREATE TABLE students (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
-//     studentID VARCHAR(20) UNIQUE,  -- You can make it UNIQUE if you want
+//     studentID VARCHAR(20) UNIQUE,
 //     firstname VARCHAR(50),
 //     surname VARCHAR(50),
 //     othername VARCHAR(50),
 //     class VARCHAR(20),
 //     guardianPhone VARCHAR(15),
 //     studentPicture VARCHAR(255)
-//   );
-  
-//   -- Create subjects table
-//   CREATE TABLE subjects (
+// );
+
+// -- Create teachers table
+// CREATE TABLE teachers (
+//     id INT AUTO_INCREMENT PRIMARY KEY,
+//     staff_id VARCHAR(50),
+//     name VARCHAR(255) NOT NULL,
+//     email VARCHAR(255) NOT NULL UNIQUE,
+//     password VARCHAR(255) NOT NULL,
+//     role VARCHAR(100) NOT NULL,
+//     formClass VARCHAR(50),
+//     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
+//     profile_picture VARCHAR(50) NOT NULL,
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+// );
+
+// -- Create subjects table
+// CREATE TABLE subjects (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     studentID VARCHAR(20),
 //     subjectName VARCHAR(50),
@@ -46,21 +60,7 @@ module.exports = db;
 //     ca INT,
 //     exams INT,
 //     grade CHAR(2),
-//     FOREIGN KEY (studentID) REFERENCES students(studentID)
-//   );
-  
-// -- Create a table for teachers
-// CREATE TABLE teachers (
-//     id INT AUTO_INCREMENT PRIMARY KEY,
-//     staff_id varchar(50),
-//     name VARCHAR(255) NOT NULL,
-//     email VARCHAR(255) NOT NULL UNIQUE,
-//     password VARCHAR(255) NOT NULL,
-//     role VARCHAR(100) NOT NULL,
-//     formClass varchar(50) NOT NULL
-//     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
-//     profile_picture varchar(50) NOT NULL,
-//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+//     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
 
 // -- Create a table for teacher subjects
