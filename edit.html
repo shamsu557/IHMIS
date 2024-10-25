@@ -64,8 +64,73 @@
                 </div>
             </div>
         </div>
-
     </div>
+<!-- Modal for Editing Student Information -->
+<div id="edit-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Student</h5>
+                <button type="button" class="close" onclick="$('#edit-modal').hide();" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="edit-student-id" class="form-control mb-2" placeholder="Student ID" disabled>
+                <input type="text" id="edit-firstname" class="form-control mb-2" placeholder="First Name">
+                <input type="text" id="edit-othername" class="form-control mb-2" placeholder="Other Name">
+                <input type="text" id="edit-surname" class="form-control mb-2" placeholder="Surname">
+                <input type="text" id="edit-guardian-phone" class="form-control mb-2" placeholder="Guardian Phone">
+
+                <div class="form-group col-md-6">
+                    <label for="formClass">Class</label>
+                    <select class="form-control" id="formClass" required>
+                        <option value="" disabled selected>Select Class</option>
+                        <option value="Pre-Nursery">Pre-Nursery</option>
+                        <option value="Nursery One">Nursery 1</option>
+                        <option value="Nursery Two">Nursery 2</option>
+                        <option value="Primary One">Primary 1</option>
+                        <option value="Primary Two">Primary 2</option>
+                        <option value="Primary Three">Primary 3</option>
+                        <option value="Primary Four">Primary 4</option>
+                        <option value="Primary Five">Primary 5</option>
+                        <option value="Primary Six">Primary 6</option>
+                        <option value="JSS One">JSS 1</option>
+                        <option value="JSS Two">JSS 2</option>
+                        <option value="JSS Three">JSS 3</option>
+                        <option value="SSS One">SSS 1</option>
+                        <option value="SSS Two">SSS 2</option>
+                        <option value="SSS Three">SSS 3</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subjects</label><br>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
+                        <label class="form-check-label" for="math">Mathematics</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="English" id="english" name="subjects">
+                        <label class="form-check-label" for="english">English</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Science" id="science" name="subjects">
+                        <label class="form-check-label" for="science">Science</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
+                        <label class="form-check-label" for="socialStudies">Social Studies</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-edit" type="button" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="$('#edit-modal').hide();">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         let studentToDelete = null; // Store the student to be deleted
@@ -163,6 +228,75 @@
                 }
             });
         }
+// Edit student
+$(document).on('click', '.edit-btn', function() {
+    // Extract all necessary student data from the clicked button
+    const studentId = $(this).data('id');
+    const firstname = $(this).data('firstname');
+    const othername = $(this).data('othername');
+    const surname = $(this).data('surname');
+    const guardianPhone = $(this).data('guardianphone');
+    const email = $(this).data('email'); // Assuming you have an email field
+    const address = $(this).data('address'); // Assuming you have an address field
+    const className = $(this).data('class'); // Assuming you have a class field
+    const subjects = $(this).data('subjects'); // Assuming subjects is an array
+
+    studentToEdit = studentId; // Store the student ID to edit
+
+    // Populate the modal fields with the student's current data
+    $('#edit-student-id').val(studentId);
+    $('#edit-firstname').val(firstname);
+    $('#edit-othername').val(othername);
+    $('#edit-surname').val(surname);
+    $('#edit-guardian-phone').val(guardianPhone);
+    $('#edit-email').val(email); // Populate email field
+    $('#edit-address').val(address); // Populate address field
+
+    // Set the selected class
+    $('#formClass').val(className);
+
+    // Set the checked subjects
+    $('input[name="subjects"]').prop('checked', false); // Uncheck all checkboxes
+    if (Array.isArray(subjects)) {
+        subjects.forEach(subject => {
+            $(`input[name="subjects"][value="${subject}"]`).prop('checked', true); // Check the relevant checkboxes
+        });
+    }
+
+    $('#edit-modal').show(); // Show the edit modal
+});
+
+// Confirm edit button click handler
+$('#confirm-edit').click(function() {
+    const updatedData = {
+        studentID: studentToEdit,
+        firstname: $('#edit-firstname').val(),
+        othername: $('#edit-othername').val(),
+        surname: $('#edit-surname').val(),
+        guardianPhone: $('#edit-guardian-phone').val(),
+        email: $('#edit-email').val(), // Include email in the update
+        address: $('#edit-address').val(), // Include address in the update
+        className: $('#formClass').val(), // Include the selected class
+        subjects: $('input[name="subjects"]:checked').map(function() {
+            return this.value; // Get the checked subjects
+        }).get() // Convert jQuery object to array
+    };
+
+    $.ajax({
+        url: `/api/updateStudent/${studentToEdit}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(updatedData),
+        success: function(response) {
+            alert(response.message);
+            $('#edit-modal').hide(); // Hide the edit modal
+            loadStudents($('#class-selection').val()); // Reload the students list
+        },
+        error: function(err) {
+            alert('Error updating student.');
+        }
+    });
+});
 
         // Document ready function
         $(document).ready(function() {
