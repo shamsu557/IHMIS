@@ -12,7 +12,7 @@
         }
         .center-container {
             max-width: 600px;
-            margin: auto; /* Centers the container */
+            margin: auto;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border-radius: 10px;
@@ -28,7 +28,6 @@
             <label for="class-selection">Class:</label>
             <select id="class-selection" name="class" class="form-control" required>
                 <option value="" selected disabled>Select Class</option>
-                <!-- Options will be populated by JavaScript -->
             </select>
         </div>
 
@@ -36,13 +35,10 @@
 
         <h2 class="mt-4">Students in Selected Class:</h2>
         <ul id="student-list" class="list-unstyled">
-            <!-- List of students will be populated here -->
         </ul>
         
-        <!-- Back button -->
         <button class="btn btn-primary btn-block" onclick="goBack()">Back</button>
         
-        <!-- Modal for Staff ID/Email and Password Confirmation -->
         <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -64,8 +60,30 @@
                 </div>
             </div>
         </div>
+
+       <!-- Edit Confirmation Modal -->
+<div id="edit-confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Edit</h5>
+                <button type="button" class="close" onclick="$('#edit-confirmation-modal').hide();" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Please enter your Staff ID or Email and Password:</p>
+                <input type="text" id="staff-email-input-edit" class="form-control" placeholder="Staff ID or Email">
+                <input type="password" id="staff-password-input-edit" class="form-control" placeholder="Password">
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-edit-save" type="button" class="btn btn-primary">Confirm Edit</button>
+                <button id="cancel-edit" type="button" class="btn btn-secondary" onclick="$('#edit-confirmation-modal').hide();">Cancel</button>
+            </div>
+        </div>
     </div>
-<!-- Modal for Editing Student Information -->
+</div>
+
 <div id="edit-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -76,15 +94,15 @@
                 </button>
             </div>
             <div class="modal-body">
-                <input type="text" id="edit-student-id" class="form-control mb-2" placeholder="Student ID" disabled>
-                <input type="text" id="edit-firstname" class="form-control mb-2" placeholder="First Name">
-                <input type="text" id="edit-othername" class="form-control mb-2" placeholder="Other Name">
-                <input type="text" id="edit-surname" class="form-control mb-2" placeholder="Surname">
-                <input type="text" id="edit-guardian-phone" class="form-control mb-2" placeholder="Guardian Phone">
+                <form id="edit-student-form">
+                    <input type="text" id="edit-student-id" class="form-control mb-2" placeholder="Student ID" disabled>
+                    <input type="text" id="edit-firstname" class="form-control mb-2" placeholder="First Name" required>
+                    <input type="text" id="edit-othername" class="form-control mb-2" placeholder="Other Name">
+                    <input type="text" id="edit-surname" class="form-control mb-2" placeholder="Surname" required>
+                    <input type="text" id="edit-guardian-phone" class="form-control mb-2" placeholder="Guardian Phone" required>
 
-                <div class="form-group col-md-6">
                     <label for="formClass">Class</label>
-                    <select class="form-control" id="formClass" required>
+                    <select class="form-control mb-2" id="formClass" required>
                         <option value="" disabled selected>Select Class</option>
                         <option value="Pre-Nursery">Pre-Nursery</option>
                         <option value="Nursery One">Nursery 1</option>
@@ -102,10 +120,8 @@
                         <option value="SSS Two">SSS 2</option>
                         <option value="SSS Three">SSS 3</option>
                     </select>
-                </div>
 
-                <div class="form-group">
-                    <label>Subjects</label><br>
+                    <label>Subjects</label>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
                         <label class="form-check-label" for="math">Mathematics</label>
@@ -122,7 +138,10 @@
                         <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
                         <label class="form-check-label" for="socialStudies">Social Studies</label>
                     </div>
-                </div>
+
+                    <label for="studentPicture">Student Picture</label>
+                    <input type="file" class="form-control-file" id="studentPicture" accept="image/*">
+                </form>
             </div>
             <div class="modal-footer">
                 <button id="confirm-edit" type="button" class="btn btn-primary">Save Changes</button>
@@ -133,190 +152,196 @@
 </div>
 
     <script>
-        let studentToDelete = null; // Store the student to be deleted
+       let studentToDelete = null;
 
-        // Function to load class options
-        function loadClassOptions() {
-            $.ajax({
-                url: '/api/getClasses',
-                method: 'GET',
-                success: function(classes) {
-                    const classSelection = $('#class-selection');
-                    classSelection.empty();
-                    classSelection.append('<option value="" selected disabled>Select Class</option>');
-                    classes.forEach(c => {
-                        classSelection.append(`<option value="${c}">${c}</option>`);
-                    });
-                },
-                error: function(err) {
-                    alert('Error loading classes. Please check the console for details.');
-                    console.error('Error loading classes:', err);
-                }
+function loadClassOptions() {
+    $.ajax({
+        url: '/api/getClasses',
+        method: 'GET',
+        success: function(classes) {
+            const classSelection = $('#class-selection');
+            classSelection.empty();
+            classSelection.append('<option value="" selected disabled>Select Class</option>');
+            classes.forEach(c => {
+                classSelection.append(`<option value="${c}">${c}</option>`);
             });
+        },
+        error: function(err) {
+            alert('Error loading classes.');
         }
+    });
+}
 
-        // Back button functionality
-        function goBack() {
-            window.history.back();
-        }
+function goBack() {
+    window.history.back();
+}
 
-        // Function to load students in the selected class
-        function loadStudents(className) {
-            $.ajax({
-                url: '/api/getStudents',
-                method: 'POST',
-                data: JSON.stringify({ class: className }),
-                contentType: 'application/json',
-                success: function(students) {
-                    const studentList = $('#student-list');
-                    studentList.empty();
-                    if (students.length > 0) {
-                        students.forEach(student => {
-                            studentList.append(`
-                            <li>
-                                ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
-                                <div class="action-buttons">
-                                    <button class="edit-btn" data-id="${student.studentID}">Edit</button>
-                                    <button class="delete-btn" data-id="${student.studentID}">Delete</button>
-                                </div>
-                            </li>
-                            `);
-                        });
-                    } else {
-                        studentList.append('<li>No students found in this class.</li>');
-                    }
-                },
-                error: function(err) {
-                    alert('Error loading students. Please check the console for details.');
-                    console.error('Error loading students:', err);
-                }
-            });
-        }
-
-        // Handle delete button click
-        $(document).on('click', '.delete-btn', function() {
-            const studentId = $(this).data('id');
-            studentToDelete = studentId; // Store the student ID to delete
-            $('#confirmation-modal').show(); // Show the modal
-        });
-
-        // Confirm delete
-        $('#confirm-delete').click(function() {
-            const confirmationInput = $('#staff-email-input').val();
-            const passwordInput = $('#staff-password-input').val(); // Ensure you have a password input field
-            if (confirmationInput && passwordInput) {
-                deleteStudent(studentToDelete, confirmationInput, passwordInput); // Pass password too
+function loadStudents(className) {
+    $.ajax({
+        url: '/api/getStudents',
+        method: 'POST',
+        data: JSON.stringify({ class: className }),
+        contentType: 'application/json',
+        success: function(students) {
+            const studentList = $('#student-list');
+            studentList.empty();
+            if (students.length > 0) {
+                students.forEach(student => {
+                    studentList.append(`
+                        <li>
+                            ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
+                            <div class="action-buttons">
+                                <button class="edit-btn" data-id="${student.studentID}" data-firstname="${student.firstname}" data-othername="${student.othername}" data-surname="${student.surname}" data-guardianphone="${student.guardianPhone}" data-class="${student.class}" data-subjects="${student.subjects}" data-studentPicture="${student.picture}">Edit</button>
+                                <button class="delete-btn" data-id="${student.studentID}">Delete</button>
+                            </div>
+                        </li>
+                    `);
+                });
             } else {
-                alert('Please enter your Staff ID/Email and Password.');
+                studentList.append('<li>No students found in this class.</li>');
             }
-        });
-
-        // Function to delete student
-        function deleteStudent(studentId, staffEmailOrID, password) {
-            $.ajax({
-                url: `/api/deleteStudent/${studentId}`,
-                method: 'DELETE',
-                contentType: 'application/json',
-                data: JSON.stringify({ staffEmailOrID, password }),
-                success: function(response) {
-                    alert(response.message);
-                    $('#confirmation-modal').hide();
-                    loadStudents($('#class-selection').val()); // Reload the students
-                },
-                error: function(error) {
-                    alert(error.responseJSON.message); // Show any error messages from the backend
-                }
-            });
+        },
+        error: function(err) {
+            alert('Error loading students.');
         }
-// Edit student
-$(document).on('click', '.edit-btn', function() {
-    // Extract all necessary student data from the clicked button
+    });
+}
+
+// Handle delete button click
+$(document).on('click', '.delete-btn', function() {
     const studentId = $(this).data('id');
-    const firstname = $(this).data('firstname');
-    const othername = $(this).data('othername');
-    const surname = $(this).data('surname');
-    const guardianPhone = $(this).data('guardianphone');
-    const email = $(this).data('email'); // Assuming you have an email field
-    const address = $(this).data('address'); // Assuming you have an address field
-    const className = $(this).data('class'); // Assuming you have a class field
-    const subjects = $(this).data('subjects'); // Assuming subjects is an array
+    studentToDelete = studentId; // Store the student ID to delete
+    $('#confirmation-modal').show(); // Show the delete confirmation modal
+});
 
-    studentToEdit = studentId; // Store the student ID to edit
-
-    // Populate the modal fields with the student's current data
-    $('#edit-student-id').val(studentId);
-    $('#edit-firstname').val(firstname);
-    $('#edit-othername').val(othername);
-    $('#edit-surname').val(surname);
-    $('#edit-guardian-phone').val(guardianPhone);
-    $('#edit-email').val(email); // Populate email field
-    $('#edit-address').val(address); // Populate address field
-
-    // Set the selected class
-    $('#formClass').val(className);
-
-    // Set the checked subjects
-    $('input[name="subjects"]').prop('checked', false); // Uncheck all checkboxes
-    if (Array.isArray(subjects)) {
-        subjects.forEach(subject => {
-            $(`input[name="subjects"][value="${subject}"]`).prop('checked', true); // Check the relevant checkboxes
-        });
+// Confirm delete
+$('#confirm-delete').click(function() {
+    const confirmationInput = $('#staff-email-input').val();
+    const passwordInput = $('#staff-password-input').val();
+    if (confirmationInput && passwordInput) {
+        deleteStudent(studentToDelete, confirmationInput, passwordInput);
+    } else {
+        alert('Please enter your Staff ID/Email and Password.');
     }
+});
 
+// Function to delete student
+function deleteStudent(studentId, staffEmailOrID, password) {
+    $.ajax({
+        url: `/api/deleteStudent/${studentId}`,
+        method: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({ staffEmailOrID, password }),
+        success: function(response) {
+            alert(response.message);
+            $('#confirmation-modal').hide();
+            loadStudents($('#class-selection').val());
+        },
+        error: function(error) {
+            alert(error.responseJSON.message);
+        }
+    });
+}
+
+// Edit student button handler
+$(document).on('click', '.edit-btn', function() {
+    const studentData = $(this).data();
+    $('#edit-student-id').val(studentData.id);
+    $('#edit-firstname').val(studentData.firstname);
+    $('#edit-othername').val(studentData.othername || '');
+    $('#edit-surname').val(studentData.surname);
+    $('#edit-guardian-phone').val(studentData.guardianphone);
+    $('#formClass').val(studentData.class);
+    $('input[name="subjects"]').prop('checked', false);
+    const subjects = studentData.subjects ? studentData.subjects.split(',') : [];
+    subjects.forEach(subject => {
+        $(`input[name="subjects"][value="${subject.trim()}"]`).prop('checked', true);
+    });
     $('#edit-modal').show(); // Show the edit modal
 });
 
-// Confirm edit button click handler
+// Show edit confirmation modal when "Confirm Edit" is clicked
 $('#confirm-edit').click(function() {
-    const updatedData = {
-        studentID: studentToEdit,
-        firstname: $('#edit-firstname').val(),
-        othername: $('#edit-othername').val(),
-        surname: $('#edit-surname').val(),
-        guardianPhone: $('#edit-guardian-phone').val(),
-        email: $('#edit-email').val(), // Include email in the update
-        address: $('#edit-address').val(), // Include address in the update
-        className: $('#formClass').val(), // Include the selected class
-        subjects: $('input[name="subjects"]:checked').map(function() {
-            return this.value; // Get the checked subjects
-        }).get() // Convert jQuery object to array
-    };
+    $('#edit-modal').hide(); // Hide the main edit modal
+    $('#edit-confirmation-modal').show(); // Show the edit confirmation modal
+});
 
+// Confirm edit in the edit confirmation modal
+$('#confirm-edit-save').click(function() {
+    const confirmationInput = $('#staff-email-input-edit').val();
+    const passwordInput = $('#staff-password-input-edit').val();
+
+    if (confirmationInput && passwordInput) {
+        const updatedStudent = {
+            id: $('#edit-student-id').val(),
+            firstname: $('#edit-firstname').val(),
+            othername: $('#edit-othername').val(),
+            surname: $('#edit-surname').val(),
+            guardianPhone: $('#edit-guardian-phone').val(),
+            class: $('#formClass').val(),
+            subjects: $('input[name="subjects"]:checked').map(function() { return this.value; }).get(),
+            picture: $('#studentPicture').prop('files')[0]
+        };
+
+        // Call the editStudent function with confirmation and password
+        editStudent(updatedStudent, confirmationInput, passwordInput)
+            .then(response => {
+                if (response.status === 200) {
+                    alert('Student updated successfully.');
+                    // Additional actions on success (e.g., close modal, refresh data)
+                } else if (response.status === 401) {
+                    alert('Invalid staff credentials. Please check your ID/Email and Password.');
+                } else {
+                    alert('Error updating student: ' + response.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error during student edit:', error);
+                alert('An unexpected error occurred. Please try again later.');
+            });
+    } else {
+        alert('Please enter your Staff ID/Email and Password.');
+    }
+});
+
+// Function to edit student
+function editStudent(student, staffEmailOrID, password) {
+    const formData = new FormData();
+    formData.append('staffEmailOrID', staffEmailOrID);
+    formData.append('password', password);
+    Object.keys(student).forEach(key => {
+        formData.append(key, student[key]);
+    });
     $.ajax({
-        url: `/api/updateStudent/${studentToEdit}`,
-        method: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify(updatedData),
-        success: function(response) {
-            alert(response.message);
-            $('#edit-modal').hide(); // Hide the edit modal
-            loadStudents($('#class-selection').val()); // Reload the students list
+        url: '/api/editStudent',
+        method: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function() {
+            $('#edit-confirmation-modal').hide(); // Hide confirmation modal after edit
+            loadStudents($('#class-selection').val());
         },
         error: function(err) {
             alert('Error updating student.');
         }
     });
+}
+
+$(document).ready(function() {
+    loadClassOptions();
+
+    $('#view-students').click(function() {
+        const classSelection = $('#class-selection').val();
+        if (classSelection) {
+            loadStudents(classSelection);
+        } else {
+            alert('Please select a class.');
+        }
+    });
 });
 
-        // Document ready function
-        $(document).ready(function() {
-            loadClassOptions(); // Load class options on page load
 
-            $('#view-students').click(function() {
-                const selectedClass = $('#class-selection').val();
-                if (selectedClass) {
-                    loadStudents(selectedClass); // Load students
-                } else {
-                    alert('Please select a class first.');
-                }
-            });
-
-            // Cancel delete
-            $('#cancel-delete').click(function() {
-                $('#confirmation-modal').hide(); // Hide the modal
-                studentToDelete = null; // Reset the student to delete
-            });
-        });
     </script>
 </body>
 </html>

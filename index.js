@@ -504,10 +504,84 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
+//endpoint for edit student
+
+app.post('/api/editStudent', upload.single('picture'), (req, res) => {
+
+    const {
+        id, firstname, othername, surname, guardianPhone, class: studentClass,
+        subjects
+    } = req.body;
+
+    // Set the student picture from the uploaded file if available
+    const studentPicture = req.file ? req.file.filename : null;
+
+    // Update the student in the students table
+    const updateStudentQuery = `
+        UPDATE students SET 
+            firstname = ?, 
+            othername = ?, 
+            surname = ?, 
+            guardianPhone = ?, 
+            class = ?, 
+            studentPicture = COALESCE(?, studentPicture)
+        WHERE studentID = ?
+    `;
+
+    db.query(updateStudentQuery, [
+        firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
+    ], (err) => {
+        if (err) {
+            console.error('Error updating student in database:', err);
+            return res.status(500).json({ message: 'Error updating student.' });
+        }
+
+        // Check if subjects were provided
+        if (subjects) {
+            const subjectsArray = subjects.split(',').map(subj => subj.trim());
+            console.log('Subjects array:', subjectsArray);
+
+            // Clear existing subjects for this studentID
+            db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
+                if (err) {
+                    console.error('Error clearing subjects from database:', err);
+                    return res.status(500).json({ message: 'Error updating subjects.' });
+                }
+
+                // Insert updated subjects for this student
+                const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
+                const insertPromises = subjectsArray.map(subject => {
+                    return new Promise((resolve, reject) => {
+                        db.query(insertSubjectQuery, [id, subject], (err) => {
+                            if (err) {
+                                console.error(`Error inserting subject "${subject}" for studentID ${id}:`, err);
+                                reject(err);
+                            } else {
+                                console.log(`Subject "${subject}" successfully inserted for studentID ${id}`);
+                                resolve();
+                            }
+                        });
+                    });
+                });
+
+                // Wait for all subjects to be inserted
+                Promise.all(insertPromises)
+                    .then(() => {
+                        res.status(200).json({ message: 'Student updated successfully.' });
+                    })
+                    .catch(err => {
+                        console.error('Error updating subjects:', err);
+                        res.status(500).json({ message: 'Error updating subjects.' });
+                    });
+            });
+        } else {
+            // If no subjects were provided, just send the success response
+            res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
+        }
+    });
+});
 
 
-
-//server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
