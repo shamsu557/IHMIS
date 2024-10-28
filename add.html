@@ -163,7 +163,7 @@ button {
         </div>
         <div class="form-group col-md-6">
           <label for="formClass">Class</label>
-          <select class="form-control" id="formClass" required>
+          <select class="form-control" id="class" required>
             <option value="" disabled selected>Select Class</option>
             <option value="Pre-Nursery">Pre-Nursery</option>
             <option value="Nursery One">Nursery 1</option>
@@ -219,10 +219,6 @@ button {
        <button class="btn btn-primary btn-block" onclick="goBack()">back</button>
 
     </form>
-
-    <!-- Success/Failure Message -->
-    <div id="message" class="mt-3"></div>
-  </div>
   <br><br>
  <!-- Footer -->
  <div class="footer bg-light mt-5">
@@ -262,82 +258,82 @@ button {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
     // Function to generate the Student ID
-    function generateStudentID() {
-      const year = new Date().getFullYear().toString().slice(-2); // last 2 digits of the year
-      const randomNum = Math.floor(Math.random() * 1000) + 1; // number between 1 and 1000
-      return `IHS${year}${randomNum}`;
-    }
-
-    // Handle form submission
-    document.getElementById('add-student-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const studentID = generateStudentID(); // Generate unique student ID
-
-      // Get form data
-      const firstname = document.getElementById('firstname').value.trim().toUpperCase(); // Trim and convert to uppercase
-      const surname = document.getElementById('surname').value.trim().toUpperCase(); // Trim and convert to uppercase
-      const othername = (document.getElementById('othername').value.trim() || '').toUpperCase(); // Trim and convert to uppercase if available
-      const studentClass = document.getElementById('formClass').value;
-      const subjects = Array.from(document.querySelectorAll('input[name="subjects"]:checked')).map(input => input.value);
-      const guardianPhone = document.getElementById('guardianPhone').value;
-      const studentPicture = document.getElementById('studentPicture').files[0];
-
-      // Create FormData object to handle file upload
-      const formData = new FormData();
-      formData.append('studentID', studentID);
-      formData.append('firstname', firstname);
-      formData.append('surname', surname);
-      formData.append('othername', othername); // Even if it's optional, it will be sent as empty string if not filled
-      formData.append('class', studentClass);
-      formData.append('subjects', JSON.stringify(subjects)); // Send subjects as JSON string
-      formData.append('guardianPhone', guardianPhone);
-      formData.append('studentPicture', studentPicture);
-
-      // Send form data to server using Fetch API
-      fetch('/add-student', {
-        method: 'POST',
-        body: formData,
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById('message').innerHTML = `<div class="alert alert-success">Student added successfully with ID: ${studentID}</div>`;
-        } else {
-          document.getElementById('message').innerHTML = `<div class="alert alert-danger">Error: ${data.message}</div>`;
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('message').innerHTML = `<div class="alert alert-danger">Something went wrong. Please try again.</div>`;
-      });
-    });
-
-    function logout() {
-  window.location.href = '/logout'; // Redirect to admin logout route
+function generateStudentID() {
+    const year = new Date().getFullYear().toString().slice(-2); // last 2 digits of the year
+    const randomNum = Math.floor(Math.random() * 1000) + 1; // number between 1 and 1000
+    return `IHS${year}${randomNum}`;
 }
 
-            // back button functionality
-          function goBack() {
-                          window.history.back();
-                          }
+// Handle form submission
+document.getElementById('add-student-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-    // Back to top button functionality
-    window.onscroll = function() { scrollFunction() };
+    const studentID = generateStudentID(); // Generate unique student ID
 
-    function scrollFunction() {
-        if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-            document.getElementById("myBtn").style.display = "block";
+    // Get form data
+    const firstname = document.getElementById('firstname').value.trim().toUpperCase(); // Trim and convert to uppercase
+    const surname = document.getElementById('surname').value.trim().toUpperCase(); // Trim and convert to uppercase
+    const othername = (document.getElementById('othername').value.trim() || '').toUpperCase(); // Trim and convert to uppercase if available
+    const studentClass = document.getElementById('class').value;
+    const subjects = Array.from(document.querySelectorAll('input[name="subjects"]:checked')).map(input => input.value);
+    const guardianPhone = document.getElementById('guardianPhone').value;
+    const studentPicture = document.getElementById('studentPicture').files[0];
+
+    // Create FormData object to handle file upload
+    const formData = new FormData();
+    formData.append('studentID', studentID);
+    formData.append('firstname', firstname);
+    formData.append('surname', surname);
+    formData.append('othername', othername); // Even if it's optional, it will be sent as empty string if not filled
+    formData.append('class', studentClass);
+    formData.append('subjects', JSON.stringify(subjects)); // Send subjects as JSON string
+    formData.append('guardianPhone', guardianPhone);
+    formData.append('studentPicture', studentPicture);
+
+    // Send form data to server using Fetch API
+    fetch('/add-student', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Student added successfully with ID: ${studentID}`);
         } else {
-            document.getElementById("myBtn").style.display = "none";
+            alert(`Error: ${data.message}`);
         }
-    }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+    });
+});
 
-    function topFunction() {
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
+function logout() {
+    window.location.href = '/logout'; // Redirect to admin logout route
+}
+
+// Back button functionality
+function goBack() {
+    window.history.back();
+}
+
+// Back to top button functionality
+window.onscroll = function() { scrollFunction() };
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
     }
- 
+}
+
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+
   </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
