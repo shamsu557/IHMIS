@@ -511,10 +511,8 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         subjects, staffEmailOrID, password
     } = req.body;
 
-    // Get student picture from the uploaded file if available
     const studentPicture = req.file ? req.file.filename : null;
 
-    // SQL query to update the student information
     const updateStudentQuery = `
         UPDATE students SET 
             firstname = ?, 
@@ -526,13 +524,11 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         WHERE studentID = ?
     `;
 
-    // SQL query to verify the staff role and credentials
     const checkStaffQuery = `
         SELECT * FROM teachers
         WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
     `;
 
-    // Verify staff credentials and permissions
     db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
         if (err) {
             console.error('Error verifying staff:', err);
@@ -545,7 +541,6 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
 
         const staff = staffResults[0];
 
-        // Check if the password is hashed and compare it
         if (!staff.password || !staff.password.startsWith('$2')) {
             return res.status(500).json({ message: 'Error: Invalid password format in the database' });
         }
@@ -560,7 +555,6 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                 return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
             }
 
-            // Proceed with updating student information
             db.query(updateStudentQuery, [
                 firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
             ], (err) => {
@@ -569,18 +563,15 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                     return res.status(500).json({ message: 'Error updating student.' });
                 }
 
-                // Update student subjects if provided
                 if (subjects) {
                     const subjectsArray = subjects.split(',').map(subj => subj.trim());
 
-                    // Clear existing subjects and add the updated ones
                     db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
                         if (err) {
                             console.error('Error clearing subjects from database:', err);
                             return res.status(500).json({ message: 'Error updating subjects.' });
                         }
 
-                        // Insert updated subjects
                         const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
                         const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
                             db.query(insertSubjectQuery, [id, subject], (err) => {
@@ -593,7 +584,6 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                         }));
 
-                        // Resolve all subject insertions
                         Promise.all(insertPromises)
                             .then(() => {
                                 res.status(200).json({ message: 'Student updated successfully.' });
@@ -604,7 +594,6 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                     });
                 } else {
-                    // No subjects provided; respond with success
                     res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
                 }
             });
