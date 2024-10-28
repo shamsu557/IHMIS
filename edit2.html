@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Class and Students</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .center-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            background: white;
+        }
+
+/* Fixed Circular Images */
+.fixed-image, .circular-img {
+    width: 55px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* First Navbar - Contains images and text */
+.first-navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030; /* Ensures it stays above other content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Second Navbar - Contains menu items */
+.second-navbar {
+    position: fixed;
+    top: 60px; /* Positioned right below the first navbar */
+    width: 100%;
+    z-index: 1029; /* Slightly lower than the first navbar */
+    display: flex;
+    padding: 24px 14px;
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Center align menu toggler on mobile */
+.navbar-toggler {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Menu link styles */
+.navbar-nav .nav-item .nav-link {
+    color: #343a40 !important; /* Dark text color */
+    line-height: 1.8;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect for link */
+.navbar-nav .nav-item .nav-link:hover {
+    color: #495057 !important; /* Slightly darker on hover */
+    background-color: rgba(220, 220, 220, 0.5) !important;
+}
+
+/* Mobile view - Keep background light */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #f8f9fa; /* Light background for mobile menu */
+    }
+
+    .navbar-nav .nav-item .nav-link {
+        color: #343a40 !important; /* Dark text color */
+    }
+
+    .navbar-toggler-icon {
+        filter: invert(1); /* Dark toggler icon for light background */
+    }
+}
+
+/* Large screen styles */
+@media (min-width: 992px) {
+    .navbar-collapse {
+        justify-content: center;
+    }
+
+    /* Hide the toggler on large screens */
+    .navbar-toggler {
+        display: none;
+    }
+}
+/* Cancel button styles */
+.cancel-btn {
+    display: none; /* Hidden by default */
+    background: transparent;
+    border: none;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #343a40; /* Color of the icon */
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    right: 10px; /* Adjust right position */
+    cursor: pointer;
+}
+
+/* Show the cancel button in mobile view */
+@media (max-width: 992px) {
+    .cancel-btn {
+        display: block; /* Show when navbar is toggled */
+    }
+}
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+    display: none;
+}
+.hidden {
+    display: none !important; /* Forcefully hide the element */
+}
+
+/* Additional spacing for page content */
+body {
+    padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
+}
+
+
+button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    .footer {
+  background: #f8f9fa;
+  color: #343a40;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  flex-direction: column;  /* Stack items vertically */
+}
+
+.footer .row {
+  width: 100%; /* Ensure row takes up the full width */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically if necessary */
+  margin: 0;
+}
+
+.footer .col {
+  padding: 0;
+  text-align: center; /* Ensure content in columns is centered */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer i {
+  font-size: 24px;
+}
+    #myBtn {
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  right: 30px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  background-color: rgb(210, 210, 233);
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+    </style>
+</head>
+<body>
+   <!-- First Navbar (Images and Admin Dashboard Text) -->
+<nav class="navbar navbar-light bg-light text-dark fixed-top first-navbar">
+    <!-- Left image (Education Cap) -->
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    
+    <!-- Navbar brand (Admin Dashboard text) centered -->
+    <span class="navbar-brand mx-auto text-dark">Admin&nbsp;&nbsp;Dashboard</span>
+    
+    <!-- Right image logo -->
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+<!-- Second Navbar (Navbar Items) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-white text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    
+
+    <!-- Collapsible navbar items -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="add.html">Add Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="edit.html">Edit Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="view.html">View Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="#" onclick="logout()">Logout</a>
+            </li>
+        </ul>
+        <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
+    </div>
+</nav>
+
+  <br><br>
+    <div class="center-container mt-5">
+        <h1 class="text-center">Select Class and View Students</h1>
+
+        <div class="form-group">
+            <label for="class-selection">Class:</label>
+            <select id="class-selection" name="class" class="form-control" required>
+                <option value="" selected disabled>Select Class</option>
+            </select>
+        </div>
+
+        <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
+
+        <h2 class="mt-4">Students in Selected Class:</h2>
+        <ul id="student-list" class="list-unstyled">
+        </ul>        
+        <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Deletion</h5>
+                        <button type="button" class="close" onclick="$('#confirmation-modal').hide();" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please enter your Staff ID or Email and Password:</p>
+                        <input type="text" id="staff-email-input" class="form-control" placeholder="Staff ID or Email">
+                        <input type="password" id="staff-password-input" class="form-control" placeholder="Password">
+                    </div>
+                    <div class="modal-footer">
+                        <button id="confirm-delete" type="button" class="btn btn-danger">Confirm</button>
+                        <button id="cancel-delete" type="button" class="btn btn-secondary" onclick="$('#confirmation-modal').hide();">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <!-- Edit Confirmation Modal -->
+<div id="edit-confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Edit</h5>
+                <button type="button" class="close" onclick="$('#edit-confirmation-modal').hide();" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Please enter your Staff ID or Email and Password:</p>
+                <input type="text" id="staff-email-input-edit" class="form-control" placeholder="Staff ID or Email">
+                <input type="password" id="staff-password-input-edit" class="form-control" placeholder="Password">
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-edit-save" type="button" class="btn btn-primary">Confirm Edit</button>
+                <button id="cancel-edit" type="button" class="btn btn-secondary" onclick="$('#edit-confirmation-modal').hide();">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edit-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Student</h5>
+                <button type="button" class="close" onclick="$('#edit-modal').hide();" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-student-form">
+                    <input type="text" id="edit-student-id" class="form-control mb-2" placeholder="Student ID" disabled>
+                    <input type="text" id="edit-firstname" class="form-control mb-2" placeholder="First Name" required>
+                    <input type="text" id="edit-othername" class="form-control mb-2" placeholder="Other Name">
+                    <input type="text" id="edit-surname" class="form-control mb-2" placeholder="Surname" required>
+                    <input type="text" id="edit-guardian-phone" class="form-control mb-2" placeholder="Guardian Phone" required>
+
+                    <label for="formClass">Class</label>
+                    <select class="form-control mb-2" id="formClass" required>
+                        <option value="" disabled selected>Select Class</option>
+                        <option value="Pre-Nursery">Pre-Nursery</option>
+                        <option value="Nursery One">Nursery 1</option>
+                        <option value="Nursery Two">Nursery 2</option>
+                        <option value="Primary One">Primary 1</option>
+                        <option value="Primary Two">Primary 2</option>
+                        <option value="Primary Three">Primary 3</option>
+                        <option value="Primary Four">Primary 4</option>
+                        <option value="Primary Five">Primary 5</option>
+                        <option value="Primary Six">Primary 6</option>
+                        <option value="JSS One">JSS 1</option>
+                        <option value="JSS Two">JSS 2</option>
+                        <option value="JSS Three">JSS 3</option>
+                        <option value="SSS One">SSS 1</option>
+                        <option value="SSS Two">SSS 2</option>
+                        <option value="SSS Three">SSS 3</option>
+                    </select>
+
+                    <label>Subjects</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
+                        <label class="form-check-label" for="math">Mathematics</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="English" id="english" name="subjects">
+                        <label class="form-check-label" for="english">English</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Science" id="science" name="subjects">
+                        <label class="form-check-label" for="science">Science</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
+                        <label class="form-check-label" for="socialStudies">Social Studies</label>
+                    </div>
+
+                    <label for="studentPicture">Student Picture</label>
+                    <input type="file" class="form-control-file" id="studentPicture" accept="image/*">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="confirm-edit" type="button" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="$('#edit-modal').hide();">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div></div><br>
+
+<br><br>
+<!-- Footer -->
+<div class="footer bg-light mt-5">
+   <div class="row text-center py-3">
+     <div class="col-md-4">
+       <p><strong>Imam Hafsin Model International School</strong></p>
+       <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+       <p>Email: imamhafsin@gmail.com</p>
+       <p>Phone: 08030999939939399</p>
+     </div>
+     <div class="col-md-4">
+       <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-facebook"></i> Facebook
+       </a>
+       <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-instagram"></i> Instagram
+       </a>
+       <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-twitter"></i> Twitter
+       </a>
+       <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+         <i class="fab fa-whatsapp"></i> WhatsApp
+       </a>
+     </div>
+     <div class="col-md-4">
+       <p>&copy; IHMIS 2024</p>
+       <p>All rights reserved.</p>
+     </div>
+   </div>
+ </div>
+ <!-- Back to top button -->
+ <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+ 
+   <!-- Bootstrap JS, Popper.js, and jQuery -->
+   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+function toggleNavbar() {
+    const navbarNav = document.getElementById("navbarNav");
+    const cancelButton = document.querySelector(".cancel-btn");
+    const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
+
+    if (navbarNav.classList.contains("show")) {
+        // If navbar is open, close it
+        navbarNav.classList.remove("show");
+        cancelButton.style.display = "none"; // Hide cancel button
+        menuIcon.classList.remove("hidden"); // Show menu icon
+    } else {
+        // If navbar is closed, open it
+        navbarNav.classList.add("show");
+        cancelButton.style.display = "block"; // Show cancel button
+        menuIcon.classList.add("hidden"); // Hide menu icon completely
+    }
+}
+
+
+
+       let studentToDelete = null;
+
+function loadClassOptions() {
+    $.ajax({
+        url: '/api/getClasses',
+        method: 'GET',
+        success: function(classes) {
+            const classSelection = $('#class-selection');
+            classSelection.empty();
+            classSelection.append('<option value="" selected disabled>Select Class</option>');
+            classes.forEach(c => {
+                classSelection.append(`<option value="${c}">${c}</option>`);
+            });
+        },
+        error: function(err) {
+            alert('Error loading classes.');
+        }
+    });
+}
+
+
+
+function loadStudents(className) {
+    $.ajax({
+        url: '/api/getStudents',
+        method: 'POST',
+        data: JSON.stringify({ class: className }),
+        contentType: 'application/json',
+        success: function(students) {
+            const studentList = $('#student-list');
+            studentList.empty();
+            if (students.length > 0) {
+                students.forEach(student => {
+                    studentList.append(`
+                        <li>
+                            ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
+                            <div class="action-buttons">
+                                <button class="edit-btn" data-id="${student.studentID}" data-firstname="${student.firstname}" data-othername="${student.othername}" data-surname="${student.surname}" data-guardianphone="${student.guardianPhone}" data-class="${student.class}" data-subjects="${student.subjects}" data-studentPicture="${student.picture}">Edit</button>
+                                <button class="delete-btn" data-id="${student.studentID}">Delete</button>
+                            </div>
+                        </li>
+                    `);
+                });
+            } else {
+                studentList.append('<li>No students found in this class.</li>');
+            }
+        },
+        error: function(err) {
+            alert('Error loading students.');
+        }
+    });
+}
+
+// Handle delete button click
+$(document).on('click', '.delete-btn', function() {
+    const studentId = $(this).data('id');
+    studentToDelete = studentId; // Store the student ID to delete
+    $('#confirmation-modal').show(); // Show the delete confirmation modal
+});
+
+// Confirm delete
+$('#confirm-delete').click(function() {
+    const confirmationInput = $('#staff-email-input').val();
+    const passwordInput = $('#staff-password-input').val();
+    if (confirmationInput && passwordInput) {
+        deleteStudent(studentToDelete, confirmationInput, passwordInput);
+    } else {
+        alert('Please enter your Staff ID/Email and Password.');
+    }
+});
+
+// Function to delete student
+function deleteStudent(studentId, staffEmailOrID, password) {
+    $.ajax({
+        url: `/api/deleteStudent/${studentId}`,
+        method: 'DELETE',
+        contentType: 'application/json',
+        data: JSON.stringify({ staffEmailOrID, password }),
+        success: function(response) {
+            alert(response.message);
+            $('#confirmation-modal').hide();
+            loadStudents($('#class-selection').val());
+        },
+        error: function(error) {
+            alert(error.responseJSON.message);
+        }
+    });
+}
+
+// Edit student button handler
+$(document).on('click', '.edit-btn', function() {
+    const studentData = $(this).data();
+    $('#edit-student-id').val(studentData.id);
+    $('#edit-firstname').val(studentData.firstname);
+    $('#edit-othername').val(studentData.othername || '');
+    $('#edit-surname').val(studentData.surname);
+    $('#edit-guardian-phone').val(studentData.guardianphone);
+    $('#formClass').val(studentData.class);
+    $('input[name="subjects"]').prop('checked', false);
+    const subjects = studentData.subjects ? studentData.subjects.split(',') : [];
+    subjects.forEach(subject => {
+        $(`input[name="subjects"][value="${subject.trim()}"]`).prop('checked', true);
+    });
+    $('#edit-modal').show(); // Show the edit modal
+});
+
+// Show edit confirmation modal when "Confirm Edit" is clicked
+$('#confirm-edit').click(function() {
+    $('#edit-modal').hide(); // Hide the main edit modal
+    $('#edit-confirmation-modal').show(); // Show the edit confirmation modal
+});
+
+// Confirm edit in the edit confirmation modal
+$('#confirm-edit-save').click(function() {
+    const confirmationInput = $('#staff-email-input-edit').val();
+    const passwordInput = $('#staff-password-input-edit').val();
+
+    if (confirmationInput && passwordInput) {
+        const updatedStudent = {
+            id: $('#edit-student-id').val(),
+            firstname: $('#edit-firstname').val(),
+            othername: $('#edit-othername').val(),
+            surname: $('#edit-surname').val(),
+            guardianPhone: $('#edit-guardian-phone').val(),
+            class: $('#formClass').val(),
+            subjects: $('input[name="subjects"]:checked').map(function() { return this.value; }).get(),
+            picture: $('#studentPicture').prop('files')[0]
+        };
+
+        // Call the editStudent function with confirmation and password
+        editStudent(updatedStudent, confirmationInput, passwordInput)
+            .then(response => {
+                if (response.status === 200) {
+                    alert('Student updated successfully.');
+                    // Additional actions on success (e.g., close modal, refresh data)
+                } else if (response.status === 401) {
+                    alert('Invalid staff credentials. Please check your ID/Email and Password.');
+                } else {
+                    alert('Error updating student: ' + response.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error during student edit:', error);
+                alert('An unexpected error occurred. Please try again later.');
+            });
+    } else {
+        alert('Please enter your Staff ID/Email and Password.');
+    }
+});
+
+// Function to edit student
+function editStudent(student, staffEmailOrID, password) {
+    const formData = new FormData();
+    formData.append('staffEmailOrID', staffEmailOrID);
+    formData.append('password', password);
+    Object.keys(student).forEach(key => {
+        formData.append(key, student[key]);
+    });
+    $.ajax({
+        url: '/api/editStudent',
+        method: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function() {
+            $('#edit-confirmation-modal').hide(); // Hide confirmation modal after edit
+            loadStudents($('#class-selection').val());
+        },
+        error: function(err) {
+            alert('Error updating student.');
+        }
+    });
+}
+
+$(document).ready(function() {
+    loadClassOptions();
+
+    $('#view-students').click(function() {
+        const classSelection = $('#class-selection').val();
+        if (classSelection) {
+            loadStudents(classSelection);
+        } else {
+            alert('Please select a class.');
+        }
+    });
+});
+
+function logout() {
+    window.location.href = '/logout'; // Redirect to admin logout route
+}
+
+// Back button functionality
+function goBack() {
+    window.history.back();
+}
+
+// Back to top button functionality
+window.onscroll = function() { scrollFunction() };
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
+    }
+}
+
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+</script>
+</body>
+</html>
