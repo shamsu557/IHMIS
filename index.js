@@ -504,19 +504,17 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
-//endpoint for edit student
-
+// Endpoint for editing a student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
-
     const {
         id, firstname, othername, surname, guardianPhone, class: studentClass,
-        subjects
+        subjects, staffEmailOrID, password
     } = req.body;
 
-    // Set the student picture from the uploaded file if available
+    // Get student picture from the uploaded file if available
     const studentPicture = req.file ? req.file.filename : null;
 
-    // Update the student in the students table
+    // SQL query to update the student information
     const updateStudentQuery = `
         UPDATE students SET 
             firstname = ?, 
@@ -528,56 +526,89 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         WHERE studentID = ?
     `;
 
-    db.query(updateStudentQuery, [
-        firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
-    ], (err) => {
+    // SQL query to verify the staff role and credentials
+    const checkStaffQuery = `
+        SELECT * FROM teachers
+        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
+    `;
+
+    // Verify staff credentials and permissions
+    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
         if (err) {
-            console.error('Error updating student in database:', err);
-            return res.status(500).json({ message: 'Error updating student.' });
+            console.error('Error verifying staff:', err);
+            return res.status(500).json({ message: 'Error verifying staff credentials' });
         }
 
-        // Check if subjects were provided
-        if (subjects) {
-            const subjectsArray = subjects.split(',').map(subj => subj.trim());
-            console.log('Subjects array:', subjectsArray);
+        if (staffResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        }
 
-            // Clear existing subjects for this studentID
-            db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
+        const staff = staffResults[0];
+
+        // Check if the password is hashed and compare it
+        if (!staff.password || !staff.password.startsWith('$2')) {
+            return res.status(500).json({ message: 'Error: Invalid password format in the database' });
+        }
+
+        bcrypt.compare(password, staff.password, (err, isMatch) => {
+            if (err) {
+                console.error('Error comparing passwords:', err);
+                return res.status(500).json({ message: 'Error verifying password' });
+            }
+
+            if (!isMatch) {
+                return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
+            }
+
+            // Proceed with updating student information
+            db.query(updateStudentQuery, [
+                firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
+            ], (err) => {
                 if (err) {
-                    console.error('Error clearing subjects from database:', err);
-                    return res.status(500).json({ message: 'Error updating subjects.' });
+                    console.error('Error updating student in database:', err);
+                    return res.status(500).json({ message: 'Error updating student.' });
                 }
 
-                // Insert updated subjects for this student
-                const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
-                const insertPromises = subjectsArray.map(subject => {
-                    return new Promise((resolve, reject) => {
-                        db.query(insertSubjectQuery, [id, subject], (err) => {
-                            if (err) {
-                                console.error(`Error inserting subject "${subject}" for studentID ${id}:`, err);
-                                reject(err);
-                            } else {
-                                console.log(`Subject "${subject}" successfully inserted for studentID ${id}`);
-                                resolve();
-                            }
-                        });
-                    });
-                });
+                // Update student subjects if provided
+                if (subjects) {
+                    const subjectsArray = subjects.split(',').map(subj => subj.trim());
 
-                // Wait for all subjects to be inserted
-                Promise.all(insertPromises)
-                    .then(() => {
-                        res.status(200).json({ message: 'Student updated successfully.' });
-                    })
-                    .catch(err => {
-                        console.error('Error updating subjects:', err);
-                        res.status(500).json({ message: 'Error updating subjects.' });
+                    // Clear existing subjects and add the updated ones
+                    db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
+                        if (err) {
+                            console.error('Error clearing subjects from database:', err);
+                            return res.status(500).json({ message: 'Error updating subjects.' });
+                        }
+
+                        // Insert updated subjects
+                        const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
+                        const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
+                            db.query(insertSubjectQuery, [id, subject], (err) => {
+                                if (err) {
+                                    console.error(`Error inserting subject "${subject}" for studentID ${id}:`, err);
+                                    reject(err);
+                                } else {
+                                    resolve();
+                                }
+                            });
+                        }));
+
+                        // Resolve all subject insertions
+                        Promise.all(insertPromises)
+                            .then(() => {
+                                res.status(200).json({ message: 'Student updated successfully.' });
+                            })
+                            .catch(err => {
+                                console.error('Error updating subjects:', err);
+                                res.status(500).json({ message: 'Error updating subjects.' });
+                            });
                     });
+                } else {
+                    // No subjects provided; respond with success
+                    res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
+                }
             });
-        } else {
-            // If no subjects were provided, just send the success response
-            res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
-        }
+        });
     });
 });
 
