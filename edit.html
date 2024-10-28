@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Class and Students</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Edit Students</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -18,9 +19,235 @@
             border-radius: 10px;
             background: white;
         }
+
+/* Fixed Circular Images */
+.fixed-image, .circular-img {
+    width: 55px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* First Navbar - Contains images and text */
+.first-navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030; /* Ensures it stays above other content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Second Navbar - Contains menu items */
+.second-navbar {
+    position: fixed;
+    top: 60px; /* Positioned right below the first navbar */
+    width: 100%;
+    z-index: 1029; /* Slightly lower than the first navbar */
+    display: flex;
+    padding: 24px 14px;
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Center align menu toggler on mobile */
+.navbar-toggler {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Menu link styles */
+.navbar-nav .nav-item .nav-link {
+    color: #343a40 !important; /* Dark text color */
+    line-height: 1.8;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect for link */
+.navbar-nav .nav-item .nav-link:hover {
+    color: #e4e8ec !important; /* Slightly darker on hover */
+    background-color: rgba(255, 254, 254, 0.5) !important;
+}
+/* Mobile view - Keep background light */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #f8f9fa; /* Light background for mobile menu */
+    }
+
+    .navbar-nav .nav-item .nav-link {
+        color: #343a40 !important; /* Dark text color */
+    }
+
+    .navbar-toggler-icon {
+        filter: invert(1); /* Dark toggler icon for light background */
+    }
+}
+
+/* Large screen styles */
+@media (min-width: 992px) {
+    .navbar-collapse {
+        justify-content: center;
+    }
+
+    /* Hide the toggler on large screens */
+    .navbar-toggler {
+        display: none;
+    }
+}
+/* Cancel button styles */
+.cancel-btn {
+    display: none; /* Hidden by default */
+    background: transparent;
+    border: none;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #dbe2e8; /* Color of the icon */
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    right: 10px; /* Adjust right position */
+    cursor: pointer;
+}
+/*to hide the menu icon*/
+.hidden {
+    display: none !important; /* Forcefully hide the element */
+}
+
+/* Show the cancel button in mobile view */
+@media (max-width: 992px) {
+    .cancel-btn {
+        display: block; /* Show when navbar is toggled */
+    }
+}
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+    display: none;
+}
+.hidden {
+    display: none !important; /* Forcefully hide the element */
+}
+
+/* Additional spacing for page content */
+body {
+    padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
+}
+
+
+button {
+            padding: 10px 15px;
+            background-color: #202122;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #a6a6a9;
+        }
+    .footer {
+  background: #f8f9fa;
+  color: #343a40;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  flex-direction: column;  /* Stack items vertically */
+}
+
+.footer .row {
+  width: 100%; /* Ensure row takes up the full width */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically if necessary */
+  margin: 0;
+}
+
+.footer .col {
+  padding: 0;
+  text-align: center; /* Ensure content in columns is centered */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer i {
+  font-size: 24px;
+}
+    #myBtn {
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  right: 30px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  background-color: rgb(210, 210, 233);
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
     </style>
 </head>
 <body>
+   <!-- First Navbar (Images and Admin Dashboard Text) -->
+<nav class="navbar navbar-light bg-light text-dark fixed-top first-navbar">
+    <!-- Left image (Education Cap) -->
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    
+    <!-- Navbar brand (Admin Dashboard text) centered -->
+    <span class="navbar-brand mx-auto text-dark">Admin&nbsp;&nbsp;Dashboard</span>
+    
+    <!-- Right image logo -->
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+<!-- Second Navbar (Navbar Items) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-white text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    
+
+    <!-- Collapsible navbar items -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="add.html">Add Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="edit.html">Edit Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="view.html">View Students</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="#" onclick="logout()">Logout</a>
+            </li>
+        </ul>
+        <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
+    </div>
+</nav>
+
+  <br><br>
     <div class="center-container mt-5">
         <h1 class="text-center">Select Class and View Students</h1>
 
@@ -35,10 +262,7 @@
 
         <h2 class="mt-4">Students in Selected Class:</h2>
         <ul id="student-list" class="list-unstyled">
-        </ul>
-        
-        <button class="btn btn-primary btn-block" onclick="goBack()">Back</button>
-        
+        </ul>        
         <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -149,9 +373,66 @@
             </div>
         </div>
     </div>
-</div>
+</div></div><br>
+
+<br><br>
+<!-- Footer -->
+<div class="footer bg-light mt-5">
+   <div class="row text-center py-3">
+     <div class="col-md-4">
+       <p><strong>Imam Hafsin Model International School</strong></p>
+       <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+       <p>Email: imamhafsin@gmail.com</p>
+       <p>Phone: 08030999939939399</p>
+     </div>
+     <div class="col-md-4">
+       <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-facebook"></i> Facebook
+       </a>
+       <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-instagram"></i> Instagram
+       </a>
+       <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+         <i class="fab fa-twitter"></i> Twitter
+       </a>
+       <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+         <i class="fab fa-whatsapp"></i> WhatsApp
+       </a>
+     </div>
+     <div class="col-md-4">
+       <p>&copy; IHMIS 2024</p>
+       <p>All rights reserved.</p>
+     </div>
+   </div>
+ </div>
+ <!-- Back to top button -->
+ <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+ 
+   <!-- Bootstrap JS, Popper.js, and jQuery -->
+   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+function toggleNavbar() {
+    const navbarNav = document.getElementById("navbarNav");
+    const cancelButton = document.querySelector(".cancel-btn");
+    const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
+
+    if (navbarNav.classList.contains("show")) {
+        // If navbar is open, close it
+        navbarNav.classList.remove("show");
+        cancelButton.style.display = "none"; // Hide cancel button
+        menuIcon.classList.remove("hidden"); // Show menu icon
+    } else {
+        // If navbar is closed, open it
+        navbarNav.classList.add("show");
+        cancelButton.style.display = "block"; // Show cancel button
+        menuIcon.classList.add("hidden"); // Hide menu icon completely
+    }
+}
+
+
+
        let studentToDelete = null;
 
 function loadClassOptions() {
@@ -172,9 +453,7 @@ function loadClassOptions() {
     });
 }
 
-function goBack() {
-    window.history.back();
-}
+
 
 function loadStudents(className) {
     $.ajax({
@@ -341,7 +620,30 @@ $(document).ready(function() {
     });
 });
 
+function logout() {
+    window.location.href = '/logout'; // Redirect to admin logout route
+}
 
-    </script>
+// Back button functionality
+function goBack() {
+    window.history.back();
+}
+
+// Back to top button functionality
+window.onscroll = function() { scrollFunction() };
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
+    }
+}
+
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}
+</script>
 </body>
 </html>

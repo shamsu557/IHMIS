@@ -315,7 +315,7 @@ app.get('/logout', (req, res) => {
             return res.redirect('/staff_dashboard'); // Redirect back to dashboard if there's an error
         }
         res.clearCookie('connect.sid'); // Clear the cookie
-        res.redirect('/login'); // Redirect to login
+        res.redirect('/'); // Redirect to login
     });
 });
 
