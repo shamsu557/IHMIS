@@ -4,7 +4,7 @@ document.getElementById("teacherSignupForm").addEventListener("submit", async fu
 
     // Validate the 'form_master' role and class selection before creating formData
     const role = document.getElementById('role').value;
-    if (role === 'form_master') {
+    if (role === 'Form Master') {
         const selectedClass = document.getElementById("formClass").value;
         if (!selectedClass) {
             alert("Please select a class for Form Master.");
@@ -67,25 +67,18 @@ document.getElementById('role').addEventListener('change', function () {
     }
 });
 
-// Back-to-top button functionality
-const mybutton = document.getElementById("myBtn");
+// Back to top button functionality
+window.onscroll = function() { scrollFunction() };
 
-    // Show button when user scrolls down 20px from top
-    window.onscroll = function() {
-      scrollFunction();
-    };
-  
-    function scrollFunction() {
-      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        mybutton.style.display = "block";
-      } else {
-        mybutton.style.display = "none";
-      }
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
     }
-  
-    // Scroll to top when button is clicked
-    $('#myBtn').on('click', function() {
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-    });
-  
+}
+
+function topFunction() {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+}

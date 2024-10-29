@@ -10,39 +10,11 @@
 </head>
 <style>
      
-    .container {
-      max-width: 500px;
-    }
-    ul {
-    list-style-type: none; /* Removes bullet points */
-    padding: 0;           /* Optional: removes default padding */
-    margin: 0;            /* Optional: removes default margin */
-}
 body {
-            background-color: #f8f9fa;
+            background-color:white ;
         }
         .center-container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            background: white;
-        }
-
-/* Fixed Circular Images */
-.fixed-image, .circular-img {
-    width: 55px;
-    height: 60px;
-    object-fit: contain;
-    border-radius: 50%;
-}
-
-body {
-            background-color: #f8f9fa;
-        }
-        .center-container {
-            max-width: 600px;
+            max-width: 500px;
             margin: auto;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -80,7 +52,9 @@ body {
     display: flex;
     padding: 24px 14px;
     background-color: #f8f9fa; /* Light background */
+    height: 50px;
 }
+
 
 /* Center align menu toggler on mobile */
 .navbar-toggler {
@@ -101,7 +75,6 @@ body {
     color: #e4e8ec !important; /* Slightly darker on hover */
     background-color: rgba(255, 254, 254, 0.5) !important;
 }
-
 /* Mobile view - Keep background light */
 @media (max-width: 992px) {
     .navbar-collapse {
@@ -165,54 +138,6 @@ body {
 }
 
 
-/* Large screen styles */
-@media (min-width: 992px) {
-    .navbar-collapse {
-        justify-content: center;
-    }
-
-    /* Hide the toggler on large screens */
-    .navbar-toggler {
-        display: none;
-    }
-}
-/* Cancel button styles */
-.cancel-btn {
-    display: none; /* Hidden by default */
-    background: transparent;
-    border: none;
-    font-size: 1.5rem; /* Adjust size as needed */
-    color: #dbe2e8; /* Color of the icon */
-    position: absolute;
-    top: 10px; /* Adjust top position */
-    right: 10px; /* Adjust right position */
-    cursor: pointer;
-}
-/*to hide the menu icon*/
-.hidden {
-    display: none !important; /* Forcefully hide the element */
-}
-
-/* Show the cancel button in mobile view */
-@media (max-width: 992px) {
-    .cancel-btn {
-        display: block; /* Show when navbar is toggled */
-    }
-}
-/* Hide the menu icon by default when navbar is shown */
-.navbar-toggler-icon.hidden {
-    display: none;
-}
-.hidden {
-    display: none !important; /* Forcefully hide the element */
-}
-
-/* Additional spacing for page content */
-body {
-    padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
-}
-
-
 button {
             padding: 10px 15px;
             background-color: #202122;
@@ -223,7 +148,7 @@ button {
             font-size: 16px;
         }
         button:hover {
-            background-color: #454563;
+            background-color: #a6a6a9;
         }
     .footer {
   background: #f8f9fa;
@@ -282,19 +207,19 @@ button {
 </style>
 <body>
   <!-- First Navbar (Images and Admin Dashboard Text) -->
-<nav class="navbar navbar-light bg-light text-dark fixed-top first-navbar">
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
   <!-- Left image (Education Cap) -->
   <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
   
   <!-- Navbar brand (Admin Dashboard text) centered -->
-  <span class="navbar-brand mx-auto text-dark">Admin&nbsp;&nbsp;Dashboard</span>
+  <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
   
   <!-- Right image logo -->
   <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
 </nav>
 
 <!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-white text-dark second-navbar">
+<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
   <!-- Toggler for mobile view -->
   <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
       <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
@@ -324,7 +249,7 @@ button {
       <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
   </div>
 </nav>
-    <div class="container mt-5">
+    <div class="center-container mt-auto bg-light">
     <form id="add-student-form" class="mt-4 border p-4 shadow-sm rounded" enctype="multipart/form-data">
     <h2 class="text-center">Add Student</h2>
       <div class="form-row">
@@ -397,7 +322,8 @@ button {
         <input type="file" class="form-control-file" id="studentPicture" accept="image/*" required>
       </div>
       <div>
-        <button type="submit" class="btn btn-success btn-lg w-100">Submit</button>
+        <button  type="submit"  class="btn btn-success btn-block">Submit</button>
+
     </div>
     </form>
   </div> 

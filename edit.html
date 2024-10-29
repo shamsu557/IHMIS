@@ -9,16 +9,20 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: white;
         }
         .center-container {
-            max-width: 600px;
+            max-width: 500px;
             margin: auto;
             padding: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             border-radius: 10px;
             background: white;
         }
+        .modal-body-scroll {
+    max-height: 400px; /* Set the maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+}
 
 /* Fixed Circular Images */
 .fixed-image, .circular-img {
@@ -28,6 +32,7 @@
     border-radius: 50%;
 }
 
+/* First Navbar - Contains images and text */
 /* First Navbar - Contains images and text */
 .first-navbar {
     position: fixed;
@@ -50,6 +55,7 @@
     display: flex;
     padding: 24px 14px;
     background-color: #f8f9fa; /* Light background */
+    height: 50px;
 }
 
 /* Center align menu toggler on mobile */
@@ -204,19 +210,19 @@ button {
 </head>
 <body>
    <!-- First Navbar (Images and Admin Dashboard Text) -->
-<nav class="navbar navbar-light bg-light text-dark fixed-top first-navbar">
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
     <!-- Left image (Education Cap) -->
     <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
     
     <!-- Navbar brand (Admin Dashboard text) centered -->
-    <span class="navbar-brand mx-auto text-dark">Admin&nbsp;&nbsp;Dashboard</span>
+    <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
     
     <!-- Right image logo -->
     <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
   </nav>
   
 <!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-white text-dark second-navbar">
+<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
     <!-- Toggler for mobile view -->
     <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
         <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
@@ -246,9 +252,7 @@ button {
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
 </nav>
-
-  <br><br>
-    <div class="center-container mt-5">
+    <div class="center-container bg-light mt-auto">
         <h1 class="text-center">Select Class and View Students</h1>
 
         <div class="form-group">
@@ -317,7 +321,7 @@ button {
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body modal-body-scroll">
                 <form id="edit-student-form">
                     <input type="text" id="edit-student-id" class="form-control mb-2" placeholder="Student ID" disabled>
                     <input type="text" id="edit-firstname" class="form-control mb-2" placeholder="First Name" required>
@@ -470,8 +474,8 @@ function loadStudents(className) {
                         <li>
                             ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
                             <div class="action-buttons">
-                                <button class="edit-btn" data-id="${student.studentID}" data-firstname="${student.firstname}" data-othername="${student.othername}" data-surname="${student.surname}" data-guardianphone="${student.guardianPhone}" data-class="${student.class}" data-subjects="${student.subjects}" data-studentPicture="${student.picture}">Edit</button>
-                                <button class="delete-btn" data-id="${student.studentID}">Delete</button>
+                               <button class="edit-btn btn-warning" data-id="${student.studentID}" data-firstname="${student.firstname}" data-othername="${student.othername}" data-surname="${student.surname}" data-guardianphone="${student.guardianPhone}" data-class="${student.class}" data-subjects="${student.subjects}" data-studentPicture="${student.picture}">Edit</button>
+                                <button class="delete-btn btn-danger" data-id="${student.studentID}">Delete</button>
                             </div>
                         </li>
                     `);
@@ -553,9 +557,9 @@ $('#confirm-edit-save').click(function() {
     if (confirmationInput && passwordInput) {
         const updatedStudent = {
             id: $('#edit-student-id').val(),
-            firstname: $('#edit-firstname').val(),
-            othername: $('#edit-othername').val(),
-            surname: $('#edit-surname').val(),
+            firstname: $('#edit-firstname').val().trim().toUpperCase(),
+            othername: $('#edit-othername').val().trim().toUpperCase(),
+            surname: $('#edit-surname').val().trim().toUpperCase(),
             guardianPhone: $('#edit-guardian-phone').val(),
             class: $('#formClass').val(),
             subjects: $('input[name="subjects"]:checked').map(function() { return this.value; }).get(),
@@ -566,12 +570,13 @@ $('#confirm-edit-save').click(function() {
         editStudent(updatedStudent, confirmationInput, passwordInput)
             .then(response => {
                 if (response.status === 200) {
-                    alert('Student updated successfully.');
-                    // Additional actions on success (e.g., close modal, refresh data)
-                } else if (response.status === 401) {
-                    alert('Invalid staff credentials. Please check your ID/Email and Password.');
+                    alert('Student updated successfully.'); // Success message
+                    $('#edit-confirmation-modal').hide(); // Hide confirmation modal after edit
+                    loadStudents($('#class-selection').val()); // Reload the students list
+                } else if (response.status === 401 || response.status === 403) {
+                    alert('Wrong email/staff ID and password combination.'); // Combined error message
                 } else {
-                    alert('Error updating student: ' + response.message);
+                    alert('Error updating student Check Your Credentials: ' + response.message);
                 }
             })
             .catch(error => {
@@ -597,12 +602,18 @@ function editStudent(student, staffEmailOrID, password) {
         data: formData,
         contentType: false,
         processData: false,
-        success: function() {
+        success: function(response) {
             $('#edit-confirmation-modal').hide(); // Hide confirmation modal after edit
-            loadStudents($('#class-selection').val());
+            loadStudents($('#class-selection').val()); // Refresh the student list
+            alert('Student updated successfully.'); // Display success message
         },
         error: function(err) {
-            alert('Error updating student.');
+            // Check for specific error messages from the server
+            if (err.responseJSON && err.responseJSON.message) {
+                alert(err.responseJSON.message); // Show the specific error message
+            } else {
+                alert('Error updating student. Please check your email/Staff ID and password combination and try again.'); // General error message
+            }
         }
     });
 }
@@ -647,3 +658,11 @@ function topFunction() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+

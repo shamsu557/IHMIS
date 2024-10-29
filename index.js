@@ -41,7 +41,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
+// User Signup page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 // User Signup page
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'signup.html'));
@@ -76,7 +79,7 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
 });
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, role, formClass, subjects, classes, qualification, otherQualification } = req.body;
+    const { name, email, password, role, formClass, subjects, classes, qualification } = req.body;
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
    // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
@@ -109,7 +112,7 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
             const columns = ['name', 'email', 'password', 'role', 'qualification', 'profile_picture', 'staff_id'];
             const values = [name, email, hashedPassword, role, qualification,  profilePicture, staffId];
 
-            if (role === 'form_master') {
+            if (role === 'Form Master') {
                 columns.push('formClass');  // Include formClass if role is 'form_master'
                 values.push(formClass);
             }
@@ -555,6 +558,7 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                 return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
             }
 
+            // Proceed to update the student if credentials are correct
             db.query(updateStudentQuery, [
                 firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
             ], (err) => {
