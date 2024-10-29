@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <style>
         body {
             background-color: white;
@@ -56,6 +60,14 @@
     padding: 24px 14px;
     background-color: #f8f9fa; /* Light background */
     height: 50px;
+}
+
+.second-navbar .navbar-nav .nav-item {
+    margin-right: 20px; /* Adds space between each nav item */
+}
+
+.second-navbar .navbar-nav .nav-item:last-child {
+    margin-right: 0; /* Removes margin from the last item for alignment */
 }
 
 /* Center align menu toggler on mobile */
@@ -209,7 +221,7 @@ button {
     </style>
 </head>
 <body>
-   <!-- First Navbar (Images and Admin Dashboard Text) -->
+ <!-- First Navbar (Images and Admin Dashboard Text) -->
 <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
     <!-- Left image (Education Cap) -->
     <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
@@ -221,15 +233,15 @@ button {
     <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
   </nav>
   
-<!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+  <!-- Second Navbar (Navbar Items) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
     <!-- Toggler for mobile view -->
     <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
         <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
     </button>
     <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
     
-
+  
     <!-- Collapsible navbar items -->
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
@@ -237,21 +249,19 @@ button {
                 <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-danger" href="add.html">Add Students</a>
+                <a class="nav-link text-danger" href="student_management.html">Students Management</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-danger" href="edit.html">Edit Students</a>
+                <a class="nav-link text-danger" href="#">Results Management</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="view.html">View Students</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="#" onclick="logout()">Logout</a>
-            </li>
+            <!-- Logout -->
+          <li class="nav-item">
+            <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
+        </li>
         </ul>
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
-</nav>
+  </nav>
     <div class="center-container bg-light mt-auto">
         <h1 class="text-center">Select Class and View Students</h1>
 
@@ -265,8 +275,11 @@ button {
         <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
 
         <h2 class="mt-4">Students in Selected Class:</h2>
-        <ul id="student-list" class="list-unstyled">
-        </ul>        
+        <ul id="student-list" class="list-unstyled"> </ul>   
+        <div>
+            <button class="btn btn-primary" onclick="window.location.href='add.html'">Add Student</button>
+            <button class="btn btn-info">View Students</button>
+        </div>      
         <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -632,7 +645,8 @@ $(document).ready(function() {
 });
 
 function logout() {
-    window.location.href = '/logout'; // Redirect to admin logout route
+    // Redirect to the logout route, which will clear the session
+    window.location.href = '/logout'; 
 }
 
 // Back button functionality

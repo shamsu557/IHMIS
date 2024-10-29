@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
 </head>
 <style>
      
@@ -55,6 +59,13 @@ body {
     height: 50px;
 }
 
+.second-navbar .navbar-nav .nav-item {
+    margin-right: 20px; /* Adds space between each nav item */
+}
+
+.second-navbar .navbar-nav .nav-item:last-child {
+    margin-right: 0; /* Removes margin from the last item for alignment */
+}
 
 /* Center align menu toggler on mobile */
 .navbar-toggler {
@@ -206,7 +217,7 @@ button {
 }
 </style>
 <body>
-  <!-- First Navbar (Images and Admin Dashboard Text) -->
+ <!-- First Navbar (Images and Admin Dashboard Text) -->
 <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
   <!-- Left image (Education Cap) -->
   <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
@@ -234,17 +245,15 @@ button {
               <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
           </li>
           <li class="nav-item">
-              <a class="nav-link text-danger" href="add.html">Add Students</a>
+              <a class="nav-link text-danger" href="student_management.html">Students Management</a>
           </li>
           <li class="nav-item">
-              <a class="nav-link text-danger" href="edit.html">Edit Students</a>
+              <a class="nav-link text-danger" href="#">Results Management</a>
           </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="view.html">View Students</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="#" onclick="logout()">Logout</a>
-          </li>
+          <!-- Logout -->
+        <li class="nav-item">
+          <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
+      </li>
       </ul>
       <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
   </div>
@@ -322,9 +331,10 @@ button {
         <input type="file" class="form-control-file" id="studentPicture" accept="image/*" required>
       </div>
       <div>
-        <button  type="submit"  class="btn btn-success btn-block">Submit</button>
-
-    </div>
+        <button class="btn btn-warning" onclick="window.location.href='edit.html'">Edit Student</button>
+        <button type="submit" class="btn btn-success" >Submit Student</button>
+        <button class="btn btn-info">View Students</button>
+    </div> 
     </form>
   </div> 
  <!-- Footer -->
@@ -435,7 +445,8 @@ document.getElementById('add-student-form').addEventListener('submit', function(
 });
 
 function logout() {
-    window.location.href = '/logout'; // Redirect to admin logout route
+    // Redirect to the logout route, which will clear the session
+    window.location.href = '/logout'; 
 }
 
 // Back to top button functionality

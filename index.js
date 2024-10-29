@@ -58,7 +58,8 @@ app.get('/login', (req, res) => {
 app.get('/staff_dashboard', isAuthenticated, (req, res) => {
     res.set('Cache-Control', 'no-store'); // Prevent caching
     res.sendFile(path.join(__dirname, 'staff_dashboard.html')); // Adjust the path as necessary
-});
+  });
+  
 
 // API route to fetch teacher details
 app.get('/api/teacher-details', isAuthenticated, (req, res) => {
@@ -171,6 +172,11 @@ function isAuthenticated(req, res, next) {
     }
 }
 
+// Middleware to prevent caching on all protected routes
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
+  });
   
   // API endpoint to handle login (POST request)
 app.post('/login', (req, res) => {
@@ -214,48 +220,35 @@ app.post('/login', (req, res) => {
     });
 });
 
-  // API endpoint to fetch teacher session details
-  app.get('/session', isAuthenticated, (req, res) => {
+ // API endpoint to fetch teacher session details
+app.get('/session', isAuthenticated, (req, res) => {
     const teacher = req.session.teacher;
     if (teacher) {
-      res.json({
-        loggedin: true,
-        teacher: {
-          name: teacher.name,
-          email: teacher.email,
-          qualification: teacher.qualification,
-          role: teacher.role,
-          formClass: teacher.formClass,
-          profile_picture: teacher.profile_picture,
-        },
-      });
+        res.json({
+            loggedin: true,
+            teacher: {
+                name: teacher.name,
+                email: teacher.email,
+                qualification: teacher.qualification,
+                role: teacher.role,
+                formClass: teacher.formClass,
+                profile_picture: teacher.profile_picture,
+            },
+        });
     } else {
-      res.status(403).json({ loggedin: false });
+        res.status(403).json({ loggedin: false });
     }
   });
-  
+
  // Check session status
 app.get('/checkSession', (req, res) => {
     if (req.session && req.session.loggedin) {
-      // If the session is active, return that the user is logged in
-      res.json({ loggedin: true, user: req.session.teacher }); // Optionally send user info
+        res.json({ loggedin: true, user: req.session.teacher }); // Optionally send user info
     } else {
-      // If the session has expired or user is not logged in, return false
-      res.json({ loggedin: false });
+        res.json({ loggedin: false });
     }
   });
-  
-  // Middleware to check if the user is authenticated
-  function isAuthenticated(req, res, next) {
-    if (req.session && req.session.loggedin) {
-      return next(); // User is authenticated
-    } else {
-      // User is not authenticated, redirect to login page
-      return res.redirect('/login');
-    }
-  }
-  
-  
+ 
 
 // Forgot password endpoint
 app.post('/forgot-password', (req, res) => {
@@ -312,16 +305,17 @@ app.post('/reset-password', (req, res) => {
 });
 
 
+// Logout route
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('/staff_dashboard'); // Redirect back to dashboard if there's an error
+            return res.redirect('/'); // Redirect back to dashboard if there's an error
         }
-        res.clearCookie('connect.sid'); // Clear the cookie
+        res.clearCookie('connect.sid'); // Clear the session cookie
         res.redirect('/'); // Redirect to login
     });
-});
-
+  });
+  
 // POST route to handle Form Master/Senior Master login
 app.post('/master-login', (req, res) => {
     const { staffIdOrEmail, password } = req.body;

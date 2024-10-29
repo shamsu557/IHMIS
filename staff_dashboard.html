@@ -6,27 +6,11 @@
     <title>Staff Dashboard</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
     <style>
-       .navbar-nav {
-      margin: auto;
-    }
-    .navbar-brand {
-    margin-left: 15px !important; /* Removes any left margin */
-    padding-left: 5px !important; /* Removes any left padding */
-    display: flex; /* Aligns image and text horizontally */
-    align-items: center; /* Vertically centers the content */
-}
-
-
-.navbar-brand img {
-    margin-right: 10px; /* Optional: adds space between the logo and text */
-}
-
-.navbar {
-    padding-left: 0; /* Ensures the navbar itself doesn't push content */
-}
-
-
     .modal-header-content {
       text-align: center;
       margin-bottom: 20px;
@@ -115,6 +99,151 @@
       border-radius: 45%;
     }
 
+ body {
+            background-color: white;
+        }
+       
+        .modal-body-scroll {
+    max-height: 400px; /* Set the maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+}
+
+/* Fixed Circular Images */
+.fixed-image, .circular-img {
+    width: 55px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* First Navbar - Contains images and text */
+/* First Navbar - Contains images and text */
+.first-navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030; /* Ensures it stays above other content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    background-color: #f8f9fa; /* Light background */
+}
+
+/* Second Navbar - Contains menu items */
+.second-navbar {
+    position: fixed;
+    top: 60px; /* Positioned right below the first navbar */
+    width: 100%;
+    z-index: 1029; /* Slightly lower than the first navbar */
+    display: flex;
+    padding: 24px 14px;
+    background-color: #f8f9fa; /* Light background */
+    height: 50px;
+    justify-content: space-between;
+}
+.second-navbar .navbar-nav .nav-item {
+    margin-right: 20px; /* Adds space between each nav item */
+}
+
+.second-navbar .navbar-nav .nav-item:last-child {
+    margin-right: 0; /* Removes margin from the last item for alignment */
+}
+
+/* Center align menu toggler on mobile */
+.navbar-toggler {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Menu link styles */
+.navbar-nav .nav-item .nav-link {
+    color: #343a40 !important; /* Dark text color */
+    line-height: 1.8;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect for link */
+.navbar-nav .nav-item .nav-link:hover {
+    color: #e4e8ec !important; /* Slightly darker on hover */
+    background-color: rgba(255, 254, 254, 0.5) !important;
+}
+/* Mobile view - Keep background light */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #f8f9fa; /* Light background for mobile menu */
+    }
+
+    .navbar-nav .nav-item .nav-link {
+        color: #343a40 !important; /* Dark text color */
+    }
+
+    .navbar-toggler-icon {
+        filter: invert(1); /* Dark toggler icon for light background */
+    }
+}
+
+/* Large screen styles */
+@media (min-width: 992px) {
+    .navbar-collapse {
+        justify-content: center;
+    }
+
+    /* Hide the toggler on large screens */
+    .navbar-toggler {
+        display: none;
+    }
+}
+/* Cancel button styles */
+.cancel-btn {
+    display: none; /* Hidden by default */
+    background: transparent;
+    border: none;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #dbe2e8; /* Color of the icon */
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    right: 10px; /* Adjust right position */
+    cursor: pointer;
+}
+/*to hide the menu icon*/
+.hidden {
+    display: none !important; /* Forcefully hide the element */
+}
+
+/* Show the cancel button in mobile view */
+@media (max-width: 992px) {
+    .cancel-btn {
+        display: block; /* Show when navbar is toggled */
+    }
+}
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+    display: none;
+}
+.hidden {
+    display: none !important; /* Forcefully hide the element */
+}
+
+   /* Additional spacing for page content */
+body {
+    padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
+}
+
+
+button {
+            padding: 10px 15px;
+            background-color: #202122;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #a6a6a9;
+        }
     .footer {
   background: #f8f9fa;
   color: #343a40;
@@ -169,36 +298,46 @@
 #myBtn:hover {
   background-color: #555;
 }
-
-
-    </style>
+    
+  </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand ml-5 pl-5" href="#">
-      <img src="logo.jpg" alt="Logo" height="30" class="mr-2"> Staff Dashboard
-  </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <!-- First Navbar (Images and Admin Dashboard Text) -->
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+  <!-- Left image (Education Cap) -->
+  <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+  
+  <!-- Navbar brand (Admin Dashboard text) centered -->
+  <span class="navbar-brand mx-auto text-dark">Staff&nbsp;&nbsp;Dashboard</span>
+  
+  <!-- Right image logo -->
+  <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+</nav>
+
+<!-- Second Navbar (Navbar Items) -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+  <!-- Toggler for mobile view -->
+  <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+      <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
   </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-          <!-- Student Management -->
-          <li  class="nav-item">
-            <a class="nav-link ml-5" href="staff_dashboard.html">Home</a>
-        </li>
+  <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+  
+
+  <!-- Collapsible navbar items -->
+  <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+      <ul class="navbar-nav">
           <li class="nav-item">
-              <a class="nav-link ml-5" href="student_management.html">Students Management</a>
+              <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
           </li>
-          
-          <!-- Result Management -->
           <li class="nav-item">
-              <a class="nav-link ml-5" href="#">Results Management</a>
+              <a class="nav-link text-danger" href="student_management.html">Students Management</a>
           </li>
-          
+          <li class="nav-item">
+              <a class="nav-link text-danger" href="#">Results Management</a>
+          </li>
           <!-- Download ID Card -->
           <li class="nav-item">
-            <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Download ID Card</a>
+            <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Staff ID Card</a>
         </li>
           
           <!-- Logout -->
@@ -209,10 +348,8 @@
   </div>
 </nav>
 
-
-   <br><br>
     <!-- Staff Profile Section -->
-    <div class="container profile-card-container">
+    <div class="containery profile-card-container">
         <div class="card profile-card text-center">
             <div class="card-header">
                 Imam Hafsin Model International School
@@ -343,7 +480,8 @@
     window.onload = fetchTeacherDetails;
 
     function logout() {
-  window.location.href = '/logout'; // Redirect to admin logout route
+    // Redirect to the logout route, which will clear the session
+    window.location.href = '/logout'; 
 }
 
 
