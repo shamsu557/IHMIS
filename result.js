@@ -1,77 +1,62 @@
 function toggleNavbar() {
     const navbarNav = document.getElementById("navbarNav");
     const cancelButton = document.querySelector(".cancel-btn");
-    const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
+    const menuIcon = document.querySelector(".navbar-toggler-icon");
 
-    if (navbarNav.classList.contains("show")) {
-        // If navbar is open, close it
-        navbarNav.classList.remove("show");
-        cancelButton.style.display = "none"; // Hide cancel button
-        menuIcon.classList.remove("hidden"); // Show menu icon
-    } else {
-        // If navbar is closed, open it
-        navbarNav.classList.add("show");
-        cancelButton.style.display = "block"; // Show cancel button
-        menuIcon.classList.add("hidden"); // Hide menu icon completely
-    }
+    const isOpen = navbarNav.classList.toggle("show");
+    cancelButton.style.display = isOpen ? "block" : "none"; // Toggle cancel button
+    menuIcon.classList.toggle("hidden", isOpen); // Show/hide menu icon
 }
 
 async function validateStaff() {
     const staffIdentifier = document.getElementById("staffIdentifier").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch('/result_login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ staffIdentifier, password })
-    });
+    try {
+        const response = await fetch('/result_login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ staffIdentifier, password })
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.success) {
-        // Store the selected class in session storage
-        sessionStorage.setItem("selectedClass", result.selectedClass); // Store selected class
-
-        document.getElementById("loginForm").style.display = "none";
-        document.getElementById("selectionForm").style.display = "block";
-        loadClasses(); // Load classes using teacher_id
-        loadSubjects(); // Load subjects using teacher_id
-    } else {
-        document.getElementById("loginError").innerText = result.message;
+        if (result.success) {
+            sessionStorage.setItem("selectedClass", result.selectedClass);
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("selectionForm").style.display = "block";
+            await Promise.all([loadClasses(), loadSubjects()]); // Load classes and subjects concurrently
+        } else {
+            document.getElementById("loginError").innerText = result.message;
+        }
+    } catch (error) {
+        console.error('Error validating staff:', error);
     }
 }
 
-function loadClassOptions() {
-    $.ajax({
-        url: '/api/getClasses',
-        method: 'GET',
-        success: function(classes) {
-            const classSelection = $('#classSelect');
-            classSelection.empty();
-            classSelection.append('<option value="" selected disabled>Select Class</option>');
-            classes.forEach(c => {
-                classSelection.append(`<option value="${c}">${c}</option>`);
-            });
-        },
-        error: function(err) {
-            alert('Error loading classes.');
-        }
-    });
+async function loadClassOptions() {
+    try {
+        const response = await fetch('/api/getClasses');
+        const classes = await response.json();
+        const classSelection = $('#classSelect');
+
+        classSelection.empty().append('<option value="" selected disabled>Select Class</option>');
+        classes.forEach(c => classSelection.append(`<option value="${c}">${c}</option>`));
+    } catch (error) {
+        alert('Error loading classes: ' + error.message);
+    }
 }
 
-async function loadClasses(teacherClass) {
+async function loadClasses() {
     try {
-        const response = await fetch('/getTeacherClasses'); // Endpoint to get classes based on teacher_id
+        const response = await fetch('/getTeacherClasses');
         const classes = await response.json();
-
         const classSelect = document.getElementById("classSelect");
-        classSelect.innerHTML = '<option value="">Select Class</option>'; // Default option
 
-        // Populate dropdown with all classes for the teacher and set the selected option
+        classSelect.innerHTML = '<option value="">Select Class</option>';
         classes.forEach(cls => {
             if (cls.class) {
-                const selected = cls.class === teacherClass ? 'selected' : '';
-                classSelect.innerHTML += `<option value="${cls.class}" ${selected}>${cls.class}</option>`;
+                classSelect.innerHTML += `<option value="${cls.class}">${cls.class}</option>`;
             }
         });
     } catch (error) {
@@ -81,15 +66,13 @@ async function loadClasses(teacherClass) {
 
 async function loadSubjects() {
     try {
-        const response = await fetch('/getTeacherSubjects'); // Endpoint to get subjects based on teacher_id
+        const response = await fetch('/getTeacherSubjects');
         const subjects = await response.json();
-
         const subjectSelect = document.getElementById("subjectSelect");
-        subjectSelect.innerHTML = '<option value="">Select Subject</option>'; // Default option
 
-        // Populate the dropdown with valid subjects only
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
         subjects.forEach(subject => {
-            if (subject.subject) { // Ensure each subject is added individually
+            if (subject.subject) {
                 subjectSelect.innerHTML += `<option value="${subject.subject}">${subject.subject}</option>`;
             }
         });
@@ -98,100 +81,140 @@ async function loadSubjects() {
     }
 }
 
-function loadStudents(className) {
-    console.log('Loading students for class:', className); // Log the class name being fetched
-    $.ajax({
-        url: '/api/getStudentsByClass',
-        method: 'POST',
-        data: JSON.stringify({ class: className }),
-        contentType: 'application/json',
-        success: function(students) {
-            const studentList = $('#student-list');
-            studentList.empty();
-            if (students.length > 0) {
-                // Create table structure
-                studentList.append(`
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Full Name</th>
-                                <th>1st Test</th>
-                                <th>2nd Test</th>
-                                <th>3rd Test</th>
-                                <th>Exam</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+async function loadStudents() {
+    const selectedClass = document.getElementById("classSelect").value;
+    const selectedSubject = document.getElementById("subjectSelect").value;
+    const selectedTerm = document.getElementById("termSelect").value;
+    const selectedSession = document.getElementById("sessionSelect").value;
+
+    console.log('Loading students for class:', selectedClass);
+    try {
+        const response = await fetch('/api/getStudentsByClass', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ class: selectedClass })
+        });
+        const students = await response.json();
+
+        const studentTbody = $('#student-tbody');
+        const studentInfo = $('#student-info');
+        const noStudentsMessage = $('#no-students-message');
+
+        studentTbody.empty();
+        studentInfo.hide();
+        noStudentsMessage.hide();
+
+        if (students.length > 0) {
+            $('#class-name').text(`Class: ${selectedClass}`);
+            $('#subject-name').text(`Subject: ${selectedSubject}`);
+            $('#term-name').text(`Term: ${selectedTerm}`);
+            $('#session-name').text(`Session: ${selectedSession}`);
+
+            studentInfo.show();
+            students.forEach(student => {
+                studentTbody.append(`
+                    <tr>
+                        <td><input type="checkbox" class="student-checkbox" data-id="${student.studentID}"></td> <!-- Checkbox for selection -->
+                        <td>${student.studentID}</td>
+                        <td>${student.firstname} ${student.othername || ''} ${student.surname}</td>
+                        ${['test1', 'test2', 'test3', 'exam'].map(test => `
+                            <td><input type="number" class="form-control score-input" name="${test}" data-id="${student.studentID}" style="width: 65px; height: 40px; font-size: 16px;"></td>
+                        `).join('')}
+                    </tr>
                 `);
-                
-                const tbody = studentList.find('tbody');
+            });
 
-                students.forEach(student => {
-                    tbody.append(`
-                        <tr>
-                            <td>${student.studentID}</td>
-                            <td>${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname}</td>
-                            <td><input type="text" class="form-control score-input" name="test1" data-id="${student.studentID}" style="width: 65px; height: 40px; font-size: 16px;"></td>
-                            <td><input type="text" class="form-control score-input" name="test2" data-id="${student.studentID}" style="width: 65px; height: 40px; font-size: 16px;"></td>
-                            <td><input type="text" class="form-control score-input" name="test3" data-id="${student.studentID}" style="width: 65px; height: 40px; font-size: 16px;"></td>
-                            <td><input type="text" class="form-control score-input" name="exam" data-id="${student.studentID}" style="width:  65px; height: 40px; font-size: 16px;"></td>
-                        </tr>
-                    `);
-                });
+            // Ensure only digits can be entered
+            $('.score-input').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allows only digits
+            });
 
-                // Optional: Add validation to ensure only numbers are entered
-                $('.score-input').on('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, ''); // Allows only digits
-                });
-            } else {
-                studentList.append('<p>No students found in this class.</p>');
-            }
-        },
-        error: function(err) {
-            console.error('AJAX Error:', err); // Log the error
-            alert('Error loading students: ' + err.responseText); // Show the error message
+            $('#view-students, #subjectSelect, #termSelect, #classSelect, #resultManagementHeader, #sessionSelect').hide();
+            $('#submit-scores').show();
+        } else {
+            noStudentsMessage.show();
         }
-    });
+    } catch (error) {
+        console.error('Error loading students:', error);
+        alert('Error loading students: ' + error.message);
+    }
 }
 
-
-
-// Event listener for the button click
 $(document).ready(function() {
     loadClassOptions();
-    $('#view-students').on('click', function() {
-        const selectedClass = $('#classSelect').val(); // Get the selected class from dropdown
-        if (selectedClass) {
-            loadStudents(selectedClass); // Call the function with the selected class
-        } else {
-            alert('Please select a class first.'); // Alert if no class is selected
+    $('#view-students').on('click', loadStudents);
+    $('#submit-scores').on('click', submitScores);
+});
+async function submitScores() {
+    const scores = [];
+    const subjectName = document.getElementById("subject-name").innerText.replace('Subject: ', '');
+    const term = document.getElementById("term-name").innerText.replace('Term: ', '');
+    const session = document.getElementById("session-name").innerText.replace('Session: ', '');
+
+    $('#student-tbody tr').each(function() {
+        const checkbox = $(this).find('.student-checkbox')[0];
+        if (checkbox.checked) { // Only proceed if the student is checked
+            const studentID = checkbox.dataset.id;
+            const scoreInputs = $(this).find('.score-input');
+
+            const total = [...scoreInputs].reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+            const examGrade = calculateGrade(total);
+
+            scores.push({
+                studentID: studentID,
+                subjectName: subjectName,
+                term: term,
+                session: session,
+                firstCA: scoreInputs[0].value,
+                secondCA: scoreInputs[1].value,
+                thirdCA: scoreInputs[2].value,
+                exams: scoreInputs[3].value,
+                total: total,
+                examGrade: examGrade
+            });
         }
     });
-});
 
+    if (scores.length === 0) {
+        alert('Please select at least one student to submit scores.');
+        return; // Exit the function if no students are selected
+    }
+
+    try {
+        const response = await fetch('/api/submitScores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ scores }) // Send scores to the server
+        });
+
+        if (response.ok) {
+            alert('Scores updated successfully!');
+        } else {
+            throw new Error('Failed to update scores.');
+        }
+    } catch (error) {
+        console.error('Error updating scores:', error);
+        alert('Failed to update scores: ' + error.message);
+    }
+}
+function calculateGrade(total) {
+    if (total >= 70) return 'A';
+    else if (total >= 60) return 'B';
+    else if (total >= 50) return 'C';
+    else if (total >= 40) return 'D';
+    return 'F';
+}
 function logout() {
-    // Redirect to the logout route, which will clear the session
-    window.location.href = '/logout'; 
+    window.location.href = '/logout';
 }
 
-// Back button functionality
 function goBack() {
     window.history.back();
 }
 
-// Back to top button functionality
-window.onscroll = function() { scrollFunction() };
-
-function scrollFunction() {
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        document.getElementById("myBtn").style.display = "block";
-    } else {
-        document.getElementById("myBtn").style.display = "none";
-    }
-}
+window.onscroll = function() {
+    document.getElementById("myBtn").style.display = (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) ? "block" : "none";
+};
 
 function topFunction() {
     document.body.scrollTop = 0;
