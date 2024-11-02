@@ -51,17 +51,6 @@ module.exports = db;
 //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 // );
 
-// -- Create subjects table
-// CREATE TABLE subjects (
-//     id INT AUTO_INCREMENT PRIMARY KEY,
-//     studentID VARCHAR(20),
-//     subjectName VARCHAR(50),
-//     term ENUM('First Term', 'Second Term', 'Third Term'),
-//     ca INT,
-//     exams INT,
-//     grade CHAR(2),
-//     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
-// );
 
 // -- Create a table for teacher subjects
 // CREATE TABLE teacher_subjects (
@@ -78,17 +67,17 @@ module.exports = db;
 //     class VARCHAR(255) NOT NULL,
 //     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 // );
-// // CREATE TABLE subjects (
+//     //CREATE TABLE subjects (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     studentID VARCHAR(20),
 //     subjectName VARCHAR(50),
 //     term ENUM('First Term', 'Second Term', 'Third Term'),
 //     session ENUM('2024/2025', '2025/2026', '2026/2027') NOT NULL,
-//     firstCA INT DEFAULT 0,
-//     secondCA INT DEFAULT 0,
-//     thirdCA INT DEFAULT 0,
-//     exams INT DEFAULT 0,
-//     total INT GENERATED ALWAYS AS (firstCA + secondCA + thirdCA + exams) STORED,
-//     examGrade ENUM('A', 'B', 'C', 'D', 'F') DEFAULT 'F',
-//      FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
+//     firstCA INT,             -- First Continuous Assessment
+//     secondCA INT,            -- Second Continuous Assessment
+//     thirdCA INT,             -- Third Continuous Assessment
+//     exams INT,               -- Exam score
+//     total INT,               -- Total score
+//     examGrade VARCHAR(2),    -- Letter grade
+//     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );

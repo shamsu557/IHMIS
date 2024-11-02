@@ -297,7 +297,37 @@ button {
 <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
 
 <!-- Div to Display Student List -->
-<div id="student-list"></div>
+<div id="student-list">
+    <!-- This section will be populated dynamically via JavaScript -->
+    <div id="student-info" style="display: none;">
+        <h3 id="class-name" style="font-size: 14px;"></h3>
+        <h3 id="subject-name" style="font-size: 14px;"></h3>
+        <h3 id="term-name" style="font-size: 14px;"></h3>
+        <h3 id="session-name" style="font-size: 14px;"></h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Select</th> <!-- New column for checkbox -->
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>1st Test</th>
+                    <th>2nd Test</th>
+                    <th>3rd Test</th>
+                    <th>Exam</th>
+                </tr>
+            </thead>
+            <tbody id="student-tbody">
+                <!-- Rows will be appended here via JavaScript -->
+            </tbody>
+        </table>
+        <!-- Submit Scores Button -->
+        <button id="submit-scores" class="btn btn-primary" style="margin-top: 20px;" onclick="submitScores()">Submit Scores</button>
+    </div>
+    <div id="no-students-message" style="display: none;">
+        <p>No students found in this class.</p>
+    </div>
+</div>
+
            
     </div></div>
       <br>

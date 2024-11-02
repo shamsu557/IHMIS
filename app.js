@@ -689,6 +689,55 @@ app.post('/api/getStudentsByClass', (req, res) => {
     });
 });
 
+// Endpoint to submit scores
+app.post('/api/submitScores', (req, res) => {
+    const scores = req.body.scores; // Expecting an array of score objects
+
+    // Ensure scores is an array and not empty
+    if (!Array.isArray(scores) || scores.length === 0) {
+        return res.status(400).json({ error: 'Scores must be a non-empty array' });
+    }
+
+    // SQL query to update scores
+    const sql = `UPDATE subjects 
+                 SET term = ?, session = ?, firstCA = ?, secondCA = ?, thirdCA = ?, exams = ?, total = ?, examGrade = ? 
+                 WHERE studentID = ? AND subjectName = ?`;
+
+    // Prepare to collect promises for each update
+    const updatePromises = scores.map(score => {
+        const values = [
+            score.term,
+            score.session,
+            score.firstCA,
+            score.secondCA,
+            score.thirdCA,
+            score.exams,
+            score.total,
+            score.examGrade,
+            score.studentID,
+            score.subjectName
+        ];
+
+        return new Promise((resolve, reject) => {
+            db.query(sql, values, (error, results) => {
+                if (error) {
+                    console.error('Database error:', error);
+                    return reject('Database error');
+                }
+                resolve(results);
+            });
+        });
+    });
+
+    // Execute all updates
+    Promise.all(updatePromises)
+        .then(results => {
+            res.status(200).json({ message: 'Scores updated successfully!', results });
+        })
+        .catch(error => {
+            res.status(500).json({ error });
+        });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
