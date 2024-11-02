@@ -600,14 +600,15 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
 });
 
 // Route teacher for login for result
+// Route teacher for login for result
 app.post('/result_login', (req, res) => {
     const { staffIdentifier, password } = req.body;
 
     // Query to find teacher by staff_id or email
     const query = `
-        SELECT id, password 
-        FROM teachers 
-        WHERE staff_id = ? OR email = ?
+        SELECT t.id, t.password 
+        FROM teachers t
+        WHERE t.staff_id = ? OR t.email = ?
     `;
     
     db.query(query, [staffIdentifier, staffIdentifier], (err, results) => {
@@ -635,16 +636,23 @@ app.post('/result_login', (req, res) => {
 
             // Password is correct, store teacher ID in session
             req.session.teacherId = teacher.id; // Store the teacher ID
-            req.session.staffIdOrEmail = staffIdentifier; // Optional: Store for future reference
 
-             // Successful login
-      // Successful login
-req.session.teacherId = teacher.id; // Use consistent field name
-return res.json({ success: true, teacherId: teacher.id }); // Send teacher ID back
+            // Fetch the teacher's classes
+            const classQuery = `SELECT class FROM teacher_classes WHERE teacher_id = ?`;
+            db.query(classQuery, [teacher.id], (err, classResults) => {
+                if (err) {
+                    console.error("Error fetching classes:", err);
+                    return res.status(500).json({ success: false, message: 'Error fetching classes' });
+                }
 
+                // Send classes along with teacher ID
+                const classes = classResults.map(cls => cls.class); // Use 'class' instead of 'class_name'
+                return res.json({ success: true, teacherId: teacher.id, classes }); // Send classes back
+            });
         });
     });
 });
+
        
    
 // Get Classes for a specific teacher
@@ -668,6 +676,19 @@ app.get('/getTeacherSubjects', (req, res) => {
         res.json(results);
     });
 });   
+// Backend endpoint to get students by class
+app.post('/api/getStudentsByClass', (req, res) => {
+     const { class: className } = req.body;
+    const query = 'SELECT * FROM students WHERE class = ?'; // Replace with your actual table name
+    db.query(query, [className], (err, results) => {
+        if (err) {
+            console.error('Error fetching students:', err);
+            return res.status(500).send('Server Error');
+        }
+        res.json(results);
+    });
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
