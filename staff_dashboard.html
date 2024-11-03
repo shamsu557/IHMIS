@@ -44,8 +44,8 @@
     }
 
     .profile-picture {
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 170px;
             border-radius: 50%;
             object-fit: cover;
         }
@@ -298,7 +298,126 @@ button {
 #myBtn:hover {
   background-color: #555;
 }
-    
+    /* Mobile adjustments */
+@media (max-width: 576px) {
+    /* Center modal header content on smaller screens */
+    .modal-header-content {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .modal-header-content img {
+        max-width: 60px; /* Smaller logo size for mobile */
+    }
+
+    .modal-title {
+        font-size: 18px; /* Adjust title size for readability */
+    }
+
+    .modal-footer {
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .signature {
+        margin-top: 15px;
+    }
+
+    .profile-picture-container {
+        max-width: 150px;
+        max-height: 200px;
+    }
+
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .profile-card {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    .id-card, .id-card-back {
+        max-width: 100%;
+        padding: 1rem;
+    }
+
+    #profile-pic {
+        max-width: 45px;
+        max-height: 50px;
+    }
+
+    .modal-body-scroll {
+        max-height: 250px;
+    }
+
+    .fixed-image, .circular-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Navbar adjustments */
+    .first-navbar {
+        top: 0;
+        padding: 0 8px;
+    }
+
+    .second-navbar {
+        top: 50px;
+        padding: 15px 10px;
+        height: 40px;
+    }
+
+    .navbar-toggler {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .cancel-btn {
+        top: 8px;
+        right: 8px;
+        font-size: 1.25rem;
+    }
+
+    /* Footer adjustments */
+    .footer {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .footer .row {
+        flex-direction: column;
+    }
+
+    .footer i {
+        font-size: 20px;
+    }
+
+    #myBtn {
+        bottom: 10px;
+        right: 20px;
+        padding: 10px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
   </style>
 </head>
 <body>
@@ -330,10 +449,7 @@ button {
               <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
           </li>
           <li class="nav-item">
-              <a class="nav-link text-danger" href="student_management.html">Students Management</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Results Management</a>
+            <a class="nav-link text-danger" id="resultManagementLink"  href="resultmanagement.html">Results Management</a>
           </li>
           <!-- Download ID Card -->
           <li class="nav-item">
@@ -447,6 +563,16 @@ button {
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+      function toggleNavbar() {
+    const navbarNav = document.getElementById("navbarNav");
+    const cancelButton = document.querySelector(".cancel-btn");
+    const menuIcon = document.querySelector(".navbar-toggler-icon");
+
+    const isOpen = navbarNav.classList.toggle("show");
+    cancelButton.style.display = isOpen ? "block" : "none"; // Toggle cancel button
+    menuIcon.classList.toggle("hidden", isOpen); // Show/hide menu icon
+}
+
         // Function to fetch teacher details from the server
     async function fetchTeacherDetails() {
         try {
