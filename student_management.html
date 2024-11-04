@@ -12,9 +12,6 @@
     <meta http-equiv="Expires" content="0" />
     </head>
   <style>
-#student-management {
-      display: none;
-    }
     ul {
     list-style-type: none; /* Removes bullet points */
     padding: 0;           /* Optional: removes default padding */
@@ -264,37 +261,18 @@ button {
   <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav">
           <li class="nav-item">
-              <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
+              <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
           </li>
           <li class="nav-item">
               <a class="nav-link text-danger" href="student_management.html">Students Management</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Results Management</a>
-          </li>
-          <!-- Logout -->
-        <li class="nav-item">
-          <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
-      </li>
+        
+            </li>
       </ul>
       <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
   </div>
 </nav>
   <div class="center-container mt-auto  border p-4 shadow-sm rounded">
     <h2 class="text-center ">Student Management</h2>
-    <form id="master-login-form" class="mt-4">
-      <div class="form-group">
-        <label for="masterIdOrEmail">Staff ID or Email</label>
-        <input type="text" class="form-control" id="masterIdOrEmail" placeholder="Enter Staff ID or Email" required>
-      </div>
-      <div class="form-group">
-        <label for="masterPassword">Password</label>
-        <input type="password" class="form-control" id="masterPassword" placeholder="Enter Password" required>
-      </div>
-      <button type="submit" class="btn btn-success btn-block">Login as Form Master or Senior Master</button>
-      <div id="error-message" class="text-danger mt-2" style="display: none;"></div>
-    </form>
-
     <!-- Student Management Section (Initially Hidden) -->
     <div id="student-management" class="mt-5 text-center">
       <p>Welcome to the student management portal. Here you can:</p>
@@ -364,51 +342,8 @@ button {
         menuIcon.classList.add("hidden"); // Hide menu icon completely
     }
 }
-    // Handle login form submission
-    document.getElementById('master-login-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      // Get the entered credentials
-      const enteredStaffIdOrEmail = document.getElementById('masterIdOrEmail').value;
-      const enteredPassword = document.getElementById('masterPassword').value;
-
-      // Send login request to the server using AJAX (fetch)
-      fetch('/master-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          staffIdOrEmail: enteredStaffIdOrEmail,
-          password: enteredPassword
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Hide the login form and show the student management section
-          document.getElementById('master-login-form').style.display = 'none';
-          document.getElementById('error-message').style.display = 'none';
-          document.getElementById('student-management').style.display = 'block';
-        } else {
-          // Show error message
-          document.getElementById('error-message').textContent = data.message;
-          document.getElementById('error-message').style.display = 'block';
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('error-message').textContent = 'Something went wrong. Please try again.';
-        document.getElementById('error-message').style.display = 'block';
-      });
-    });
     
-    function logout() {
-    // Redirect to the logout route, which will clear the session
-    window.location.href = '/logout'; 
-}
-
-
+   
     // Back to top button functionality
     window.onscroll = function() { scrollFunction() };
 

@@ -208,6 +208,20 @@ function logout() {
     window.location.href = '/logout';
 }
 
+// Function to check authentication status
+function checkAuth() {
+    fetch('/auth-check')
+    .then(response => response.json())
+    .then(data => {
+      if (!data.authenticated) {
+        // Redirect to admin login if not authenticated
+        window.location.href = '/adminLogin';
+      }
+    })
+    .catch(err => {
+      console.error('Error checking authentication:', err);
+    });
+  }
 function goBack() {
     window.history.back();
 }

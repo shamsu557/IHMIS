@@ -16,13 +16,48 @@
             background-color: white;
         }
         .center-container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            background: white;
-        }
+    max-width: 50%; /* Fixed width for larger screens */
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: white;
+    overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+/* Ensure table is responsive */
+table {
+    width: 100%; /* Make table take full width of container */
+    border-collapse: collapse; /* Optional: to remove gaps between table cells */
+}
+
+/* Make the table cells and input fields responsive */
+td, th {
+    padding: 8px; /* Adjust padding */
+    text-align: left; /* Align text */
+    overflow: hidden; /* Prevent overflow */
+}
+
+/* Input fields inside table cells */
+.score-input {
+    width: 100%; /* Make inputs full width of the cell */
+    height: 40px; /* Consistent height */
+    font-size: 16px; /* Font size */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 480px) {
+    .center-container {
+        padding: 10px; /* Further reduce padding for mobile */
+    }
+
+    td, th {
+        padding: 5px; /* Further reduce padding for mobile */
+        font-size: 14px; /* Reduce font size for mobile */
+    }
+}
+
+
         .modal-body-scroll {
     max-height: 400px; /* Set the maximum height */
     overflow-y: auto;  /* Enable vertical scrolling */
@@ -342,7 +377,7 @@ button {
     <!-- Right image logo -->
     <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
   </nav>
- 
+  <div class="center-container mt-auto bg-light">
   <div class="container">
     <div id="resultManagementHeader" class="mt-5 text-center">
         <h2>Cumulative Result Entry</h2>
@@ -406,7 +441,7 @@ button {
         <p>No students found in this class.</p>
     </div>
 </div>
-</div></div>
+</div></div></div>
     <div class="close-container vh-100  justify-content-center align-items-center py-3">
         <button class="close-btn btn-danger" onclick="goBack()">Close</button>
     </div><br>
