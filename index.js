@@ -309,52 +309,14 @@ app.post('/reset-password', (req, res) => {
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('/'); // Redirect back to dashboard if there's an error
+            return res.redirect('/login'); // Redirect back to dashboard if there's an error
         }
         res.clearCookie('connect.sid'); // Clear the session cookie
-        res.redirect('/'); // Redirect to login
+        res.redirect('/login'); // Redirect to login
     });
   });
   
-// POST route to handle Form Master/Senior Master login
-app.post('/master-login', (req, res) => {
-    const { staffIdOrEmail, password } = req.body;
-  
-    // Query to find the teacher by staff ID or email
-    const sql = `SELECT * FROM teachers WHERE staff_id = ? OR email = ?`;
-    
-    db.query(sql, [staffIdOrEmail, staffIdOrEmail], (err, result) => {
-      if (err) throw err;
-  
-      if (result.length > 0) {
-        const teacher = result[0];
-  
-        // Check the role: Only form master or senior master can proceed
-        if (teacher.role === 'Form Master' || teacher.role === 'Senior Master') {
-          // Compare passwords
-          bcrypt.compare(password, teacher.password, (err, isMatch) => {
-            if (err) throw err;
-  
-            if (isMatch) {
-              // Password matched, send success response
-              res.json({ success: true });
-            } else {
-              // Incorrect password
-              res.status(401).json({ success: false, message: 'Incorrect password' });
-            }
-          });
-        } else {
-          // User is not a form master or senior master
-          res.status(403).json({ success: false, message: 'Access denied. You are not a Form Master or Senior Master.' });
-        }
-      } else {
-        // Staff ID or email not found
-        res.status(404).json({ success: false, message: 'Staff ID or email not found' });
-      }
-    });
-  });
 
-  
    // Endpoint to add student
 app.post('/add-student', upload.single('studentPicture'), (req, res) => {
     const studentID = req.body.studentID;
@@ -738,6 +700,156 @@ app.post('/api/submitScores', (req, res) => {
             res.status(500).json({ error });
         });
 });
+
+// Admin creation login route (only allows Admin001 with 'default' password) i used this to first create the super admin then i now comment it as i will use the database 
+
+// app.post('/admin-creation-login', (req, res) => {
+//     const { username, password } = req.body;
+  
+//     // Hardcoded credentials
+//     const validUsername = 'Admin';
+//     const validPassword = 'password';
+  
+//     // Check the credentials
+//     if (username === validUsername && password === validPassword) {
+//       // Credentials are correct, allow access to the admin signup page
+//       return res.json({ success: true, message: 'Login successful! You can now create a new admin.' });
+//     } else {
+//       // Invalid credentials
+//       return res.json({ success: false, message: 'Invalid credentials! You do not have permission to create admins.' });
+//     }
+//   });
+
+
+// this will be commented and uncomment the above to create the superAdmin
+app.post('/admin-creation-login', (req, res) => {
+    const { username, password } = req.body;
+    const adminEmail = '1440shamsusabo@gmail.com';
+
+    // SQL query to find the admin by email, username, and password
+    const sql = 'SELECT username, password FROM admins WHERE email = ? AND username = ?';
+
+    db.query(sql, [adminEmail, username], async (error, results) => {
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+
+        // Check if the admin exists
+        if (results.length === 0) {
+            return res.json({ success: false, message: 'No admin found with the specified email and username!' });
+        }
+
+        const admin = results[0];
+
+        // Compare the provided password with the hashed password from the database
+        const passwordMatch = await bcrypt.compare(password, admin.password);
+
+        if (passwordMatch) {
+            // Password is correct, allow access to the admin signup page
+            return res.json({ success: true, message: 'Login successful! You can now create a new admin.' });
+        } else {
+            // Invalid password
+            return res.json({ success: false, message: 'Invalid password! You do not have permission to create admins.' });
+        }
+    });
+});
+
+// Admin Signup page
+app.get('/admin-signup', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-signup.html'));
+  });
+  
+  // Handle admin signup
+  app.post('/admin-signup', (req, res) => {
+    const { username, password, email, fullName, phone } = req.body;
+  
+    // Check if the email already exists
+    db.query('SELECT email FROM admins WHERE email = ?', [email], (err, results) => {
+      if (err) {
+        console.error('Error querying database for signup:', err);
+        return res.status(500).json({ success: false, message: 'Server error' });
+      }
+  
+      // Check if the email is already taken
+      if (results.length > 0) {
+        return res.status(400).json({ success: false, message: 'Email already exists' });
+      } 
+  
+      // Hash the password
+      bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+        if (err) {
+          console.error('Error hashing password:', err);
+          return res.status(500).json({ success: false, message: 'Server error' });
+        }
+  
+        // Insert new admin into the database
+        db.query('INSERT INTO admins (username, password, email, fullName, phone) VALUES (?, ?, ?, ?, ?)', 
+          [username, hashedPassword, email, fullName, phone], (err) => {
+            if (err) {
+              console.error('Error inserting admin into database:', err);
+              return res.status(500).json({ success: false, message: 'Server error' });
+            }
+            res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.', redirectUrl: '/adminLogin' });
+          }
+        );
+      });
+    });
+  });
+// Admin login page
+app.get('/adminLogin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-login.html'));
+  });
+  // Handle admin login
+  app.post('/adminLogin', (req, res) => {
+    const { username, password } = req.body;
+  
+    db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+        if (err) {
+            console.error('Error querying database for admin login:', err);
+            return res.status(500).send('Server error');
+        }
+  
+        if (results.length === 0) {
+            return res.status(400).send('No admin found');
+        }
+  
+        const user = results[0];
+        if (bcrypt.compareSync(password, user.password)) {
+            req.session.user = user;
+            res.redirect('/admin-dashboard.html'); // Redirect to the admin dashboard
+        } else {
+            res.status(400).send('Incorrect password');
+        }
+    });
+  });
+  
+  // admin Logout route
+app.get('/adminLogout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.redirect('/admin-login.html');
+    });
+  });
+  
+   // staff Logout route
+app.get('/staffLogout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.redirect('/login.html');
+    });
+  });
+  
+  // Single auth-check route for both admin-dashboard.html and resources.html
+app.get('/auth-check', (req, res) => {
+    if (req.session.user) {
+      // Include userType to differentiate between admin and regular users
+      res.json({ authenticated: true, userType: req.session.userType });
+    } else {
+      res.json({ authenticated: false });
+    }
+  });
+  
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

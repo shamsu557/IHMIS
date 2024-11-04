@@ -217,47 +217,40 @@ button {
 }
 </style>
 <body>
- <!-- First Navbar (Images and Admin Dashboard Text) -->
+<!-- First Navbar (Images and Admin Dashboard Text) -->
 <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
-  <!-- Left image (Education Cap) -->
-  <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    <!-- Left image (Education Cap) -->
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    
+    <!-- Navbar brand (Admin Dashboard text) centered -->
+    <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
+    
+    <!-- Right image logo -->
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
   
-  <!-- Navbar brand (Admin Dashboard text) centered -->
-  <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
+  <!-- Second Navbar (Navbar Items) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    
   
-  <!-- Right image logo -->
-  <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
-</nav>
-
-<!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
-  <!-- Toggler for mobile view -->
-  <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
-      <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
-  </button>
-  <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
-  
-
-  <!-- Collapsible navbar items -->
-  <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-      <ul class="navbar-nav">
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="student_management.html">Students Management</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Results Management</a>
-          </li>
-          <!-- Logout -->
-        <li class="nav-item">
-          <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
-      </li>
-      </ul>
-      <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
-  </div>
-</nav>
+    <!-- Collapsible navbar items -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="student_management.html">Students Management</a>
+              </li>
+        </ul>
+        <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
+    </div>
+  </nav>
     <div class="center-container mt-auto bg-light">
     <form id="add-student-form" class="mt-4 border p-4 shadow-sm rounded" enctype="multipart/form-data">
     <h2 class="text-center">Add Student</h2>
@@ -300,138 +293,138 @@ button {
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Subjects</label><br>
-    
-        <!-- Alphabetized list of Pre-Nursery, Nursery, Primary, and Secondary Subjects -->
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Agricultural Science" id="agric-science" name="subjects">
-            <label class="form-check-label" for="agric-science">Agricultural Science</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Basic Science" id="basic-science" name="subjects">
-            <label class="form-check-label" for="basic-science">Basic Science</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Biology" id="biology" name="subjects">
-            <label class="form-check-label" for="biology">Biology</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Chemistry" id="chemistry" name="subjects">
-            <label class="form-check-label" for="chemistry">Chemistry</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Computer Studies" id="computer-studies" name="subjects">
-            <label class="form-check-label" for="computer-studies">Computer Studies</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Creativity" id="creativity" name="subjects">
-            <label class="form-check-label" for="creativity">Creativity</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Cultural and Creative Arts" id="cultural-creative-arts" name="subjects">
-            <label class="form-check-label" for="cultural-creative-arts">Cultural and Creative Arts</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Civic Education" id="civic-education" name="subjects">
-            <label class="form-check-label" for="civic-education">Civic Education</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Economics" id="economics" name="subjects">
-            <label class="form-check-label" for="economics">Economics</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="English Language" id="english" name="subjects">
-            <label class="form-check-label" for="english">English Language</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Government" id="government" name="subjects">
-            <label class="form-check-label" for="government">Government</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Health Education" id="health-education" name="subjects">
-            <label class="form-check-label" for="health-education">Health Education</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Literacy" id="literacy" name="subjects">
-            <label class="form-check-label" for="literacy">Literacy</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Literature in English" id="literature" name="subjects">
-            <label class="form-check-label" for="literature">Literature in English</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
-            <label class="form-check-label" for="math">Mathematics</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Numeracy" id="numeracy" name="subjects">
-            <label class="form-check-label" for="numeracy">Numeracy</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Phonics" id="phonics" name="subjects">
-            <label class="form-check-label" for="phonics">Phonics</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Physics" id="physics" name="subjects">
-            <label class="form-check-label" for="physics">Physics</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Rhymes" id="rhymes" name="subjects">
-            <label class="form-check-label" for="rhymes">Rhymes</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Science" id="science" name="subjects">
-            <label class="form-check-label" for="science">Science</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
-            <label class="form-check-label" for="socialStudies">Social Studies</label>
-        </div>
-    
-        <!-- Arabic and Islamic Studies (placed at the bottom) -->
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Arabic" id="arabic" name="subjects">
-            <label class="form-check-label" for="arabic">Arabic (العربية)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Islamic Studies" id="islamic-studies" name="subjects">
-            <label class="form-check-label" for="islamic-studies">Islamic Studies (الدراسات الإسلامية)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Quranic Studies" id="quranic-studies" name="subjects">
-            <label class="form-check-label" for="quranic-studies">Quranic Studies (دراسات القرآن)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Tafsir" id="tafsir" name="subjects">
-            <label class="form-check-label" for="tafsir">Tafsir (تفسير)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Hadith" id="hadith" name="subjects">
-            <label class="form-check-label" for="hadith">Hadith (الحديث)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Fiqh" id="fiqh" name="subjects">
-            <label class="form-check-label" for="fiqh">Fiqh (الفقه)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Seerah" id="seerah" name="subjects">
-            <label class="form-check-label" for="seerah">Seerah (السيرة النبوية)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Aqeedah" id="aqeedah" name="subjects">
-            <label class="form-check-label" for="aqeedah">Aqeedah (العقيدة)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Tajweed" id="tajweed" name="subjects">
-            <label class="form-check-label" for="tajweed">Tajweed (التجويد)</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="Arabic Grammar" id="arabic-grammar" name="subjects">
-            <label class="form-check-label" for="arabic-grammar">Arabic Grammar (النحو العربي)</label>
-        </div>
+     <div class="form-group">
+    <label>Subjects</label><br>
+
+    <!-- Alphabetized list of Pre-Nursery, Nursery, Primary, and Secondary Subjects -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Agricultural Science" id="agric-science" name="subjects">
+        <label class="form-check-label" for="agric-science">Agricultural Science</label>
     </div>
-    
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Basic Science" id="basic-science" name="subjects">
+        <label class="form-check-label" for="basic-science">Basic Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Biology" id="biology" name="subjects">
+        <label class="form-check-label" for="biology">Biology</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Chemistry" id="chemistry" name="subjects">
+        <label class="form-check-label" for="chemistry">Chemistry</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Computer Studies" id="computer-studies" name="subjects">
+        <label class="form-check-label" for="computer-studies">Computer Studies</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Creativity" id="creativity" name="subjects">
+        <label class="form-check-label" for="creativity">Creativity</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Cultural and Creative Arts" id="cultural-creative-arts" name="subjects">
+        <label class="form-check-label" for="cultural-creative-arts">Cultural and Creative Arts</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Civic Education" id="civic-education" name="subjects">
+        <label class="form-check-label" for="civic-education">Civic Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Economics" id="economics" name="subjects">
+        <label class="form-check-label" for="economics">Economics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="English Language" id="english" name="subjects">
+        <label class="form-check-label" for="english">English Language</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Government" id="government" name="subjects">
+        <label class="form-check-label" for="government">Government</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Health Education" id="health-education" name="subjects">
+        <label class="form-check-label" for="health-education">Health Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Literacy" id="literacy" name="subjects">
+        <label class="form-check-label" for="literacy">Literacy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Literature in English" id="literature" name="subjects">
+        <label class="form-check-label" for="literature">Literature in English</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
+        <label class="form-check-label" for="math">Mathematics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Numeracy" id="numeracy" name="subjects">
+        <label class="form-check-label" for="numeracy">Numeracy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Phonics" id="phonics" name="subjects">
+        <label class="form-check-label" for="phonics">Phonics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Physics" id="physics" name="subjects">
+        <label class="form-check-label" for="physics">Physics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Rhymes" id="rhymes" name="subjects">
+        <label class="form-check-label" for="rhymes">Rhymes</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Science" id="science" name="subjects">
+        <label class="form-check-label" for="science">Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
+        <label class="form-check-label" for="socialStudies">Social Studies</label>
+    </div>
+
+    <!-- Arabic and Islamic Studies (placed at the bottom) -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Arabic" id="arabic" name="subjects">
+        <label class="form-check-label" for="arabic">Arabic (العربية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Islamic Studies" id="islamic-studies" name="subjects">
+        <label class="form-check-label" for="islamic-studies">Islamic Studies (الدراسات الإسلامية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Quranic Studies" id="quranic-studies" name="subjects">
+        <label class="form-check-label" for="quranic-studies">Quranic Studies (دراسات القرآن)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Tafsir" id="tafsir" name="subjects">
+        <label class="form-check-label" for="tafsir">Tafsir (تفسير)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Hadith" id="hadith" name="subjects">
+        <label class="form-check-label" for="hadith">Hadith (الحديث)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Fiqh" id="fiqh" name="subjects">
+        <label class="form-check-label" for="fiqh">Fiqh (الفقه)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Seerah" id="seerah" name="subjects">
+        <label class="form-check-label" for="seerah">Seerah (السيرة النبوية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Aqeedah" id="aqeedah" name="subjects">
+        <label class="form-check-label" for="aqeedah">Aqeedah (العقيدة)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Tajweed" id="tajweed" name="subjects">
+        <label class="form-check-label" for="tajweed">Tajweed (التجويد)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="Arabic Grammar" id="arabic-grammar" name="subjects">
+        <label class="form-check-label" for="arabic-grammar">Arabic Grammar (النحو العربي)</label>
+    </div>
+</div>
+
       <div class="form-group">
         <label for="guardianPhone">Guardian/Parent Phone</label>
         <input type="tel" class="form-control" id="guardianPhone" placeholder="Enter Guardian/Parent Phone" required>
@@ -554,11 +547,6 @@ document.getElementById('add-student-form').addEventListener('submit', function(
         alert('Something went wrong. Please try again.');
     });
 });
-
-function logout() {
-    // Redirect to the logout route, which will clear the session
-    window.location.href = '/logout'; 
-}
 
 // Back to top button functionality
 window.onscroll = function() { scrollFunction() };

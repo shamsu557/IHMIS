@@ -81,3 +81,11 @@ module.exports = db;
 //     examGrade VARCHAR(2),    -- Letter grade
 //     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
+// CREATE TABLE admins (
+//     id INT AUTO_INCREMENT PRIMARY KEY, -- Optional: a unique identifier for each admin
+//     username VARCHAR(50) , -- Username must be unique
+//     password VARCHAR(255) NOT NULL, -- Password storage should allow for hashed passwords
+//     email VARCHAR(100) NOT NULL UNIQUE, -- Email must be unique
+//     fullName VARCHAR(100) NOT NULL, -- Full name of the admin
+//     phone VARCHAR(20)  -- Phone number must be unique
+// );

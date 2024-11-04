@@ -1,3 +1,21 @@
+.navbar-nav {
+  margin: auto;
+}
+.navbar-brand {
+margin-left: 15px !important; /* Removes any left margin */
+padding-left: 5px !important; /* Removes any left padding */
+display: flex; /* Aligns image and text horizontally */
+align-items: center; /* Vertically centers the content */
+}
+
+
+.navbar-brand img {
+margin-right: 10px; /* Optional: adds space between the logo and text */
+}
+
+.navbar {
+padding-left: 0; /* Ensures the navbar itself doesn't push content */
+}
 
      /* Flexbox to ensure footer sticks to the bottom */
      body {

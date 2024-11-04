@@ -221,7 +221,7 @@ button {
     </style>
 </head>
 <body>
- <!-- First Navbar (Images and Admin Dashboard Text) -->
+<!-- First Navbar (Images and Admin Dashboard Text) -->
 <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
     <!-- Left image (Education Cap) -->
     <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
@@ -246,18 +246,12 @@ button {
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
+                <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-danger" href="student_management.html">Students Management</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="#">Results Management</a>
-            </li>
-            <!-- Logout -->
-          <li class="nav-item">
-            <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
-        </li>
+          
+              </li>
         </ul>
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
@@ -644,15 +638,7 @@ $(document).ready(function() {
     });
 });
 
-function logout() {
-    // Redirect to the logout route, which will clear the session
-    window.location.href = '/logout'; 
-}
 
-// Back button functionality
-function goBack() {
-    window.history.back();
-}
 
 // Back to top button functionality
 window.onscroll = function() { scrollFunction() };
