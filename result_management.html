@@ -92,11 +92,12 @@
                 const classSelect = document.getElementById("classSelect");
                 classSelect.innerHTML = '<option value="">Select Class</option>'; // Default option
 
-                // Populate the dropdown with valid classes only
-                classes.forEach(cls => {
-                    if (cls.class && cls.class !== 'JSS 1,JSS 3,SS 2') { 
-                        classSelect.innerHTML += `<option value="${cls.class}">${cls.class}</option>`;
-                    }
+               // Populate dropdown with all classes for the teacher
+        classes.forEach(cls => {
+            if (cls.class) {
+                classSelect.innerHTML += `<option value="${cls.class}">${cls.class}</option>`;
+            }
+        
                 });
             } catch (error) {
                 console.error('Error loading classes:', error);
@@ -113,9 +114,9 @@
 
                 // Populate the dropdown with valid subjects only
                 subjects.forEach(subject => {
-                    if (subject.subject && subject.subject !== 'Mathematics,Physics') {
-                        subjectSelect.innerHTML += `<option value="${subject.subject}">${subject.subject}</option>`;
-                    }
+            if (subject.subject) { // Ensure each subject is added individually
+                subjectSelect.innerHTML += `<option value="${subject.subject}">${subject.subject}</option>`;
+            }
                 });
             } catch (error) {
                 console.error('Error loading subjects:', error);
@@ -123,42 +124,45 @@
         }
 
         async function loadStudents() {
-            const className = document.getElementById("classSelect").value;
-            const subjectName = document.getElementById("subjectSelect").value;
+        const className = document.getElementById("classSelect").value;
+        const subjectName = document.getElementById("subjectSelect").value;
 
-            if (!className || !subjectName) {
-                document.getElementById("studentsList").innerHTML = ''; // Clear if no selection
-                document.getElementById("scoresForm").style.display = "none"; // Hide the form
-                return;
-            }
+        try {
+            const response = await fetch('/api/getStudentsByClass', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ class: className })
+            });
 
-            try {
-                const response = await fetch(`/getStudentByClass?className=${className}&subjectName=${subjectName}`);
-                const students = await response.json();
+            const students = await response.json();
+            const studentsList = document.getElementById("studentsList");
+            studentsList.innerHTML = ''; // Clear previous entries
 
-                const studentsList = document.getElementById("studentsList");
-                studentsList.innerHTML = ''; // Clear previous data
+            if (students.length > 0) {
+                document.getElementById("scoresForm").style.display = "block";
 
-                // Populate the table with students
                 students.forEach(student => {
-                    const fullName = `${student.firstname} ${student.surname} ${student.othername || ''}`.trim();
                     studentsList.innerHTML += `
                         <tr>
                             <td>${student.studentID}</td>
-                            <td>${fullName}</td>
-                            <td><input type="number" class="form-control" name="ca1-${student.studentID}" /></td>
-                            <td><input type="number" class="form-control" name="ca2-${student.studentID}" /></td>
-                            <td><input type="number" class="form-control" name="ca3-${student.studentID}" /></td>
-                            <td><input type="number" class="form-control" name="exam-${student.studentID}" /></td>
+                            <td>${student.fullname}</td>
+                            <td><input type="number" name="ca1-${student.studentID}" class="form-control" placeholder="First CA"></td>
+                            <td><input type="number" name="ca2-${student.studentID}" class="form-control" placeholder="Second CA"></td>
+                            <td><input type="number" name="ca3-${student.studentID}" class="form-control" placeholder="Third CA"></td>
+                            <td><input type="number" name="exam-${student.studentID}" class="form-control" placeholder="Exam"></td>
                         </tr>
                     `;
                 });
-
-                document.getElementById("scoresForm").style.display = "block"; // Show the scores form
-            } catch (error) {
-                console.error('Error loading students:', error);
+            } else {
+                studentsList.innerHTML = '<tr><td colspan="6">No students found in this class.</td></tr>';
             }
+        } catch (error) {
+            console.error('Error loading students:', error);
+            alert('Error loading students.');
         }
+    }
 
         async function submitScores() {
             const className = document.getElementById("classSelect").value;
