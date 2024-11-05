@@ -45,6 +45,7 @@ module.exports = db;
 //     email VARCHAR(255) NOT NULL UNIQUE,
 //     password VARCHAR(255) NOT NULL,
 //     role VARCHAR(100) NOT NULL,
+ //    phone VARCHAR(20) NOT NUL UNIQUE, -- Phone number must be unique
 //     formClass VARCHAR(50),
 //     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
 //     profile_picture VARCHAR(50) NOT NULL,
@@ -67,25 +68,34 @@ module.exports = db;
 //     class VARCHAR(255) NOT NULL,
 //     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 // );
-//     //CREATE TABLE subjects (
+   
+// CREATE TABLE subjects (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     studentID VARCHAR(20),
 //     subjectName VARCHAR(50),
-//     term ENUM('First Term', 'Second Term', 'Third Term'),
-//     session ENUM('2024/2025', '2025/2026', '2026/2027') NOT NULL,
-//     firstCA INT,             -- First Continuous Assessment
-//     secondCA INT,            -- Second Continuous Assessment
-//     thirdCA INT,             -- Third Continuous Assessment
-//     exams INT,               -- Exam score
-//     total INT,               -- Total score
-//     examGrade VARCHAR(2),    -- Letter grade
+//     term ENUM('First Term', 'Second Term', 'Third Term') DEFAULT 'First Term',  -- Default to 'First Term'
+//     session ENUM('2024/2025', '2025/2026', '2026/2027') NOT NULL DEFAULT '2024/2025',  -- Default to '2024/2025'
+//     firstCA INT DEFAULT 0,          -- Default for First Continuous Assessment
+//     secondCA INT DEFAULT 0,         -- Default for Second Continuous Assessment
+//     thirdCA INT DEFAULT 0,          -- Default for Third Continuous Assessment
+//     exams INT DEFAULT 0,            -- Default for Exam score
+//     total INT DEFAULT 0,            -- Default for Total score
+//     examGrade VARCHAR(2) DEFAULT 'N/A',  -- Default to 'N/A' if no grade is assigned
 //     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
+
 // CREATE TABLE admins (
 //     id INT AUTO_INCREMENT PRIMARY KEY, -- Optional: a unique identifier for each admin
 //     username VARCHAR(50) , -- Username must be unique
 //     password VARCHAR(255) NOT NULL, -- Password storage should allow for hashed passwords
 //     email VARCHAR(100) NOT NULL UNIQUE, -- Email must be unique
 //     fullName VARCHAR(100) NOT NULL, -- Full name of the admin
-//     phone VARCHAR(20)  -- Phone number must be unique
+//     phone VARCHAR(20)  -- Phone number must be uniqu
+//     role VARCHAR(50) NOT NULL;
 // );
+// // -- Insert email addresses with valid qualifications
+// INSERT INTO teachers (staff_id, name, email, password, role, phone, formClass, qualification, profile_picture, created_at) VALUES
+// ('TEMP001', 'John Doe', '1440shamsusabo@gmail.com', 'placeholderpassword1', 'Teacher', '08030909799', 'Form A', 'BSc', 'default.jpg', NOW()),
+// ('TEMP002', 'Jane Smith', 'fadimatusani2021@gmail.com', 'placeholderpassword2', 'Teacher', '0809990099090', 'Form B', 'HND', 'default.jpg', NOW()),
+// ('TEMP003', 'Alice Johnson', 'shamsusabocom@gmail.com', 'placeholderpassword3', 'Teacher', '08003333333', 'Form C', 'Master', 'default.jpg', NOW());
+
