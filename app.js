@@ -80,26 +80,25 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
 });
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, role, formClass, subjects, classes, qualification } = req.body;
+    const { name, email, password, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
-   // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
-   const currentYear = new Date().getFullYear();
-   const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
-   const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
-   const staffId = `IHMISS${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
+    // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
+    const currentYear = new Date().getFullYear();
+    const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
+    const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
+    const staffId = `IHMISS${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
 
-
-    // Check if the email already exists
+    // Check if the email exists in the teachers table
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         if (err) {
-            console.error('Error querying database for teacher signup:', err);
+            console.error('Error querying database for email verification:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // Check if the email is already taken
-        if (results.length > 0) {
-            return res.status(400).json({ success: false, message: 'Email already registered.' });
+        // If the email is not found in the teachers table, prevent signup
+        if (results.length === 0) {
+            return res.status(400).json({ success: false, message: 'Email not authorized for signup.' });
         }
 
         // Hash the password
@@ -109,25 +108,26 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
                 return res.status(500).json({ success: false, message: 'Server error' });
             }
 
-            // Build the SQL query based on the role
-            const columns = ['name', 'email', 'password', 'role', 'qualification', 'profile_picture', 'staff_id'];
-            const values = [name, email, hashedPassword, role, qualification,  profilePicture, staffId];
+            // Build the SQL query to update the teacher's information
+            const columns = ['name', 'password', 'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns
+            const values = [name, hashedPassword, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
 
             if (role === 'Form Master') {
-                columns.push('formClass');  // Include formClass if role is 'form_master'
+                columns.push('formClass'); // Include formClass if role is 'Form Master'
                 values.push(formClass);
             }
 
-            // Insert the new teacher into the database
-            const query = `INSERT INTO teachers (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`;
+            // Update teacher's information in the database
+            const query = `UPDATE teachers SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE email = ?`;
 
-            db.query(query, values, (err, result) => {
+            db.query(query, [...values, email], (err, result) => {
                 if (err) {
-                    console.error('Error inserting teacher into database:', err);
+                    console.error('Error updating teacher in database:', err);
                     return res.status(500).json({ success: false, message: 'Server error' });
                 }
 
-                const teacherId = result.insertId; // Get the ID of the newly inserted teacher
+                // Use the teacher's ID from the results
+                const teacherId = results[0].id; // Get the ID of the existing teacher
 
                 // Helper function to insert subjects or classes
                 const insertItems = (table, itemList) => {
@@ -162,6 +162,7 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
         });
     });
 });
+
 
 // Middleware to check if the user is logged in
 function isAuthenticated(req, res, next) {
@@ -309,52 +310,14 @@ app.post('/reset-password', (req, res) => {
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
-            return res.redirect('/'); // Redirect back to dashboard if there's an error
+            return res.redirect('/login'); // Redirect back to dashboard if there's an error
         }
         res.clearCookie('connect.sid'); // Clear the session cookie
-        res.redirect('/'); // Redirect to login
+        res.redirect('/login'); // Redirect to login
     });
   });
   
-// POST route to handle Form Master/Senior Master login
-app.post('/master-login', (req, res) => {
-    const { staffIdOrEmail, password } = req.body;
-  
-    // Query to find the teacher by staff ID or email
-    const sql = `SELECT * FROM teachers WHERE staff_id = ? OR email = ?`;
-    
-    db.query(sql, [staffIdOrEmail, staffIdOrEmail], (err, result) => {
-      if (err) throw err;
-  
-      if (result.length > 0) {
-        const teacher = result[0];
-  
-        // Check the role: Only form master or senior master can proceed
-        if (teacher.role === 'Form Master' || teacher.role === 'Senior Master') {
-          // Compare passwords
-          bcrypt.compare(password, teacher.password, (err, isMatch) => {
-            if (err) throw err;
-  
-            if (isMatch) {
-              // Password matched, send success response
-              res.json({ success: true });
-            } else {
-              // Incorrect password
-              res.status(401).json({ success: false, message: 'Incorrect password' });
-            }
-          });
-        } else {
-          // User is not a form master or senior master
-          res.status(403).json({ success: false, message: 'Access denied. You are not a Form Master or Senior Master.' });
-        }
-      } else {
-        // Staff ID or email not found
-        res.status(404).json({ success: false, message: 'Staff ID or email not found' });
-      }
-    });
-  });
 
-  
    // Endpoint to add student
 app.post('/add-student', upload.single('studentPicture'), (req, res) => {
     const studentID = req.body.studentID;
@@ -693,9 +656,9 @@ app.post('/api/getStudentsByClass', (req, res) => {
 app.post('/api/submitScores', (req, res) => {
     const scores = req.body.scores; // Expecting an array of score objects
 
-    // Ensure scores is an array and not empty
-    if (!Array.isArray(scores) || scores.length === 0) {
-        return res.status(400).json({ error: 'Scores must be a non-empty array' });
+    // Ensure scores is an array
+    if (!Array.isArray(scores)) {
+        return res.status(400).json({ error: 'Scores must be an array' });
     }
 
     // SQL query to update scores
@@ -737,6 +700,171 @@ app.post('/api/submitScores', (req, res) => {
         .catch(error => {
             res.status(500).json({ error });
         });
+});
+
+
+//to create admin for the first time as it will be used to login to admin dashboard visit /creation. then create the admin in the dashboard then other admin are created.
+// Admin Signup page 
+app.get('/creation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-signup.html'));
+});
+  
+// Handle admin signup
+app.post('/creation', (req, res) => {
+    const { username, password, email, fullName, phone, role } = req.body;
+
+    // Check if the email already exists
+    db.query('SELECT email FROM admins WHERE email = ?', [email], (err, results) => {
+        if (err) {
+            console.error('Error querying database for signup:', err);
+            return res.status(500).json({ success: false, message: 'Server error' });
+        }
+
+        // Check if the email is already taken
+        if (results.length > 0) {
+            return res.status(400).json({ success: false, message: 'Email already exists' });
+        }
+
+        // Hash the password
+        bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+            if (err) {
+                console.error('Error hashing password:', err);
+                return res.status(500).json({ success: false, message: 'Server error' });
+            }
+
+            // Insert new admin into the database
+            db.query('INSERT INTO admins (username, password, email, fullName, phone, role) VALUES (?, ?, ?, ?, ?, ?)', 
+                [username, hashedPassword, email, fullName, phone, role], (err) => {
+                    if (err) {
+                        console.error('Error inserting admin into database:', err);
+                        return res.status(500).json({ success: false, message: 'Server error' });
+                    }
+                    res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.', redirectUrl: '/adminLogin' });
+                }
+            );
+        });
+    });
+});
+
+// Admin login page
+app.get('/adminLogin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin-login.html'));
+  });
+  // Handle admin login
+  app.post('/adminLogin', (req, res) => {
+    const { username, password } = req.body;
+  
+    db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+        if (err) {
+            console.error('Error querying database for admin login:', err);
+            return res.status(500).send('Server error');
+        }
+  
+        if (results.length === 0) {
+            return res.status(400).send('No admin found');
+        }
+  
+        const user = results[0];
+        if (bcrypt.compareSync(password, user.password)) {
+            req.session.user = user;
+            res.redirect('/admin-dashboard.html'); // Redirect to the admin dashboard
+        } else {
+            res.status(400).send('Incorrect password');
+        }
+    });
+  });
+  
+  // admin Logout route
+app.get('/adminLogout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.redirect('/admin-login.html');
+    });
+  });
+  
+   // staff Logout route
+app.get('/staffLogout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.redirect('/login.html');
+    });
+  });
+  
+  // Single auth-check route for both admin-dashboard.html and resources.html
+app.get('/auth-check', (req, res) => {
+    if (req.session.user) {
+      // Include userType to differentiate between admin and regular users
+      res.json({ authenticated: true, userType: req.session.userType });
+    } else {
+      res.json({ authenticated: false });
+    }
+  });
+  
+//staff management Validate Admin Credentials
+app.post('/api/validate-admin', (req, res) => {
+    const { username, password } = req.body;
+    db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+        if (err) return res.status(500).send(err);
+        if (results.length === 0) {
+            return res.json({ isValid: false });
+        }
+        const admin = results[0];
+        const isPasswordValid = bcrypt.compareSync(password, admin.password); // Assuming passwords are hashed
+        if (isPasswordValid) {
+            const role = admin.role;
+            // Only allow access if the role is Super Admin or Assistant Super Admin
+            if (role === 'Super Admin' || role === 'Assistant Super Admin') {
+                return res.json({ isValid: true, role });
+            } else {
+                return res.json({ isValid: false });
+            }
+        }
+        return res.json({ isValid: false });
+    });
+});
+
+// Fetch Staff List
+app.get('/api/staff', (req, res) => {
+    db.query('SELECT * FROM teachers', (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});
+
+// Fetch Admin List
+app.get('/api/admins', (req, res) => {
+    db.query('SELECT * FROM admins', (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});
+
+// Delete Staff
+app.delete('/api/delete-staff/:id', (req, res) => {
+    const staffId = req.params.id;
+    db.query('DELETE FROM teachers WHERE id = ?', [staffId], (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json({ success: true, message: 'Staff deleted successfully' });
+    });
+});
+
+// Delete Admin
+app.delete('/api/delete-admin/:id', (req, res) => {
+    const adminId = req.params.id;
+    db.query('SELECT role FROM admins WHERE id = ?', [adminId], (err, results) => {
+        if (err) return res.status(500).send(err);
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        const admin = results[0];
+        if (admin.role === 'Super Admin') {
+            return res.status(403).json({ message: 'Super Admin cannot be deleted' });
+        }
+        db.query('DELETE FROM admins WHERE id = ?', [adminId], (err) => {
+            if (err) return res.status(500).send(err);
+            res.json({ success: true, message: 'Admin deleted successfully' });
+        });
+    });
 });
 
 const PORT = process.env.PORT || 3000;

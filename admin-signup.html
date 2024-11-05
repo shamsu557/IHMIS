@@ -6,32 +6,10 @@
   <title>Admin Creation</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
- <link rel="stylesheet" href="admins.css">
-
-  
+  <link rel="stylesheet" href="admins.css">
 </head>
 <body>
   
-<!-- Admin Login Form -->
-<div class="container" id="loginContainer">
-  <form id="loginForm" class="border p-4 shadow-sm rounded">
-      <div class="card-header text-center">
-          Admin Creation Login
-      </div>
-      <div class="card-body">
-          <div class="form-group">
-              <label for="loginUsername">Username</label>
-              <input type="text" class="form-control" id="loginUsername" required>
-          </div>
-          <div class="form-group">
-              <label for="loginPassword">Password</label>
-              <input type="password" class="form-control" id="loginPassword" required>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Login</button>
-      </div>
-  </form>
-</div>
-
 <!-- Admin Signup Form -->
 <div class="container" id="signupContainer">
   <form id="signupForm" action="/admin-signup" method="POST" class="border p-4 shadow-sm rounded">
@@ -46,7 +24,7 @@
           <div class="row">
               <div class="col-md-6">
                   <div class="form-group">
-                      <label for="username">Email</label>
+                      <label for="email">Email</label>
                       <input type="text" class="form-control" id="email" name="email" required>
                   </div>
               </div>
@@ -60,27 +38,32 @@
           <div class="row">
               <div class="col-md-6">
                   <div class="form-group">
-                      <label for="email">Username</label>
+                      <label for="username">Username</label>
                       <input type="text" class="form-control" id="username" name="username" required>
                   </div>
               </div>
               <div class="col-md-6">
                   <div class="form-group">
-                      <label for="phone">Password</label>
+                      <label for="password">Password</label>
                       <input type="password" class="form-control" id="password" name="password" required>
                   </div>
               </div>
+          </div>
+          <div class="form-group">
+              <label for="role">Role</label>
+              <select class="form-control" id="role" name="role" required>
+                  <option value="">Select Role</option>
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Assistant Super Admin">Assistant Super Admin</option>
+              </select>
           </div>
           <button type="submit" class="btn btn-primary btn-block">Create Admin</button>
       </div>
   </form>
 </div>
 <br><br>
-  
 
-  <script src="admin-signup.js">
-   
-</script>
-
+<script src="admin-signup.js"></script>
 </body>
 </html>
