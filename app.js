@@ -800,7 +800,7 @@ app.get('/auth-check', (req, res) => {
     }
   });
   
-//staff management Validate Admin Credentials
+// Staff Management Validate Admin Credentials
 app.post('/api/validate-admin', (req, res) => {
     const { username, password } = req.body;
     db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
@@ -843,10 +843,19 @@ app.get('/api/admins', (req, res) => {
 app.delete('/api/delete-staff/:id', (req, res) => {
     const staffId = req.params.id;
     db.query('DELETE FROM teachers WHERE id = ?', [staffId], (err, results) => {
-        if (err) return res.status(500).send(err);
+        if (err) {
+            console.error(err); // Log the error for debugging
+            return res.status(500).json({ success: false, message: 'An error occurred while trying to delete the staff member.' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Staff member not found.' });
+        }
+
         res.json({ success: true, message: 'Staff deleted successfully' });
     });
 });
+
 
 // Delete Admin
 app.delete('/api/delete-admin/:id', (req, res) => {
@@ -866,6 +875,106 @@ app.delete('/api/delete-admin/:id', (req, res) => {
         });
     });
 });
+// Fetch teacher details by id
+app.get('/teacher/:id', (req, res) => {
+    const teacherId = req.params.id;
+    const query = 'SELECT staff_id, name, email, phone FROM teachers WHERE id = ?';
+    
+    // Use db.query() instead of db.execute()
+    db.query(query, [teacherId], (err, results) => {
+        if (err) {
+            console.error('Error fetching teacher data:', err);
+            return res.status(500).json({ success: false, message: 'Failed to fetch teacher data.' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, teacher: results[0] });
+        } else {
+            res.status(404).json({ success: false, message: 'Teacher not found.' });
+        }
+    });
+});
+
+app.post('/update-teacher/:staff_id', async (req, res) => {
+    const staffId = req.params.staff_id;  // staff_id used only to identify the teacher
+    const { name, email, phone, role, qualification, formClass, subjects, classes } = req.body;
+
+    // Prepare the update columns and values dynamically
+    let updateColumns = [];
+    let updateValues = [];
+
+    if (name) {
+        updateColumns.push('name = ?');
+        updateValues.push(name);
+    }
+    if (email) {
+        updateColumns.push('email = ?');
+        updateValues.push(email);
+    }
+    if (phone) {
+        updateColumns.push('phone = ?');
+        updateValues.push(phone);
+    }
+    if (role) {
+        updateColumns.push('role = ?');
+        updateValues.push(role);
+    }
+    if (qualification) {
+        updateColumns.push('qualification = ?');
+        updateValues.push(qualification);
+    }
+    if (formClass) {
+        updateColumns.push('formClass = ?');
+        updateValues.push(formClass);
+    }
+
+    try {
+        if (updateColumns.length > 0) {
+            // Update main teacher data without modifying the staff_id
+            const query = `UPDATE teachers SET ${updateColumns.join(', ')} WHERE staff_id = ?`;
+            updateValues.push(staffId);
+
+            // Perform the update query
+            const result = await db.query(query, updateValues);
+
+            // Log the result to inspect its structure
+            console.log('Update query result:', result);
+
+            // Check for affected rows
+            if (result && result.affectedRows === 0) {
+                return res.status(404).json({ success: false, message: 'Teacher not found or no changes made.' });
+            }
+        }
+
+        // Update subjects if provided
+        if (subjects && Array.isArray(subjects)) {
+            await db.query('DELETE FROM teacher_subjects WHERE teacher_id = ?', [staffId]);
+
+            const subjectPromises = subjects.map(subject => {
+                return db.query('INSERT INTO teacher_subjects (teacher_id, subject) VALUES (?, ?)', [staffId, subject]);
+            });
+
+            await Promise.all(subjectPromises);
+        }
+
+        // Update classes if provided
+        if (classes && Array.isArray(classes)) {
+            await db.query('DELETE FROM teacher_classes WHERE teacher_id = ?', [staffId]);
+
+            const classPromises = classes.map(classItem => {
+                return db.query('INSERT INTO teacher_classes (teacher_id, class) VALUES (?, ?)', [staffId, classItem]);
+            });
+
+            await Promise.all(classPromises);
+        }
+
+        res.json({ success: true, message: 'Teacher data updated successfully.' });
+    } catch (error) {
+        console.error('Error updating teacher data:', error);
+        res.status(500).json({ success: false, message: 'Failed to update teacher data.' });
+    }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <style>
+        #staffManagementSection {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="mt-5">Staff Management</h1>
+
+    <!-- Login Form for Admin -->
+    <div id="loginSection">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="adminUsername">Username</label>
+                <input type="text" class="form-control" id="adminUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Password</label>
+                <input type="password" class="form-control" id="adminPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+
+    <!-- Success Alert -->
+    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+    <!-- Staff Management Section -->
+    <div id="staffManagementSection">
+        <table class="table table-bordered" id="staffTable">
+            <thead>
+                <tr>
+                    <th>Staff ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Form Class</th>
+                    <th>Email</th>
+                    <th>Phone Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="staffBody"></tbody>
+        </table>
+
+        <h2 class="mt-4">Admin List</h2>
+        <table class="table table-bordered" id="adminTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="adminBody"></tbody>
+        </table>
+
+        <!-- Add Staff and Admin Buttons -->
+        <a href="signup.html" class="btn btn-success">Add Staff</a>
+        <a href="admin-signup.html" class="btn btn-success">Add Admin</a>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Please enter admin credentials to confirm deletion.</p>
+                <form id="adminConfirmationForm">
+                    <div class="form-group">
+                        <label for="confirmAdminUsername">Username</label>
+                        <input type="text" class="form-control" id="confirmAdminUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmAdminPassword">Password</label>
+                        <input type="password" class="form-control" id="confirmAdminPassword" required>
+                    </div>
+                    <input type="hidden" id="entityToDelete" value="">
+                    <input type="hidden" id="entityType" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Staff Modal -->
+<div class="modal fade" id="editStaffModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Staff</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editTeacherForm">
+                    <div class="form-group">
+                        <label for="staffId">Staff ID</label>
+                        <input type="text" class="form-control" id="staffId" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select" id="role" name="role" >
+                            <label for="role">Role</label>
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Senior Master">Senior Master</option>
+                            <option value="Form Master">Form Master</option>
+                        </select>
+                    </div>
+                    <div id="class-selection" class="form-group" style="display: none;">
+                        <label for="formClass">Form Class</label>
+                        <select class="form-select" id="formClass" name="formClass">
+                            <option value="" disabled selected>Select Class</option>
+                            <option value="Pre-Nursery">Pre-Nursery</option>
+                            <option value="Nursery One">Nursery 1</option>
+                            <option value="Nursery Two">Nursery 2</option>
+                            <option value="Primary One">Primary 1</option>
+                            <option value="Primary Two">Primary 2</option>
+                            <option value="Primary Three">Primary 3</option>
+                            <option value="Primary Four">Primary 4</option>
+                            <option value="Primary Five">Primary 5</option>
+                            <option value="Primary Six">Primary 6</option>
+                            <option value="JSS One">JSS 1</option>
+                            <option value="JSS Two">JSS 2</option>
+                            <option value="JSS Three">JSS 3</option>
+                            <option value="SSS One">SSS 1</option>
+                            <option value="SSS Two">SSS 2</option>
+                            <option value="SSS Three">SSS 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subjects">Subjects</label>
+                        <div><small class="text-muted">Please select all the subjects you are currently teaching by checking the boxes below.</small></div>
+
+                        <!-- Alphabetized list of Pre-Nursery, Nursery, Primary, and Secondary Subjects -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agric-science" name="subjects[]" value="Agricultural Science">
+                            <label class="form-check-label" for="agric-science">Agricultural Science</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="basic-science" name="subjects[]" value="Basic Science">
+                            <label class="form-check-label" for="basic-science">Basic Science</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="biology" name="subjects[]" value="Biology">
+                            <label class="form-check-label" for="biology">Biology</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="chemistry" name="subjects[]" value="Chemistry">
+                            <label class="form-check-label" for="chemistry">Chemistry</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="computer-studies-primary" name="subjects[]" value="Computer Studies">
+                            <label class="form-check-label" for="computer-studies-primary">Computer Studies</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="creativity" name="subjects[]" value="Creativity">
+                            <label class="form-check-label" for="creativity">Creativity</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cultural-and-creative-arts" name="subjects[]" value="Cultural and Creative Arts">
+                            <label class="form-check-label" for="cultural-and-creative-arts">Cultural and Creative Arts</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="civic-education" name="subjects[]" value="Civic Education">
+                            <label class="form-check-label" for="civic-education">Civic Education</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="economics" name="subjects[]" value="Economics">
+                            <label class="form-check-label" for="economics">Economics</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="english" name="subjects[]" value="English Language">
+                            <label class="form-check-label" for="english">English Language</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="government" name="subjects[]" value="Government">
+                            <label class="form-check-label" for="government">Government</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="health-education" name="subjects[]" value="Health Education">
+                            <label class="form-check-label" for="health-education">Health Education</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="literacy" name="subjects[]" value="Literacy">
+                            <label class="form-check-label" for="literacy">Literacy</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="literature" name="subjects[]" value="Literature in English">
+                            <label class="form-check-label" for="literature">Literature in English</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="mathematics" name="subjects[]" value="Mathematics">
+                            <label class="form-check-label" for="mathematics">Mathematics</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="numeracy" name="subjects[]" value="Numeracy">
+                            <label class="form-check-label" for="numeracy">Numeracy</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="phonics" name="subjects[]" value="Phonics">
+                            <label class="form-check-label" for="phonics">Phonics</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="physics" name="subjects[]" value="Physics">
+                            <label class="form-check-label" for="physics">Physics</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rhymes" name="subjects[]" value="Rhymes">
+                            <label class="form-check-label" for="rhymes">Rhymes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="science" name="subjects[]" value="Science">
+                            <label class="form-check-label" for="science">Science</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="social-studies" name="subjects[]" value="Social Studies">
+                            <label class="form-check-label" for="social-studies">Social Studies</label>
+                        </div>
+                    
+                        <!-- Arabic and Islamic Studies (placed at the bottom) -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="arabic" name="subjects[]" value="Arabic">
+                            <label class="form-check-label" for="arabic">Arabic (العربية)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="islamic-studies" name="subjects[]" value="Islamic Studies">
+                            <label class="form-check-label" for="islamic-studies">Islamic Studies (الدراسات الإسلامية)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="quranic-studies" name="subjects[]" value="Quranic Studies">
+                            <label class="form-check-label" for="quranic-studies">Quranic Studies (دراسات القرآن)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="tafsir" name="subjects[]" value="Tafsir">
+                            <label class="form-check-label" for="tafsir">Tafsir (تفسير)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="hadith" name="subjects[]" value="Hadith">
+                            <label class="form-check-label" for="hadith">Hadith (الحديث)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="fiqh" name="subjects[]" value="Fiqh">
+                            <label class="form-check-label" for="fiqh">Fiqh (الفقه)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="seerah" name="subjects[]" value="Seerah">
+                            <label class="form-check-label" for="seerah">Seerah (السيرة النبوية)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="aqeedah" name="subjects[]" value="Aqeedah">
+                            <label class="form-check-label" for="aqeedah">Aqeedah (العقيدة)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="tajweed" name="subjects[]" value="Tajweed">
+                            <label class="form-check-label" for="tajweed">Tajweed (التجويد)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="arabic-grammar" name="subjects[]" value="Arabic Grammar">
+                            <label class="form-check-label" for="arabic-grammar">Arabic Grammar (النحو العربي)</label>
+                        </div>
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="classes">Classes</label>
+                        <div><small class="text-muted">Please select all the classes you are currently teaching by checking the boxes below.</small>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pre-nursery" name="classes[]" value="Pre-Nursery">
+                            <label class="form-check-label" for="pre-nursery">Pre-Nursery</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="nursery-1" name="classes[]" value="Nursery One">
+                            <label class="form-check-label" for="nursery-1">Nursery 1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="nursery-2" name="classes[]" value="Nursery Two">
+                            <label class="form-check-label" for="nursery-2">Nursery 2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-1" name="classes[]" value="Primary One">
+                            <label class="form-check-label" for="primary-1">Primary 1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-2" name="classes[]" value="Primary Two">
+                            <label class="form-check-label" for="primary-2">Primary 2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-3" name="classes[]" value="Primary Three">
+                            <label class="form-check-label" for="primary-3">Primary 3</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-4" name="classes[]" value="Primary Four">
+                            <label class="form-check-label" for="primary-4">Primary 4</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-5" name="classes[]" value="Primary Five">
+                            <label class="form-check-label" for="primary-5">Primary 5</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="primary-6" name="classes[]" value="Primary Six">
+                            <label class="form-check-label" for="primary-6">Primary 6</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jss-1" name="classes[]" value="JSS One">
+                            <label class="form-check-label" for="jss-1">JSS 1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jss-2" name="classes[]" value="JSS Two">
+                            <label class="form-check-label" for="jss-2">JSS 2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jss-3" name="classes[]" value="JSS Three">
+                            <label class="form-check-label" for="jss-3">JSS 3</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ss-1" name="classes[]" value="SSS One">
+                            <label class="form-check-label" for="ss-1">SS 1</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ss-2" name="classes[]" value="SSS Two">
+                            <label class="form-check-label" for="ss-2">SS 2</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ss-3" name="classes[]" value="SSS Three">
+                            <label class="form-check-label" for="ss-3">SS 3</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="qualification" class="form-label">Highest Qualification</label>
+                            <select class="form-select" id="qualification" name="qualification" >
+                                <option value="" disabled selected>Select Qualification</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="HND">HND</option>
+                                <option value="BSc">BSc</option>
+                                <option value="Master">Master</option>
+                                <option value="NCE">NCE</option>
+                                <option value="PhD">PhD</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="profilePicture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*" >
+                        </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <div class="modal-footer">
+                        <button id="confirm-edit" type="button" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="$('#edit-modal').hide();">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        // Login Form Submission
+        $('#adminLoginForm').submit(function(e) {
+            e.preventDefault();
+            const username = $('#adminUsername').val();
+            const password = $('#adminPassword').val();
+
+            $.post('/api/validate-admin', { username, password }, function(response) {
+                if (response.isValid && (response.role === 'Super Admin' || response.role === 'Assistant Super Admin')) {
+                    $('#loginSection').hide();
+                    $('#staffManagementSection').show();
+                    fetchStaff();
+                    fetchAdmins();
+                } else {
+                    alert('Invalid credentials or insufficient permissions!');
+                }
+            });
+        });
+
+        // Fetch Staff
+        function fetchStaff() {
+            $.get('/api/staff', function(data) {
+                $('#staffBody').empty();
+                data.forEach(staff => {
+                    $('#staffBody').append(`
+                        <tr>
+                            <td>${staff.staff_id}</td>
+                            <td>${staff.name}</td>
+                            <td>${staff.role}</td>
+                            <td>${staff.role === 'Form Master' ? staff.formClass : ''}</td>
+                            <td>${staff.email}</td>
+                            <td>${staff.phone}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editStaff(${staff.id})">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteEntity('staff', ${staff.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            });
+        }
+
+        // Fetch Admins
+        function fetchAdmins() {
+            $.get('/api/admins', function(data) {
+                $('#adminBody').empty();
+                data.forEach(admin => {
+                    $('#adminBody').append(`
+                        <tr>
+                            <td>${admin.username}</td>
+                            <td>${admin.fullName}</td>
+                            <td>${admin.role}</td>
+                            <td>${admin.phone}</td>
+                            <td>${admin.email}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteEntity('admin', ${admin.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            });
+        }
+
+        // Delete Entity and Confirmation
+        window.deleteEntity = function(type, id) {
+            $('#entityToDelete').val(id);
+            $('#entityType').val(type);
+            $('#confirmationModal').modal('show');
+        };
+
+        $('#confirmDelete').click(function() {
+            const id = $('#entityToDelete').val();
+            const type = $('#entityType').val();
+            const username = $('#confirmAdminUsername').val();
+            const password = $('#confirmAdminPassword').val();
+
+            $.post('/api/validate-admin', { username, password }, function(response) {
+                if (response.isValid) {
+                    $.ajax({
+                        url: `/api/delete-${type}/${id}`,
+                        type: 'DELETE',
+                        success: function() {
+                            fetchStaff();
+                            fetchAdmins();
+                            $('#confirmationModal').modal('hide');
+                            $('#successMessage').text('Entity deleted successfully.').show().delay(3000).fadeOut();
+                        },
+                        error: function(err) {
+                            alert('Error deleting the entity: ' + (err.responseJSON.message || 'An error occurred.'));
+                        }
+                    });
+                } else {
+                    alert('Invalid admin credentials!');
+                }
+            });
+        });
+// Show or hide formClass field based on role selection
+document.getElementById('role').addEventListener('change', function () {
+    const formClassField = document.getElementById('class-selection');
+    const formClassInput = document.getElementById('formClass');
+
+    // Show the formClass field only if "Form Master" is selected
+    if (this.value === 'Form Master') {
+        formClassField.style.display = 'block';
+    } else {
+        formClassField.style.display = 'none';
+        formClassInput.value = ''; // Clear formClass input if not needed
+    }
+});
+
+
+        // Function to open and populate the Edit Staff modal
+    window.editStaff = function (staffId) {
+        fetch(`/teacher/${staffId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const teacher = data.teacher;
+                    $('#staffId').val(teacher.staff_id);
+                    $('#name').val(teacher.name);
+                    $('#email').val(teacher.email);
+                    $('#phone').val(teacher.phone);
+                    $('#role').val(teacher.role);
+
+                    // Show or hide form class based on role
+                    if (teacher.role === 'Form Master') {
+                        $('#class-selection').show();
+                        $('#formClass').val(teacher.formClass || '');
+                    } else {
+                        $('#class-selection').hide();
+                        $('#formClass').val('');
+                    }
+
+                    // Populate subjects
+                    const subjectSelect = $('#subjects').empty();
+                    (teacher.subjects || []).forEach(subject => {
+                        subjectSelect.append(`<option value="${subject}" selected>${subject}</option>`);
+                    });
+
+                    // Populate classes
+                    const classSelect = $('#classes').empty();
+                    (teacher.classes || []).forEach(classItem => {
+                        classSelect.append(`<option value="${classItem}" selected>${classItem}</option>`);
+                    });
+
+                    // Show the modal
+                    $('#editStaffModal').modal('show');
+                } else {
+                    alert('Could not load staff data for editing.');
+                }
+            })
+            .catch(error => console.error('Error loading staff data:', error));
+    };
+
+
+    // Handle form submission in the modal
+    $('#editTeacherForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const teacherData = {
+            staff_id: $('#staffId').val(),
+            name: $('#name').val(),
+            email: $('#email').val(),
+            phone: $('#phone').val(),
+            role: $('#role').val(),
+        };
+
+        if (teacherData.role === 'Form Master') {
+            teacherData.formClass = $('#formClass').val();
+        }
+
+        const selectedSubjects = Array.from($('#subjects').find('option:selected')).map(option => option.value);
+        if (selectedSubjects.length) {
+            teacherData.subjects = selectedSubjects;
+        }
+
+        const selectedClasses = Array.from($('#classes').find('option:selected')).map(option => option.value);
+        if (selectedClasses.length) {
+            teacherData.classes = selectedClasses;
+        }
+
+        fetch(`/update-teacher/${teacherData.staff_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(teacherData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Teacher details updated successfully!');
+                $('#editStaffModal').modal('hide');
+                fetchStaff(); // Refresh the staff table
+            } else {
+                alert('Failed to update teacher details.');
+            }
+        })
+        .catch(error => console.error('Error updating teacher data:', error));
+    });
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
