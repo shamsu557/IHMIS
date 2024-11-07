@@ -412,31 +412,32 @@ app.post('/api/getStudents', (req, res) => {
 // DELETE student endpoint
 app.delete('/api/deleteStudent/:studentID', (req, res) => {
     const studentID = req.params.studentID;
-    const { staffEmailOrID, password } = req.body;
+    const { username, password } = req.body;
 
-    const checkStaffQuery = `
-        SELECT * FROM teachers
-        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
+    // Query the admins table to verify username and password
+    const checkAdminQuery = `
+        SELECT * FROM admins
+        WHERE username = ?
     `;
 
-    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
+    db.query(checkAdminQuery, [username], (err, adminResults) => {
         if (err) {
-            console.error('Error verifying staff:', err);
-            return res.status(500).json({ message: 'Error verifying staff credentials' });
+            console.error('Error verifying admin:', err);
+            return res.status(500).json({ message: 'Error verifying admin credentials' });
         }
 
-        if (staffResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        if (adminResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect username or password' });
         }
 
-        const staff = staffResults[0];
+        const admin = adminResults[0];
 
-        // Ensure staff password exists and appears hashed
-        if (!staff.password || !staff.password.startsWith('$2')) {
+        // Ensure admin password exists and appears hashed
+        if (!admin.password || !admin.password.startsWith('$2')) {
             return res.status(500).json({ message: 'Error: Invalid password format in the database' });
         }
 
-        bcrypt.compare(password, staff.password, (err, isMatch) => {
+        bcrypt.compare(password, admin.password, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords:', err);
                 return res.status(500).json({ message: 'Error verifying password' });
@@ -464,6 +465,7 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
+
 // Endpoint for editing a student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     const {
@@ -484,28 +486,24 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         WHERE studentID = ?
     `;
 
-    const checkStaffQuery = `
-        SELECT * FROM teachers
-        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
+    const checkAdminQuery = `
+        SELECT * FROM admins
+        WHERE (username = ? OR email = ?)
     `;
 
-    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
+    db.query(checkAdminQuery, [staffEmailOrID, staffEmailOrID], (err, adminResults) => {
         if (err) {
-            console.error('Error verifying staff:', err);
-            return res.status(500).json({ message: 'Error verifying staff credentials' });
+            console.error('Error verifying admin:', err);
+            return res.status(500).json({ message: 'Error verifying admin credentials' });
         }
 
-        if (staffResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        if (adminResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
         }
 
-        const staff = staffResults[0];
+        const admin = adminResults[0];
 
-        if (!staff.password || !staff.password.startsWith('$2')) {
-            return res.status(500).json({ message: 'Error: Invalid password format in the database' });
-        }
-
-        bcrypt.compare(password, staff.password, (err, isMatch) => {
+        bcrypt.compare(password, admin.password, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords:', err);
                 return res.status(500).json({ message: 'Error verifying password' });
@@ -562,7 +560,6 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     });
 });
 
-// Route teacher for login for result
 // Route teacher for login for result
 app.post('/result_login', (req, res) => {
     const { staffIdentifier, password } = req.body;
