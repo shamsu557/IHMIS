@@ -252,28 +252,36 @@ button {
                 <a class="nav-link text-danger" href="student_management.html">Students Management</a>
           
               </li>
+              </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
+            </li>
         </ul>
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
   </nav>
-    <div class="center-container bg-light mt-auto">
-        <h1 class="text-center">Select Class and View Students</h1>
+  <div class="center-container bg-light mt-auto" style="max-height: 500px; overflow-y: auto;">
+    <h1 id="select-class-header" class="text-center">Select Class and View Students</h1>
 
-        <div class="form-group">
-            <label for="class-selection">Class:</label>
-            <select id="class-selection" name="class" class="form-control" required>
-                <option value="" selected disabled>Select Class</option>
-            </select>
-        </div>
+    <div class="form-group">
+        <label id="class-label" for="class-selection">Class:</label>
+        <select id="class-selection" name="class" class="form-control" required>
+            <option value="" selected disabled>Select Class</option>
+            <!-- Populate this dropdown with classes dynamically -->
+        </select>
+    </div>
 
-        <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
+    <button id="view-students" type="button" class="btn btn-success">View Students</button>
 
-        <h2 class="mt-4">Students in Selected Class:</h2>
-        <ul id="student-list" class="list-unstyled"> </ul>   
-        <div>
-            <button class="btn btn-primary" onclick="window.location.href='add.html'">Add Student</button>
-            <button class="btn btn-info">View Students</button>
-        </div>      
+    <!-- New button to go back to class selection -->
+    <button id="back-to-selection" type="button" class="btn btn-secondary mt-3" style="display: none;">Back to Class Selection</button>
+
+    <!-- Placeholder for the selected class name -->
+    <h4 id="selected-class-header" class="mt-4"></h4>
+
+    <!-- List of students will appear here -->
+    <ul id="student-list" class="list-unstyled"></ul>
+</div>
         <div id="confirmation-modal" class="modal" tabindex="-1" role="dialog" style="display:none;">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -284,14 +292,14 @@ button {
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Please enter your Staff ID or Email and Password:</p>
-                        <input type="text" id="staff-email-input" class="form-control" placeholder="Staff ID or Email">
-                        <input type="password" id="staff-password-input" class="form-control" placeholder="Password">
+                        <p>Please enter your Username and Password:</p>
+                        <input type="text" id="admin-username-input" class="form-control" placeholder="Username">
+                        <input type="password" id="admin-password-input" class="form-control" placeholder="Password">
                     </div>
                     <div class="modal-footer">
                         <button id="confirm-delete" type="button" class="btn btn-danger">Confirm</button>
                         <button id="cancel-delete" type="button" class="btn btn-secondary" onclick="$('#confirmation-modal').hide();">Cancel</button>
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>
@@ -307,10 +315,10 @@ button {
                 </button>
             </div>
             <div class="modal-body">
-                <p>Please enter your Staff ID or Email and Password:</p>
-                <input type="text" id="staff-email-input-edit" class="form-control" placeholder="Staff ID or Email">
-                <input type="password" id="staff-password-input-edit" class="form-control" placeholder="Password">
-            </div>
+                <p>Please enter your Admin Username or Email and Password:</p>
+                <input type="text" id="admin-email-input-edit" class="form-control" placeholder="Admin Username or Email">
+                <input type="password" id="admin-password-input-edit" class="form-control" placeholder="Password">
+            </div>            
             <div class="modal-footer">
                 <button id="confirm-edit-save" type="button" class="btn btn-primary">Confirm Edit</button>
                 <button id="cancel-edit" type="button" class="btn btn-secondary" onclick="$('#edit-confirmation-modal').hide();">Cancel</button>
@@ -357,22 +365,133 @@ button {
                     </select>
 
                     <label>Subjects</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Mathematics" id="math" name="subjects">
-                        <label class="form-check-label" for="math">Mathematics</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="English" id="english" name="subjects">
-                        <label class="form-check-label" for="english">English</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Science" id="science" name="subjects">
-                        <label class="form-check-label" for="science">Science</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="Social Studies" id="socialStudies" name="subjects">
-                        <label class="form-check-label" for="socialStudies">Social Studies</label>
-                    </div>
+                    <!-- Alphabetized list of Pre-Nursery, Nursery, Primary, and Secondary Subjects -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="agric-science" name="subjects[]" value="Agricultural Science">
+        <label class="form-check-label" for="agric-science">Agricultural Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="basic-science" name="subjects[]" value="Basic Science">
+        <label class="form-check-label" for="basic-science">Basic Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="biology" name="subjects[]" value="Biology">
+        <label class="form-check-label" for="biology">Biology</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="chemistry" name="subjects[]" value="Chemistry">
+        <label class="form-check-label" for="chemistry">Chemistry</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="computer-studies-primary" name="subjects[]" value="Computer Studies">
+        <label class="form-check-label" for="computer-studies-primary">Computer Studies</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="creativity" name="subjects[]" value="Creativity">
+        <label class="form-check-label" for="creativity">Creativity</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="cultural-and-creative-arts" name="subjects[]" value="Cultural and Creative Arts">
+        <label class="form-check-label" for="cultural-and-creative-arts">Cultural and Creative Arts</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="civic-education" name="subjects[]" value="Civic Education">
+        <label class="form-check-label" for="civic-education">Civic Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="economics" name="subjects[]" value="Economics">
+        <label class="form-check-label" for="economics">Economics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="english" name="subjects[]" value="English Language">
+        <label class="form-check-label" for="english">English Language</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="government" name="subjects[]" value="Government">
+        <label class="form-check-label" for="government">Government</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="health-education" name="subjects[]" value="Health Education">
+        <label class="form-check-label" for="health-education">Health Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="literacy" name="subjects[]" value="Literacy">
+        <label class="form-check-label" for="literacy">Literacy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="literature" name="subjects[]" value="Literature in English">
+        <label class="form-check-label" for="literature">Literature in English</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="mathematics" name="subjects[]" value="Mathematics">
+        <label class="form-check-label" for="mathematics">Mathematics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="numeracy" name="subjects[]" value="Numeracy">
+        <label class="form-check-label" for="numeracy">Numeracy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="phonics" name="subjects[]" value="Phonics">
+        <label class="form-check-label" for="phonics">Phonics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="physics" name="subjects[]" value="Physics">
+        <label class="form-check-label" for="physics">Physics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="rhymes" name="subjects[]" value="Rhymes">
+        <label class="form-check-label" for="rhymes">Rhymes</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="science" name="subjects[]" value="Science">
+        <label class="form-check-label" for="science">Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="social-studies" name="subjects[]" value="Social Studies">
+        <label class="form-check-label" for="social-studies">Social Studies</label>
+    </div>
+
+    <!-- Arabic and Islamic Studies (placed at the bottom) -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="arabic" name="subjects[]" value="Arabic">
+        <label class="form-check-label" for="arabic">Arabic (العربية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="islamic-studies" name="subjects[]" value="Islamic Studies">
+        <label class="form-check-label" for="islamic-studies">Islamic Studies (الدراسات الإسلامية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="quranic-studies" name="subjects[]" value="Quranic Studies">
+        <label class="form-check-label" for="quranic-studies">Quranic Studies (دراسات القرآن)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="tafsir" name="subjects[]" value="Tafsir">
+        <label class="form-check-label" for="tafsir">Tafsir (تفسير)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="hadith" name="subjects[]" value="Hadith">
+        <label class="form-check-label" for="hadith">Hadith (الحديث)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="fiqh" name="subjects[]" value="Fiqh">
+        <label class="form-check-label" for="fiqh">Fiqh (الفقه)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="seerah" name="subjects[]" value="Seerah">
+        <label class="form-check-label" for="seerah">Seerah (السيرة النبوية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="aqeedah" name="subjects[]" value="Aqeedah">
+        <label class="form-check-label" for="aqeedah">Aqeedah (العقيدة)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="tajweed" name="subjects[]" value="Tajweed">
+        <label class="form-check-label" for="tajweed">Tajweed (التجويد)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="arabic-grammar" name="subjects[]" value="Arabic Grammar">
+        <label class="form-check-label" for="arabic-grammar">Arabic Grammar (النحو العربي)</label>
+    </div>
 
                     <label for="studentPicture">Student Picture</label>
                     <input type="file" class="form-control-file" id="studentPicture" accept="image/*">
@@ -506,22 +625,22 @@ $(document).on('click', '.delete-btn', function() {
 
 // Confirm delete
 $('#confirm-delete').click(function() {
-    const confirmationInput = $('#staff-email-input').val();
-    const passwordInput = $('#staff-password-input').val();
-    if (confirmationInput && passwordInput) {
-        deleteStudent(studentToDelete, confirmationInput, passwordInput);
+    const usernameInput = $('#admin-username-input').val();
+    const passwordInput = $('#admin-password-input').val();
+    if (usernameInput && passwordInput) {
+        deleteStudent(studentToDelete, usernameInput, passwordInput);
     } else {
-        alert('Please enter your Staff ID/Email and Password.');
+        alert('Please enter your Username and Password.');
     }
 });
 
 // Function to delete student
-function deleteStudent(studentId, staffEmailOrID, password) {
+function deleteStudent(studentId, username, password) {
     $.ajax({
         url: `/api/deleteStudent/${studentId}`,
         method: 'DELETE',
         contentType: 'application/json',
-        data: JSON.stringify({ staffEmailOrID, password }),
+        data: JSON.stringify({ username, password }),
         success: function(response) {
             alert(response.message);
             $('#confirmation-modal').hide();
@@ -532,6 +651,7 @@ function deleteStudent(studentId, staffEmailOrID, password) {
         }
     });
 }
+
 
 // Edit student button handler
 $(document).on('click', '.edit-btn', function() {
@@ -558,8 +678,8 @@ $('#confirm-edit').click(function() {
 
 // Confirm edit in the edit confirmation modal
 $('#confirm-edit-save').click(function() {
-    const confirmationInput = $('#staff-email-input-edit').val();
-    const passwordInput = $('#staff-password-input-edit').val();
+    const confirmationInput = $('#admin-email-input-edit').val();
+    const passwordInput = $('#admin-password-input-edit').val();
 
     if (confirmationInput && passwordInput) {
         const updatedStudent = {
@@ -625,20 +745,49 @@ function editStudent(student, staffEmailOrID, password) {
     });
 }
 
+
+
 $(document).ready(function() {
     loadClassOptions();
 
+    // Click event for "View Students" button
     $('#view-students').click(function() {
         const classSelection = $('#class-selection').val();
+        const selectedClassText = $('#class-selection option:selected').text();
+
         if (classSelection) {
+            // Load students for the selected class
             loadStudents(classSelection);
+
+            // Hide class selection fields and "View Students" button
+            $('#select-class-header').hide();
+            $('#view-students').hide();
+            $('#class-label').hide();
+            $('#class-selection').hide();
+
+            // Show the selected class name and "Back to Class Selection" button
+            $('#selected-class-header').text(`${selectedClassText} Students:`).show();
+            $('#back-to-selection').show();
         } else {
             alert('Please select a class.');
         }
     });
+
 });
 
+ // Click event for "Back to Class Selection" button
+ $('#back-to-selection').click(function() {
+        // Hide the selected class header, student list, and "Back to Class Selection" button
+        $('#selected-class-header').hide();
+        $('#student-list').empty();  // Clear the student list
+        $(this).hide();
 
+        // Show class selection fields and "View Students" button
+        $('#select-class-header').show();
+        $('#view-students').show();
+        $('#class-label').show();
+        $('#class-selection').show();
+    });
 
 // Back to top button functionality
 window.onscroll = function() { scrollFunction() };

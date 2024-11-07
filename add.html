@@ -247,6 +247,10 @@ button {
             <li class="nav-item">
                 <a class="nav-link text-danger" href="student_management.html">Students Management</a>
               </li>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
+            </li>
         </ul>
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
@@ -435,9 +439,7 @@ button {
         <input type="file" class="form-control-file" id="studentPicture" accept="image/*" required>
       </div>
       <div>
-        <button class="btn btn-warning" onclick="window.location.href='edit.html'">Edit Student</button>
-        <button type="submit" class="btn btn-success" >Submit Student</button>
-        <button class="btn btn-info">View Students</button>
+        <button type="submit" class="btn btn-success btn-block" >Submit Student</button>
     </div> 
     </form>
   </div> 
