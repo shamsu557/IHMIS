@@ -975,7 +975,32 @@ app.post('/update-teacher/:staff_id', async (req, res) => {
     }
 });
 
+// for view students page
+// Endpoint to get students by class
+app.post('/api/fetchStudents', (req, res) => {
+    const { class: className } = req.body;
+    const query = 'SELECT * FROM students WHERE class = ?'; // Replace with your actual table name
+    db.query(query, [className], (err, results) => {
+        if (err) {
+            console.error('Error fetching students:', err);
+            return res.status(500).send('Server Error');
+        }
+        res.json(results);
+    });
+});
 
+// Endpoint to get classes
+app.get('/api/fetchClasses', (req, res) => {
+    const query = 'SELECT DISTINCT class FROM students'; // Replace with your actual table name
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching classes:', err);
+            return res.status(500).send('Server Error');
+        }
+        const classes = results.map(row => row.class);
+        res.json(classes);
+    });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

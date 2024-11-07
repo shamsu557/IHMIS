@@ -10,15 +10,22 @@
         #staffManagementSection {
             display: none;
         }
+        
     </style>
 </head>
 <body>
-<div class="container">
-    <h1 class="mt-5">Staff Management</h1>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3>Staff Management</h3>
+                    </div>
+                    <div class="card-body">
 
     <!-- Login Form for Admin -->
     <div id="loginSection">
-        <h2>Admin Login</h2>
+        <h2 class="text-center">Admin Login</h2>
         <form id="adminLoginForm">
             <div class="form-group">
                 <label for="adminUsername">Username</label>
@@ -35,43 +42,20 @@
     <!-- Success Alert -->
     <div id="successMessage" class="alert alert-success" style="display: none;"></div>
 
-    <!-- Staff Management Section -->
-    <div id="staffManagementSection">
-        <table class="table table-bordered" id="staffTable">
-            <thead>
-                <tr>
-                    <th>Staff ID</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Form Class</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="staffBody"></tbody>
-        </table>
+<!-- Staff Management Section -->
+<div id="staffManagementSection">
 
-        <h2 class="mt-4">Admin List</h2>
-        <table class="table table-bordered" id="adminTable">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="adminBody"></tbody>
-        </table>
+    <h2>Staff List</h2>
+    <div id="staffList"></div> <!-- Placeholder for Staff List -->
 
-        <!-- Add Staff and Admin Buttons -->
-        <a href="signup.html" class="btn btn-success">Add Staff</a>
-        <a href="admin-signup.html" class="btn btn-success">Add Admin</a>
-    </div>
+    <h2 class="mt-4">Admin List</h2>
+    <div id="adminList"></div> <!-- Placeholder for Admin List -->
+
+    <!-- Add Staff and Admin Buttons -->
+    <a href="signup.html" class="btn btn-success">Add Staff</a>
+    <a href="admin-signup.html" class="btn btn-success">Add Admin</a>
 </div>
+
 
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog">
@@ -115,7 +99,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
                 <form id="editTeacherForm">
                     <div class="form-group">
                         <label for="staffId">Staff ID</label>
@@ -247,7 +231,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="science" name="subjects[]" value="Science">
                             <label class="form-check-label" for="science">Science</label>
-                        </div>
+                        </div>b
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="social-studies" name="subjects[]" value="Social Studies">
                             <label class="form-check-label" for="social-studies">Social Studies</label>
@@ -376,15 +360,15 @@
                             <label for="profilePicture" class="form-label">Profile Picture</label>
                             <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*" >
                         </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <div class="modal-footer">
-                        <button id="confirm-edit" type="button" class="btn btn-primary">Save Changes</button>
-                        <button type="button" class="btn btn-secondary" onclick="$('#edit-modal').hide();">Cancel</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <script>
     $(document).ready(function() {
@@ -406,49 +390,40 @@
             });
         });
 
-        // Fetch Staff
-        function fetchStaff() {
-            $.get('/api/staff', function(data) {
-                $('#staffBody').empty();
-                data.forEach(staff => {
-                    $('#staffBody').append(`
-                        <tr>
-                            <td>${staff.staff_id}</td>
-                            <td>${staff.name}</td>
-                            <td>${staff.role}</td>
-                            <td>${staff.role === 'Form Master' ? staff.formClass : ''}</td>
-                            <td>${staff.email}</td>
-                            <td>${staff.phone}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editStaff(${staff.id})">Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteEntity('staff', ${staff.id})">Delete</button>
-                            </td>
-                        </tr>
-                    `);
-                });
-            });
-        }
+      // Fetch Staff
+function fetchStaff() {
+    $.get('/api/staff', function(data) {
+        $('#staffList').empty(); // Assuming the list is in an element with id 'staffList'
+        data.forEach(staff => {
+            $('#staffList').append(`
+                <li>
+                    ${staff.staff_id} - ${staff.name} - ${staff.role} 
+                    ${staff.role === 'Form Master' ? `- ${staff.formClass}` : ''} 
+                    - ${staff.email} - ${staff.phone}
+                    <button class="btn btn-warning btn-sm" onclick="editStaff(${staff.id})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteEntity('staff', ${staff.id})">Delete</button>
+                </li>
+                <hr> <!-- Horizontal line for separation -->
+            `);
+        });
+    });
+}
 
-        // Fetch Admins
-        function fetchAdmins() {
-            $.get('/api/admins', function(data) {
-                $('#adminBody').empty();
-                data.forEach(admin => {
-                    $('#adminBody').append(`
-                        <tr>
-                            <td>${admin.username}</td>
-                            <td>${admin.fullName}</td>
-                            <td>${admin.role}</td>
-                            <td>${admin.phone}</td>
-                            <td>${admin.email}</td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" onclick="deleteEntity('admin', ${admin.id})">Delete</button>
-                            </td>
-                        </tr>
-                    `);
-                });
-            });
-        }
+// Fetch Admins
+function fetchAdmins() {
+    $.get('/api/admins', function(data) {
+        $('#adminList').empty(); // Assuming the list is in an element with id 'adminList'
+        data.forEach(admin => {
+            $('#adminList').append(`
+                <li>
+                    ${admin.username} - ${admin.fullName} - ${admin.role} - ${admin.phone} - ${admin.email}
+                    <button class="btn btn-danger btn-sm" onclick="deleteEntity('admin', ${admin.id})">Delete</button>
+                </li>
+                <hr> <!-- Horizontal line for separation -->
+            `);
+        });
+    });
+}
 
         // Delete Entity and Confirmation
         window.deleteEntity = function(type, id) {
