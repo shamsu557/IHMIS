@@ -998,6 +998,79 @@ app.get('/api/fetchClasses', (req, res) => {
         res.json(classes);
     });
 });
+
+// Form Master Login Route
+app.post('/form-master-login', (req, res) => {
+    const { identifier, password } = req.body;
+    const query = `SELECT * FROM teachers WHERE (email = ? OR staff_id = ?) AND role = 'Form Master'`;
+
+    db.query(query, [identifier, identifier], async (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).send("Internal server error");
+        }
+        if (results.length === 0) return res.status(401).json({ message: "Invalid credentials" });
+
+        const formMaster = results[0];
+        const isPasswordMatch = await bcrypt.compare(password, formMaster.password);
+
+        if (!isPasswordMatch) return res.status(401).json({ message: "Invalid password" });
+
+        // Login successful - fetch students in the form master's assigned class
+        const formClass = formMaster.formClass;
+        const staffId = formMaster.staff_id; // Include the staff_id in the response
+        const studentsQuery = `SELECT * FROM students WHERE class = ?`;
+
+        db.query(studentsQuery, [formClass], (err, students) => {
+            if (err) {
+                console.error('Error fetching students:', err);
+                return res.status(500).json({ message: "Error fetching students" });
+            }
+
+            res.json({
+                message: "Login successful",
+                formClass: formClass, // Ensure the frontend receives the assigned class
+                staffId: staffId,
+                students: students // List of students in the form master's assigned class
+            });
+        });
+    });
+});
+
+app.post('/form-master/submit-assessment', (req, res) => {
+    const { term, session, assessments } = req.body;
+
+    const assessmentQueries = assessments.map(({ studentID, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment }) => {
+        return new Promise((resolve, reject) => {
+            // Insert or update the assessment without calculating averages
+            const insertQuery = `
+                INSERT INTO form_master_assessments (studentID, term, session, academic_responsibility, respect_and_discipline, punctuality_and_personal_organization, social_and_physical_development)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                    academic_responsibility = VALUES(academic_responsibility),
+                    respect_and_discipline = VALUES(respect_and_discipline),
+                    punctuality_and_personal_organization = VALUES(punctuality_and_personal_organization),
+                    social_and_physical_development = VALUES(social_and_physical_development)
+            `;
+
+            db.query(insertQuery, [
+                studentID, term, session, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment
+            ], (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+    });
+
+    Promise.all(assessmentQueries)
+        .then(() => res.status(200).json({ message: 'Assessment data saved successfully' }))
+        .catch(error => {
+            console.error('Error saving assessments:', error);
+            res.status(500).json({ message: 'Failed to save assessment data' });
+        });
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
