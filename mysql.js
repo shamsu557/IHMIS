@@ -98,4 +98,24 @@ module.exports = db;
 // ('TEMP001', 'John Doe', '1440shamsusabo@gmail.com', 'placeholderpassword1', 'Teacher', '08030909799', 'Form A', 'BSc', 'default.jpg', NOW()),
 // ('TEMP002', 'Jane Smith', 'fadimatusani2021@gmail.com', 'placeholderpassword2', 'Teacher', '0809990099090', 'Form B', 'HND', 'default.jpg', NOW()),
 // ('TEMP003', 'Alice Johnson', 'shamsusabocom@gmail.com', 'placeholderpassword3', 'Teacher', '08003333333', 'Form C', 'Master', 'default.jpg', NOW());
+// -- Create form_master_assessments table to store assessments
+// //CREATE TABLE  form_master_assessments (
+//     id INT AUTO_INCREMENT PRIMARY KEY,
+//     studentID VARCHAR(50) NOT NULL,  -- Primary identifier for the student
+//     term ENUM('First Term', 'Second Term', 'Third Term') DEFAULT 'First Term',
+//     session ENUM('2024/2025', '2025/2026', '2026/2027') NOT NULL DEFAULT '2024/2025',  -- Default to '2024/2025'
+    
+//     -- Individual scores for each category (1-5)
+//     academic_responsibility TINYINT NOT NULL CHECK (academic_responsibility BETWEEN 1 AND 5),
+//     respect_and_discipline TINYINT NOT NULL CHECK (respect_and_discipline BETWEEN 1 AND 5),
+//     punctuality_and_personal_organization TINYINT NOT NULL CHECK (punctuality_and_personal_organization BETWEEN 1 AND 5),
+//     social_and_physical_development TINYINT NOT NULL CHECK (social_and_physical_development BETWEEN 1 AND 5),
 
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+//     -- Ensure the combination of studentID and term is unique
+//     CONSTRAINT unique_student_term UNIQUE (studentID, term),
+
+//     -- Foreign key constraint for studentID
+//     CONSTRAINT fk_student FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
+// );

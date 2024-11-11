@@ -1,11 +1,19 @@
 function toggleNavbar() {
     const navbarNav = document.getElementById("navbarNav");
     const cancelButton = document.querySelector(".cancel-btn");
-    const menuIcon = document.querySelector(".navbar-toggler-icon");
+    const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
 
-    const isOpen = navbarNav.classList.toggle("show");
-    cancelButton.style.display = isOpen ? "block" : "none"; // Toggle cancel button
-    menuIcon.classList.toggle("hidden", isOpen); // Show/hide menu icon
+    if (navbarNav.classList.contains("show")) {
+        // If navbar is open, close it
+        navbarNav.classList.remove("show");
+        cancelButton.style.display = "none"; // Hide cancel button
+        menuIcon.classList.remove("hidden"); // Show menu icon
+    } else {
+        // If navbar is closed, open it
+        navbarNav.classList.add("show");
+        cancelButton.style.display = "block"; // Show cancel button
+        menuIcon.classList.add("hidden"); // Hide menu icon completely
+    }
 }
 
 async function validateStaff() {
@@ -118,12 +126,18 @@ async function loadStudents() {
                         <td>${student.studentID}</td>
                         <td>${student.firstname} ${student.othername || ''} ${student.surname}</td>
                         ${['test1', 'test2', 'test3', 'exam'].map(test => `
-                            <td><input type="number" class="form-control score-input" name="${test}" data-id="${student.studentID}" style="width: 65px; height: 40px; font-size: 16px;"></td>
+                            <td><input type="text" maxlength="2" class="form-control score-input" name="${test}" data-id="${student.studentID}" style="width: 50px; text-align: center;"></td>
                         `).join('')}
                     </tr>
                 `);
             });
-
+            
+            // Restrict input to numbers only (0-100 if these are score fields)
+            document.querySelectorAll('.score-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, ''); // Allow only digits 0-9
+                });
+            });
             // Ensure only digits can be entered
             $('.score-input').on('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, ''); // Allows only digits
@@ -222,9 +236,6 @@ function checkAuth() {
       console.error('Error checking authentication:', err);
     });
   }
-function goBack() {
-    window.history.back();
-}
 
 window.onscroll = function() {
     document.getElementById("myBtn").style.display = (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) ? "block" : "none";
