@@ -525,12 +525,14 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                 if (subjects) {
                     const subjectsArray = subjects.split(',').map(subj => subj.trim());
 
+                    // Delete existing subjects for the student
                     db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
                         if (err) {
                             console.error('Error clearing subjects from database:', err);
                             return res.status(500).json({ message: 'Error updating subjects.' });
                         }
 
+                        // Insert new subjects for the student
                         const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
                         const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
                             db.query(insertSubjectQuery, [id, subject], (err) => {
@@ -543,9 +545,10 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                         }));
 
+                        // Wait for all insertions to complete
                         Promise.all(insertPromises)
                             .then(() => {
-                                res.status(200).json({ message: 'Student updated successfully.' });
+                                res.status(200).json({ message: 'Student updated successfully with new subjects.' });
                             })
                             .catch(err => {
                                 console.error('Error updating subjects:', err);
@@ -553,6 +556,7 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                     });
                 } else {
+                    // If no subjects were provided, just update the student without modifying subjects
                     res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
                 }
             });
@@ -891,85 +895,94 @@ app.get('/teacher/:id', (req, res) => {
         }
     });
 });
+//edit staff
+// Edit staff with separate handling for subjects and classes
+app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
+    const staffId = req.params.staff_id;
+    const teacherData = JSON.parse(req.body.teacherData);
+    const { name, email, phone, role, qualification, formClass, subjects, classes } = teacherData;
+    const profilePicture = req.file ? req.file.filename : null;
 
-app.post('/update-teacher/:staff_id', async (req, res) => {
-    const staffId = req.params.staff_id;  // staff_id used only to identify the teacher
-    const { name, email, phone, role, qualification, formClass, subjects, classes } = req.body;
-
-    // Prepare the update columns and values dynamically
+    // Prepare the update columns and values
     let updateColumns = [];
     let updateValues = [];
 
-    if (name) {
-        updateColumns.push('name = ?');
-        updateValues.push(name);
-    }
-    if (email) {
-        updateColumns.push('email = ?');
-        updateValues.push(email);
-    }
-    if (phone) {
-        updateColumns.push('phone = ?');
-        updateValues.push(phone);
-    }
-    if (role) {
-        updateColumns.push('role = ?');
-        updateValues.push(role);
-    }
-    if (qualification) {
-        updateColumns.push('qualification = ?');
-        updateValues.push(qualification);
-    }
-    if (formClass) {
-        updateColumns.push('formClass = ?');
-        updateValues.push(formClass);
-    }
+    if (name) updateColumns.push('name'), updateValues.push(name);
+    if (email) updateColumns.push('email'), updateValues.push(email);
+    if (phone) updateColumns.push('phone'), updateValues.push(phone);
+    if (role) updateColumns.push('role'), updateValues.push(role);
+    if (qualification) updateColumns.push('qualification'), updateValues.push(qualification);
+    if (formClass) updateColumns.push('formClass'), updateValues.push(formClass);
+    if (profilePicture) updateColumns.push('profile_picture'), updateValues.push(profilePicture);
 
-    try {
-        if (updateColumns.length > 0) {
-            // Update main teacher data without modifying the staff_id
-            const query = `UPDATE teachers SET ${updateColumns.join(', ')} WHERE staff_id = ?`;
-            updateValues.push(staffId);
+    // Add staff ID for WHERE clause
+    const query = `UPDATE teachers SET ${updateColumns.map(col => `${col} = ?`).join(', ')} WHERE staff_id = ?`;
+    updateValues.push(staffId);
 
-            // Perform the update query
-            const result = await db.query(query, updateValues);
+    db.query(query, updateValues, (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: 'Failed to update teacher data.' });
+        if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Teacher not found or no changes made.' });
 
-            // Log the result to inspect its structure
-            console.log('Update query result:', result);
+        db.query('SELECT id FROM teachers WHERE staff_id = ?', [staffId], (err, rows) => {
+            if (err) return res.status(500).json({ success: false, message: 'Failed to retrieve teacher ID.' });
+            if (rows.length === 0) return res.status(404).json({ success: false, message: 'Teacher not found.' });
 
-            // Check for affected rows
-            if (result && result.affectedRows === 0) {
-                return res.status(404).json({ success: false, message: 'Teacher not found or no changes made.' });
-            }
-        }
+            const teacherId = rows[0].id;
 
-        // Update subjects if provided
-        if (subjects && Array.isArray(subjects)) {
-            await db.query('DELETE FROM teacher_subjects WHERE teacher_id = ?', [staffId]);
+            // Separate handling for updating subjects
+            const updateSubjects = () => {
+                return new Promise((resolve, reject) => {
+                    if (!subjects) return resolve(); // No subjects to update
 
-            const subjectPromises = subjects.map(subject => {
-                return db.query('INSERT INTO teacher_subjects (teacher_id, subject) VALUES (?, ?)', [staffId, subject]);
-            });
+                    db.query('DELETE FROM teacher_subjects WHERE teacher_id = ?', [teacherId], (err) => {
+                        if (err) return reject(err);
 
-            await Promise.all(subjectPromises);
-        }
+                        const subjectQueries = subjects.map(subject => {
+                            return new Promise((subResolve, subReject) => {
+                                db.query('INSERT INTO teacher_subjects (teacher_id, subject) VALUES (?, ?)', [teacherId, subject], (err) => {
+                                    if (err) subReject(err);
+                                    else subResolve();
+                                });
+                            });
+                        });
 
-        // Update classes if provided
-        if (classes && Array.isArray(classes)) {
-            await db.query('DELETE FROM teacher_classes WHERE teacher_id = ?', [staffId]);
+                        Promise.all(subjectQueries)
+                            .then(() => resolve())
+                            .catch(reject);
+                    });
+                });
+            };
 
-            const classPromises = classes.map(classItem => {
-                return db.query('INSERT INTO teacher_classes (teacher_id, class) VALUES (?, ?)', [staffId, classItem]);
-            });
+            // Separate handling for updating classes
+            const updateClasses = () => {
+                return new Promise((resolve, reject) => {
+                    if (!classes) return resolve(); // No classes to update
 
-            await Promise.all(classPromises);
-        }
+                    db.query('DELETE FROM teacher_classes WHERE teacher_id = ?', [teacherId], (err) => {
+                        if (err) return reject(err);
 
-        res.json({ success: true, message: 'Teacher data updated successfully.' });
-    } catch (error) {
-        console.error('Error updating teacher data:', error);
-        res.status(500).json({ success: false, message: 'Failed to update teacher data.' });
-    }
+                        const classQueries = classes.map(classItem => {
+                            return new Promise((classResolve, classReject) => {
+                                db.query('INSERT INTO teacher_classes (teacher_id, class) VALUES (?, ?)', [teacherId, classItem], (err) => {
+                                    if (err) classReject(err);
+                                    else classResolve();
+                                });
+                            });
+                        });
+
+                        Promise.all(classQueries)
+                            .then(() => resolve())
+                            .catch(reject);
+                    });
+                });
+            };
+
+            // Execute both update functions independently
+            Promise.all([updateSubjects(), updateClasses()])
+                .then(() => res.json({ success: true, message: 'Teacher data updated successfully.' }))
+                .catch(err => res.status(500).json({ success: false, message: 'Failed to update subjects or classes.' }));
+        });
+    });
 });
 
 // for view students page
