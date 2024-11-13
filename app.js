@@ -465,26 +465,51 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
-
-// Endpoint for editing a student
+//edit student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     const {
-        id, firstname, othername, surname, guardianPhone, class: studentClass,
+        id, firstname, othername, surname, guardianPhone, studentClass,
         subjects, staffEmailOrID, password
     } = req.body;
 
     const studentPicture = req.file ? req.file.filename : null;
 
-    const updateStudentQuery = `
-        UPDATE students SET 
-            firstname = ?, 
-            othername = ?, 
-            surname = ?, 
-            guardianPhone = ?, 
-            class = ?, 
-            studentPicture = COALESCE(?, studentPicture)
-        WHERE studentID = ?
-    `;
+    // Start with a base query
+    let updateStudentQuery = `UPDATE students SET `;
+    let queryValues = [];
+
+    // Conditionally add fields to the query
+    if (firstname) {
+        updateStudentQuery += `firstname = ?, `;
+        queryValues.push(firstname);
+    }
+    if (othername) {
+        updateStudentQuery += `othername = ?, `;
+        queryValues.push(othername);
+    }
+    if (surname) {
+        updateStudentQuery += `surname = ?, `;
+        queryValues.push(surname);
+    }
+    if (guardianPhone) {
+        updateStudentQuery += `guardianPhone = ?, `;
+        queryValues.push(guardianPhone);
+    }
+    if (studentClass) {
+        updateStudentQuery += `class = ?, `;
+        queryValues.push(studentClass);
+    }
+    if (studentPicture) {
+        updateStudentQuery += `studentPicture = ?, `;
+        queryValues.push(studentPicture);
+    }
+
+    // Trim the trailing comma and space from the query
+    updateStudentQuery = updateStudentQuery.slice(0, -2);
+
+    // Add the WHERE clause to update the specific student
+    updateStudentQuery += ` WHERE studentID = ?`;
+    queryValues.push(id);
 
     const checkAdminQuery = `
         SELECT * FROM admins
@@ -514,14 +539,13 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
             }
 
             // Proceed to update the student if credentials are correct
-            db.query(updateStudentQuery, [
-                firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
-            ], (err) => {
+            db.query(updateStudentQuery, queryValues, (err) => {
                 if (err) {
                     console.error('Error updating student in database:', err);
                     return res.status(500).json({ message: 'Error updating student.' });
                 }
 
+                // If subjects are provided, update them
                 if (subjects) {
                     const subjectsArray = subjects.split(',').map(subj => subj.trim());
 
@@ -563,6 +587,7 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         });
     });
 });
+
 
 // Route teacher for login for result
 app.post('/result_login', (req, res) => {
