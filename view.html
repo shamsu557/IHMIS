@@ -351,6 +351,24 @@ function toggleNavbar() {
         menuIcon.classList.add("hidden"); // Hide menu icon completely
     }
 }
+function loadClassOptions() {
+    $.ajax({
+        url: '/api/fetchClasses',
+        method: 'GET',
+        success: function(classes) {
+            const classSelection = $('#class-selection');
+            classSelection.empty();
+            classSelection.append('<option value="" selected disabled>Select Class</option>');
+            classes.forEach(c => {
+                classSelection.append(`<option value="${c}">${c}</option>`);
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('Failed to load classes:', textStatus, errorThrown);
+            alert('Error loading classes. Please check the console for more details.');
+        }
+    });
+}
 
 
 
@@ -467,10 +485,3 @@ function topFunction() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
