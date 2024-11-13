@@ -366,14 +366,14 @@ button {
                         <input type="text" class="form-control" id="phone" required>
                     </div>
                     <div class="form-group">
-                        <select class="form-select" id="role" name="role" >
-                            <label for="role">Role</label>
+                        <label for="role">Role</label>
+                        <select class="form-select" id="role" name="role">
                             <option value="" disabled selected>Select Role</option>
                             <option value="Teacher">Teacher</option>
                             <option value="Senior Master">Senior Master</option>
                             <option value="Form Master">Form Master</option>
                         </select>
-                    </div>
+                    </div>                    
                     <div id="class-selection" class="form-group" style="display: none;">
                         <label for="formClass">Form Class</label>
                         <select class="form-select" id="formClass" name="formClass">
@@ -479,7 +479,7 @@ button {
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="science" name="subjects[]" value="Science">
                             <label class="form-check-label" for="science">Science</label>
-                        </div>b
+                        </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="social-studies" name="subjects[]" value="Social Studies">
                             <label class="form-check-label" for="social-studies">Social Studies</label>
@@ -754,96 +754,109 @@ document.getElementById('role').addEventListener('change', function () {
 });
 
 
-        // Function to open and populate the Edit Staff modal
-    window.editStaff = function (staffId) {
-        fetch(`/teacher/${staffId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const teacher = data.teacher;
-                    $('#staffId').val(teacher.staff_id);
-                    $('#name').val(teacher.name);
-                    $('#email').val(teacher.email);
-                    $('#phone').val(teacher.phone);
-                    $('#role').val(teacher.role);
-
-                    // Show or hide form class based on role
-                    if (teacher.role === 'Form Master') {
-                        $('#class-selection').show();
-                        $('#formClass').val(teacher.formClass || '');
-                    } else {
-                        $('#class-selection').hide();
-                        $('#formClass').val('');
-                    }
-
-                    // Populate subjects
-                    const subjectSelect = $('#subjects').empty();
-                    (teacher.subjects || []).forEach(subject => {
-                        subjectSelect.append(`<option value="${subject}" selected>${subject}</option>`);
-                    });
-
-                    // Populate classes
-                    const classSelect = $('#classes').empty();
-                    (teacher.classes || []).forEach(classItem => {
-                        classSelect.append(`<option value="${classItem}" selected>${classItem}</option>`);
-                    });
-
-                    // Show the modal
-                    $('#editStaffModal').modal('show');
-                } else {
-                    alert('Could not load staff data for editing.');
-                }
-            })
-            .catch(error => console.error('Error loading staff data:', error));
-    };
-
-
-    // Handle form submission in the modal
-    $('#editTeacherForm').on('submit', function (e) {
-        e.preventDefault();
-
-        const teacherData = {
-            staff_id: $('#staffId').val(),
-            name: $('#name').val(),
-            email: $('#email').val(),
-            phone: $('#phone').val(),
-            role: $('#role').val(),
-        };
-
-        if (teacherData.role === 'Form Master') {
-            teacherData.formClass = $('#formClass').val();
-        }
-
-        const selectedSubjects = Array.from($('#subjects').find('option:selected')).map(option => option.value);
-        if (selectedSubjects.length) {
-            teacherData.subjects = selectedSubjects;
-        }
-
-        const selectedClasses = Array.from($('#classes').find('option:selected')).map(option => option.value);
-        if (selectedClasses.length) {
-            teacherData.classes = selectedClasses;
-        }
-
-        fetch(`/update-teacher/${teacherData.staff_id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(teacherData)
-        })
+       // Function to open and populate the Edit Staff modal
+window.editStaff = function (staffId) {
+    fetch(`/teacher/${staffId}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Teacher details updated successfully!');
-                $('#editStaffModal').modal('hide');
-                fetchStaff(); // Refresh the staff table
+                const teacher = data.teacher;
+                $('#staffId').val(teacher.staff_id);
+                $('#name').val(teacher.name);
+                $('#email').val(teacher.email);
+                $('#phone').val(teacher.phone);
+                $('#role').val(teacher.role);
+                $('#qualification').val(teacher.qualification);
+
+                // Show or hide form class based on role
+                if (teacher.role === 'Form Master') {
+                    $('#class-selection').show();
+                    $('#formClass').val(teacher.formClass || '');
+                } else {
+                    $('#class-selection').hide();
+                    $('#formClass').val('');
+                }
+
+                // Populate subjects
+                const subjectSelect = $('#subjects').empty();
+                (teacher.subjects || []).forEach(subject => {
+                    subjectSelect.append(`<option value="${subject}" selected>${subject}</option>`);
+                });
+
+                // Populate classes
+                const classSelect = $('#classes').empty();
+                (teacher.classes || []).forEach(classItem => {
+                    classSelect.append(`<option value="${classItem}" selected>${classItem}</option>`);
+                });
+
+                // Show the modal
+                $('#editStaffModal').modal('show');
             } else {
-                alert('Failed to update teacher details.');
+                alert('Could not load staff data for editing.');
             }
         })
-        .catch(error => console.error('Error updating teacher data:', error));
-    });
+        .catch(error => console.error('Error loading staff data:', error));
+};
+
+// Handle form submission in the modal
+$('#editTeacherForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const teacherData = {
+        staff_id: $('#staffId').val(),
+        name: $('#name').val().trim().toUpperCase(),
+        email: $('#email').val(),
+        phone: $('#phone').val(),
+        role: $('#role').val(),
+        qualification: $('#qualification').val()
+    };
+
+    // Include formClass only if the role is 'Form Master'
+    if (teacherData.role === 'Form Master') {
+        teacherData.formClass = $('#formClass').val();
+    }
+
+    // Get selected subjects
+    const selectedSubjects = $("input[name='subjects[]']:checked").map(function () {
+        return $(this).val();
+    }).get();
+    if (selectedSubjects.length) teacherData.subjects = selectedSubjects;
+
+    // Get selected classes
+    const selectedClasses = $("input[name='classes[]']:checked").map(function () {
+        return $(this).val();
+    }).get();
+    if (selectedClasses.length) teacherData.classes = selectedClasses;
+
+    console.log('Updating teacher data:', teacherData);
+
+    // Create FormData to handle profile picture and JSON data together
+    const formData = new FormData();
+    formData.append('teacherData', JSON.stringify(teacherData));
+
+    const profilePictureFile = $('#profilePicture')[0].files[0];
+    if (profilePictureFile) {
+        formData.append('profilePicture', profilePictureFile);
+    }
+
+    // Send data to backend
+    fetch(`/update-teacher/${teacherData.staff_id}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Teacher details updated successfully!');
+            $('#editStaffModal').modal('hide');
+            fetchStaff();
+        } else {
+            alert('Failed to update teacher details.');
+        }
+    })
+    .catch(error => console.error('Error updating teacher data:', error));
 });
+    });
 
 function toggleNavbar() {
     const navbarNav = document.getElementById("navbarNav");
