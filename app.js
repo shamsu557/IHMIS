@@ -1112,7 +1112,7 @@ app.post('/form-master/submit-assessment', (req, res) => {
 
 // School Information
 const schoolInfo = {
-    name: 'Imam Hafsin Model International School',
+    name: 'IMAM HAFSIN MODEL INTERNATIONAL SCHOOL',
     logoPath: 'logo.jpg', // Update with the actual path to the school logo
     address: '622, Yakasai Street, Tal\'udu G/Kaya',
     email: 'imamhafsin@gmail.com',
@@ -1163,21 +1163,47 @@ function generateStudentReport(req, res, saveToFile = false) {
                             doc.pipe(res);
                         }
 
-                        // Add school header
-                        doc.fontSize(20).text(schoolInfo.name, { align: 'center' });
-                        try {
-                            doc.image(schoolInfo.logoPath, { align: 'center', width: 100, height: 100 });
-                        } catch (imageError) {
-                            console.error("Failed to load logo image:", imageError);
-                            doc.text("(Logo unavailable)", { align: 'center' });
-                        }
-                        doc.fontSize(12).text(schoolInfo.address, { align: 'center' });
-                        doc.text(schoolInfo.email, { align: 'center' });
-                        doc.text(schoolInfo.phone, { align: 'center' });
+                       // Add school header
+// Define dimensions and positions
+const logoWidth = 80;
+const logoHeight = 80;
+const margin = 20;
+const textStartX = logoWidth + 2 * margin;
+
+// Place the logo in the top-left corner
+try {
+    doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
+} catch (imageError) {
+    console.error("Failed to load logo image:", imageError);
+    doc.text("(Logo unavailable)", margin, margin);
+}
+
+// Make the school name bold
+doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+
+// Set the font back to regular for the rest of the information
+doc.font('Helvetica').fontSize(12)
+   .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+   .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+   .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+
+// Add report sheet header text just below school information
+const reportTextY = margin + 80;
+doc.font('Helvetica-Bold').fontSize(14).text(
+    `Report Sheet for ${term} ${session} Acadmic Session`,
+    margin, // starting from the left margin to center-align within the page width
+    reportTextY,
+    { width: doc.page.width - 2 * margin, align: 'center' }
+);
+
+// Draw horizontal line after report sheet header text
+const lineStartY = reportTextY + 20;
+doc.moveTo(margin, lineStartY).lineTo(doc.page.width - margin, lineStartY).stroke();
+
 
                         // Student Information
                         doc.moveDown();
-                        doc.fontSize(14).text(`Student: ${studentResult[0].name}`);
+                        doc.font('Helvetica').fontSize(14).text(`Student: ${studentResult[0].name}`);
                         doc.text(`Student ID: ${studentID}`);
                         doc.text(`Class: ${studentResult[0].class}`);
                         doc.text(`Term: ${term}`);
