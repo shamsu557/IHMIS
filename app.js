@@ -9,6 +9,7 @@ const app = express();
 const saltRounds = 10; // Define salt rounds for bcrypt hashing
 const session = require('express-session');
 const PDFDocument = require('pdfkit');
+const { Table } = require('pdfkit-table');
 
 app.use(session({
     secret: 'a45A7ZMpVby14qNkWxlSwYGaSUv1d64x', // Replace with your secret key
@@ -1109,7 +1110,195 @@ app.post('/form-master/submit-assessment', (req, res) => {
         });
 });
 
+// School Information
+const schoolInfo = {
+    name: 'Imam Hafsin Model International School',
+    logoPath: 'logo.jpg', // Update with the actual path to the school logo
+    address: '622, Yakasai Street, Tal\'udu G/Kaya',
+    email: 'imamhafsin@gmail.com',
+    phone: '08030999939939399'
+};
 
+// Helper function for grades and comments
+function getGradeAndComment(score) {
+    if (score >= 70) return { grade: 'A', comment: 'Excellent' };
+    if (score >= 60) return { grade: 'B', comment: 'Very Good' };
+    if (score >= 50) return { grade: 'C', comment: 'Good' };
+    if (score >= 40) return { grade: 'D', comment: 'Pass' };
+    return { grade: 'F', comment: 'Fail' };
+}
+
+// Generate Student Report PDF
+function generateStudentReport(req, res, saveToFile = false) {
+    const { studentID } = req.params;
+    const { term, session } = req.query;
+
+    db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, studentResult) => {
+        if (err) return res.status(500).json({ error: 'Database error fetching student', details: err });
+        if (studentResult.length === 0) return res.status(404).json({ error: 'Student not found' });
+
+        db.query(`
+            SELECT subjectName, firstCA, secondCA, thirdCA, exams, total, examGrade
+            FROM subjects
+            WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+            (err, subjectsResult) => {
+                if (err) return res.status(500).json({ error: 'Database error fetching subjects', details: err });
+
+                db.query(`
+                    SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
+                           social_and_physical_development
+                    FROM form_master_assessments
+                    WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+                    (err, assessmentResult) => {
+                        if (err) return res.status(500).json({ error: 'Database error fetching assessment', details: err });
+
+                        let doc = new PDFDocument({ layout: session === 'whole session' ? 'landscape' : 'portrait' });
+                        const filename = `Student_Report_${studentID}.pdf`;
+
+                        if (saveToFile) {
+                            doc.pipe(fs.createWriteStream(filename));
+                        } else {
+                            res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                            res.setHeader('Content-Type', 'application/pdf');
+                            doc.pipe(res);
+                        }
+
+                        // Add school header
+                        doc.fontSize(20).text(schoolInfo.name, { align: 'center' });
+                        try {
+                            doc.image(schoolInfo.logoPath, { align: 'center', width: 100, height: 100 });
+                        } catch (imageError) {
+                            console.error("Failed to load logo image:", imageError);
+                            doc.text("(Logo unavailable)", { align: 'center' });
+                        }
+                        doc.fontSize(12).text(schoolInfo.address, { align: 'center' });
+                        doc.text(schoolInfo.email, { align: 'center' });
+                        doc.text(schoolInfo.phone, { align: 'center' });
+
+                        // Student Information
+                        doc.moveDown();
+                        doc.fontSize(14).text(`Student: ${studentResult[0].name}`);
+                        doc.text(`Student ID: ${studentID}`);
+                        doc.text(`Class: ${studentResult[0].class}`);
+                        doc.text(`Term: ${term}`);
+                        doc.text(`Session: ${session}`);
+// Set up font, starting coordinates, and cell dimensions
+doc.moveDown().fontSize(8);
+const startX = 50;
+let currentY = doc.y + 20;
+const cellHeight = 15;
+const cellWidth = 50;
+
+// Draw horizontal line at the top before the header row
+doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
+
+// Draw table headers
+doc.text('Subject', startX, currentY, { width: 100, align: 'center' });
+doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center' });
+doc.text('2nd CA', startX + 150, currentY, { width: cellWidth, align: 'center' });
+doc.text('3rd CA', startX + 200, currentY, { width: cellWidth, align: 'center' });
+doc.text('Exam', startX + 250, currentY, { width: cellWidth, align: 'center' });
+doc.text('Total', startX + 300, currentY, { width: cellWidth, align: 'center' });
+doc.text('Grade', startX + 350, currentY, { width: cellWidth, align: 'center' });
+doc.text('Comment', startX + 400, currentY, { width: 100, align: 'center' });
+
+// Move to the first row position, no line above the header
+currentY += 15;
+
+// Draw horizontal line directly under the header row
+doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
+currentY += 5;
+
+// Render each subject in a new row with alternating row colors
+let totalScore = 0;
+subjectsResult.forEach((subject, index) => {
+    const rowY = currentY + index * cellHeight;
+
+    // Set alternating row background colors
+    if (index % 2 === 0) {
+        doc.rect(startX, rowY, 500, cellHeight).fill('#F0F0F0'); // Light gray for even rows
+    }
+
+    const { grade, comment } = getGradeAndComment(subject.total);
+    totalScore += subject.total;
+
+    // Set font size and alignment for each cell
+    doc.fontSize(8)
+       .fillColor('black')  // Reset fill color to black for text
+       .text(subject.subjectName, startX, rowY + cellHeight / 4, { width: 100, align: 'center' })
+       .text(subject.firstCA, startX + 100, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(subject.secondCA, startX + 150, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(subject.thirdCA, startX + 200, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(subject.exams, startX + 250, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(subject.total, startX + 300, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(grade, startX + 350, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
+       .text(comment, startX + 400, rowY + cellHeight / 4, { width: 100, align: 'center' });
+
+    // Draw horizontal line between rows
+    doc.moveTo(startX, rowY + cellHeight).lineTo(startX + 500, rowY + cellHeight).stroke();
+});
+
+// Draw vertical lines for columns, excluding the Subject column and between Grade & Comment columns
+const tableBottomY = currentY + subjectsResult.length * cellHeight;
+const columnXPositions = [
+    startX + 100,   // 1st CA
+    startX + 150,   // 2nd CA
+    startX + 200,   // 3rd CA
+    startX + 250,   // Exam
+    startX + 300,   // Total
+    startX + 350,   // Grade
+    startX + 400    // Comment
+];
+
+// Draw vertical lines at the correct positions
+columnXPositions.forEach(xPos => {
+    doc.moveTo(xPos, currentY)  // Start exactly at the first horizontal line
+       .lineTo(xPos, tableBottomY)  // End exactly at the last horizontal line
+       .stroke();
+});
+
+// Total Score and Average Score
+const average = (totalScore / subjectsResult.length).toFixed(2);
+doc.moveDown();
+doc.text(`Total Score: ${totalScore}`);
+doc.text(`Average Score: ${average}`);
+
+
+                        // Conduct and Development Table
+                        if (assessmentResult.length > 0) {
+                            const assess = assessmentResult[0];
+                            doc.moveDown();
+                            doc.text('Conduct and Development', { underline: true });
+
+                            doc.text(`Academic Responsibility: ${assess.academic_responsibility}`);
+                            doc.text(`Respect and Discipline: ${assess.respect_and_discipline}`);
+                            doc.text(`Punctuality and Personal Organization: ${assess.punctuality_and_personal_organization}`);
+                            doc.text(`Social and Physical Development: ${assess.social_and_physical_development}`);
+                        }
+
+                        // Scale Table
+                        doc.moveDown();
+                        doc.text('Scale', { underline: true });
+                        doc.text('5 - Exemplary, 4 - Good, 3 - Above Average, 2 - Average, 1 - Below Average');
+
+                        // End-of-Year Average Table (if session is "whole session")
+                        if (session === 'whole session') {
+                            doc.moveDown();
+                            doc.text('End-of-Year Average', { underline: true });
+                            doc.text(`Total Score: ${totalScore}`);
+                            doc.text(`Average Score: ${(totalScore / (subjectsResult.length * 3)).toFixed(2)}`);
+                        }
+
+                        doc.end();
+                        if (saveToFile) res.download(filename);
+                    });
+            });
+    });
+}
+
+// Route Definitions for downloading and viewing 
+app.get('/api/viewResult/:studentID', (req, res) => generateStudentReport(req, res));
+app.get('/api/downloadResult/:studentID', (req, res) => generateStudentReport(req, res, true));
 
 
 const PORT = process.env.PORT || 3000;
