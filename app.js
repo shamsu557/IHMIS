@@ -1192,7 +1192,8 @@ const cellWidth = 50;
 // Draw horizontal line at the top before the header row
 doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
 
-// Draw table headers
+// Draw table headers with percentages in brackets
+// Draw table headers with percentages below
 doc.text('Subject', startX, currentY, { width: 100, align: 'center' });
 doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center' });
 doc.text('2nd CA', startX + 150, currentY, { width: cellWidth, align: 'center' });
@@ -1202,8 +1203,20 @@ doc.text('Total', startX + 300, currentY, { width: cellWidth, align: 'center' })
 doc.text('Grade', startX + 350, currentY, { width: cellWidth, align: 'center' });
 doc.text('Comment', startX + 400, currentY, { width: 100, align: 'center' });
 
+// Move down a bit to place the percentages below
+currentY += 10;
+
+// Draw percentages below each column header
+doc.text('(10%)', startX + 100, currentY, { width: cellWidth, align: 'center' });
+doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
+doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
+doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
+doc.text('', startX + 300, currentY, { width: cellWidth, align: 'center' }); // Empty space for Total
+doc.text('', startX + 350, currentY, { width: cellWidth, align: 'center' }); // Empty space for Grade
+doc.text('', startX + 400, currentY, { width: 100, align: 'center' }); // Empty space for Comment
+
 // Move to the first row position, no line above the header
-currentY += 15;
+currentY += 10;
 
 // Draw horizontal line directly under the header row
 doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
