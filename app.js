@@ -8,6 +8,7 @@ const multer = require('multer'); // Add multer for file handling
 const app = express();
 const saltRounds = 10; // Define salt rounds for bcrypt hashing
 const session = require('express-session');
+const PDFDocument = require('pdfkit');
 
 app.use(session({
     secret: 'a45A7ZMpVby14qNkWxlSwYGaSUv1d64x', // Replace with your secret key
@@ -1107,6 +1108,8 @@ app.post('/form-master/submit-assessment', (req, res) => {
             res.status(500).json({ message: 'Failed to save assessment data' });
         });
 });
+
+
 
 
 const PORT = process.env.PORT || 3000;
