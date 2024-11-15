@@ -1128,7 +1128,6 @@ function getGradeAndComment(score) {
     return { grade: 'F', comment: 'Fail' };
 }
 
-// Generate Student Report PDF
 function generateStudentReport(req, res, saveToFile = false) {
     const { studentID } = req.params;
     const { term, session } = req.query;
@@ -1137,203 +1136,184 @@ function generateStudentReport(req, res, saveToFile = false) {
         if (err) return res.status(500).json({ error: 'Database error fetching student', details: err });
         if (studentResult.length === 0) return res.status(404).json({ error: 'Student not found' });
 
-        db.query(`
-            SELECT subjectName, firstCA, secondCA, thirdCA, exams, total, examGrade
-            FROM subjects
-            WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
-            (err, subjectsResult) => {
-                if (err) return res.status(500).json({ error: 'Database error fetching subjects', details: err });
+        const studentClass = studentResult[0].class;
 
-                db.query(`
-                    SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
-                           social_and_physical_development
-                    FROM form_master_assessments
-                    WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
-                    (err, assessmentResult) => {
-                        if (err) return res.status(500).json({ error: 'Database error fetching assessment', details: err });
+        db.query('SELECT COUNT(*) as count FROM students WHERE class = ?', [studentClass], (err, studentCountResult) => {
+            if (err) return res.status(500).json({ error: 'Database error fetching student count', details: err });
 
-                        let doc = new PDFDocument({ layout: session === 'whole session' ? 'landscape' : 'portrait' });
-                        const filename = `Student_Report_${studentID}.pdf`;
+            const totalStudents = studentCountResult[0].count;
 
-                        if (saveToFile) {
-                            doc.pipe(fs.createWriteStream(filename));
-                        } else {
-                            res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-                            res.setHeader('Content-Type', 'application/pdf');
-                            doc.pipe(res);
-                        }
+            db.query(`
+                SELECT subjectName, firstCA, secondCA, thirdCA, exams, total, examGrade
+                FROM subjects
+                WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+                (err, subjectsResult) => {
+                    if (err) return res.status(500).json({ error: 'Database error fetching subjects', details: err });
 
-                       // Add school header
-// Define dimensions and positions
-const logoWidth = 80;
-const logoHeight = 80;
-const margin = 20;
-const textStartX = logoWidth + 2 * margin;
+                    db.query(`
+                        SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
+                               social_and_physical_development, attendance
+                        FROM form_master_assessments
+                        WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+                        (err, assessmentResult) => {
+                            if (err) return res.status(500).json({ error: 'Database error fetching assessment', details: err });
 
-// Place the logo in the top-left corner
-try {
-    doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
-} catch (imageError) {
-    console.error("Failed to load logo image:", imageError);
-    doc.text("(Logo unavailable)", margin, margin);
-}
+                            let doc = new PDFDocument({ layout: session === 'whole session' ? 'landscape' : 'portrait' });
+                            const filename = `Student_Report_${studentID}.pdf`;
 
-// Make the school name bold
-doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                            if (saveToFile) {
+                                doc.pipe(fs.createWriteStream(filename));
+                            } else {
+                                res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                                res.setHeader('Content-Type', 'application/pdf');
+                                doc.pipe(res);
+                            }
 
-// Set the font back to regular for the rest of the information
-doc.font('Helvetica').fontSize(12)
-   .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
-   .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
-   .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+                            // School Header Section
+                            const margin = 20;
+                            const logoWidth = 80;
+                            const logoHeight = 80;
+                            const textStartX = logoWidth + 2 * margin;
 
-// Add report sheet header text just below school information
-const reportTextY = margin + 80;
-doc.font('Helvetica-Bold').fontSize(14).text(
-    `Report Sheet for ${term} ${session} Acadmic Session`,
-    margin, // starting from the left margin to center-align within the page width
-    reportTextY,
-    { width: doc.page.width - 2 * margin, align: 'center' }
-);
+                            try {
+                                doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
+                            } catch (imageError) {
+                                console.error("Failed to load logo image:", imageError);
+                                doc.text("(Logo unavailable)", margin, margin);
+                            }
 
-// Draw horizontal line after report sheet header text
-const lineStartY = reportTextY + 20;
-doc.moveTo(margin, lineStartY).lineTo(doc.page.width - margin, lineStartY).stroke();
+                            doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                            doc.font('Helvetica').fontSize(12)
+                                .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+                                .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+                                .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
 
+                            doc.font('Helvetica-Bold').fontSize(14).text(
+                                `Report Sheet for ${term} ${session} Academic Session`,
+                                margin,
+                                margin + 80,
+                                { width: doc.page.width - 2 * margin, align: 'center' }
+                            );
+                            doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
 
-                        // Student Information
-                        doc.moveDown();
-                        doc.font('Helvetica').fontSize(14).text(`Student: ${studentResult[0].name}`);
-                        doc.text(`Student ID: ${studentID}`);
-                        doc.text(`Class: ${studentResult[0].class}`);
-                        doc.text(`Term: ${term}`);
-                        doc.text(`Session: ${session}`);
-// Set up font, starting coordinates, and cell dimensions
-doc.moveDown().fontSize(8);
-const startX = 50;
-let currentY = doc.y + 20;
-const cellHeight = 15;
-const cellWidth = 50;
-
-// Draw horizontal line at the top before the header row
-doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
-
-// Draw table headers with percentages in brackets
-// Draw table headers with percentages below
-doc.text('Subject', startX, currentY, { width: 100, align: 'center' });
-doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center' });
-doc.text('2nd CA', startX + 150, currentY, { width: cellWidth, align: 'center' });
-doc.text('3rd CA', startX + 200, currentY, { width: cellWidth, align: 'center' });
-doc.text('Exam', startX + 250, currentY, { width: cellWidth, align: 'center' });
-doc.text('Total', startX + 300, currentY, { width: cellWidth, align: 'center' });
-doc.text('Grade', startX + 350, currentY, { width: cellWidth, align: 'center' });
-doc.text('Comment', startX + 400, currentY, { width: 100, align: 'center' });
-
-// Move down a bit to place the percentages below
-currentY += 10;
-
-// Draw percentages below each column header
-doc.text('(10%)', startX + 100, currentY, { width: cellWidth, align: 'center' });
-doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
-doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
-doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
-doc.text('', startX + 300, currentY, { width: cellWidth, align: 'center' }); // Empty space for Total
-doc.text('', startX + 350, currentY, { width: cellWidth, align: 'center' }); // Empty space for Grade
-doc.text('', startX + 400, currentY, { width: 100, align: 'center' }); // Empty space for Comment
-
-// Move to the first row position, no line above the header
-currentY += 10;
-
-// Draw horizontal line directly under the header row
-doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
-currentY += 5;
-
-// Render each subject in a new row with alternating row colors
-let totalScore = 0;
-subjectsResult.forEach((subject, index) => {
-    const rowY = currentY + index * cellHeight;
-
-    // Set alternating row background colors
-    if (index % 2 === 0) {
-        doc.rect(startX, rowY, 500, cellHeight).fill('#F0F0F0'); // Light gray for even rows
-    }
-
-    const { grade, comment } = getGradeAndComment(subject.total);
-    totalScore += subject.total;
-
-    // Set font size and alignment for each cell
-    doc.fontSize(8)
-       .fillColor('black')  // Reset fill color to black for text
-       .text(subject.subjectName, startX, rowY + cellHeight / 4, { width: 100, align: 'center' })
-       .text(subject.firstCA, startX + 100, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(subject.secondCA, startX + 150, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(subject.thirdCA, startX + 200, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(subject.exams, startX + 250, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(subject.total, startX + 300, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(grade, startX + 350, rowY + cellHeight / 4, { width: cellWidth, align: 'center' })
-       .text(comment, startX + 400, rowY + cellHeight / 4, { width: 100, align: 'center' });
-
-    // Draw horizontal line between rows
-    doc.moveTo(startX, rowY + cellHeight).lineTo(startX + 500, rowY + cellHeight).stroke();
-});
-
-// Draw vertical lines for columns, excluding the Subject column and between Grade & Comment columns
-const tableBottomY = currentY + subjectsResult.length * cellHeight;
-const columnXPositions = [
-    startX + 100,   // 1st CA
-    startX + 150,   // 2nd CA
-    startX + 200,   // 3rd CA
-    startX + 250,   // Exam
-    startX + 300,   // Total
-    startX + 350,   // Grade
-    startX + 400    // Comment
-];
-
-// Draw vertical lines at the correct positions
-columnXPositions.forEach(xPos => {
-    doc.moveTo(xPos, currentY)  // Start exactly at the first horizontal line
-       .lineTo(xPos, tableBottomY)  // End exactly at the last horizontal line
-       .stroke();
-});
-
-// Total Score and Average Score
-const average = (totalScore / subjectsResult.length).toFixed(2);
-doc.moveDown();
-doc.text(`Total Score: ${totalScore}`);
-doc.text(`Average Score: ${average}`);
-
-
-                        // Conduct and Development Table
-                        if (assessmentResult.length > 0) {
-                            const assess = assessmentResult[0];
+                            // Student Information Section
                             doc.moveDown();
-                            doc.text('Conduct and Development', { underline: true });
+                            const infoStartX = 50;
+                            let infoCurrentY = doc.y;
 
-                            doc.text(`Academic Responsibility: ${assess.academic_responsibility}`);
-                            doc.text(`Respect and Discipline: ${assess.respect_and_discipline}`);
-                            doc.text(`Punctuality and Personal Organization: ${assess.punctuality_and_personal_organization}`);
-                            doc.text(`Social and Physical Development: ${assess.social_and_physical_development}`);
-                        }
+                            const studentInfoRows = [
+                                { label: "Student Name", value: studentResult[0].name },
+                                { label: "Admission No", value: studentID },
+                                { label: "Class", value: studentClass },
+                                { label: "Term", value: term },
+                                { label: "Session", value: session },
+                                { label: "Total Students", value: totalStudents },
+                                { label: "Attendance", value: assessmentResult.length > 0 ? assessmentResult[0].attendance : "N/A" }
+                            ];
 
-                        // Scale Table
-                        doc.moveDown();
-                        doc.text('Scale', { underline: true });
-                        doc.text('5 - Exemplary, 4 - Good, 3 - Above Average, 2 - Average, 1 - Below Average');
+                            studentInfoRows.forEach((row, index) => {
+                                const rowY = infoCurrentY + index * 15;
 
-                        // End-of-Year Average Table (if session is "whole session")
-                        if (session === 'whole session') {
-                            doc.moveDown();
-                            doc.text('End-of-Year Average', { underline: true });
-                            doc.text(`Total Score: ${totalScore}`);
-                            doc.text(`Average Score: ${(totalScore / (subjectsResult.length * 3)).toFixed(2)}`);
-                        }
+                                // Set alternating background color
+                                if (index % 2 === 0) {
+                                    doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                                }
 
-                        doc.end();
-                        if (saveToFile) res.download(filename);
-                    });
-            });
+                                // Draw text
+                                doc.fontSize(10).fillColor('black')
+                                    .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
+                                    .text(row.value, infoStartX + 200, rowY + 4, { width: doc.page.width - 2 * infoStartX - 200, align: 'left' });
+                            });
+
+                            infoCurrentY += studentInfoRows.length * 15;
+
+                            // Subject Table without vertical lines
+                            doc.moveDown().fontSize(8);
+                            const startX = 50;
+                            let currentY = doc.y + 20;
+                            const cellHeight = 15;
+                            const cellWidth = 50;
+
+                            // Draw table headers with percentages
+                            doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
+                            doc.text('Subject', startX, currentY, { width: 100, align: 'center', bold: true });
+                            doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('2nd CA', startX + 150, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('3rd CA', startX + 200, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Exam', startX + 250, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Total', startX + 300, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Grade', startX + 350, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Comment', startX + 400, currentY, { width: 100, align: 'center', bold: true });
+
+                            // Move down for percentages
+                            currentY += 10;
+
+                            // Draw percentages below each column header
+                            doc.text('(10%)', startX + 100, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
+
+                            // Move to the first row position
+                            currentY += 10;
+                            doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
+                            currentY += 5;
+
+                            // Render each subject in a new row
+                            let totalScore = 0;
+                            subjectsResult.forEach((subject, index) => {
+                                const rowY = currentY + index * cellHeight;
+
+                                // Set alternating row background colors
+                                if (index % 2 === 0) {
+                                    doc.rect(startX, rowY, 500, cellHeight).fill('#F0F0F0');
+                                }
+
+                                const { grade, comment } = getGradeAndComment(subject.total);
+                                totalScore += subject.total;
+
+                                doc.fontSize(8).fillColor('black')
+                                    .text(subject.subjectName, startX, rowY + 4, { width: 100, align: 'center' })
+                                    .text(subject.firstCA, startX + 100, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.secondCA, startX + 150, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.thirdCA, startX + 200, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.exams, startX + 250, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.total, startX + 300, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(grade, startX + 350, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(comment, startX + 400, rowY + 4, { width: 100, align: 'center' });
+                            });
+
+                            currentY += subjectsResult.length * cellHeight + 5;
+                            doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
+
+                            // Conduct and Development Section
+                            currentY += 20;
+                            doc.fontSize(10).text('Conduct and Development:', startX, currentY);
+                            currentY += 15;
+
+                            // Grading Scale for Conduct and Development
+                            const conductDevelopment = [
+                                { label: "Academic Responsibility", score: assessmentResult[0]?.academic_responsibility || 0 },
+                                { label: "Respect and Discipline", score: assessmentResult[0]?.respect_and_discipline || 0 },
+                                { label: "Punctuality & Organization", score: assessmentResult[0]?.punctuality_and_personal_organization || 0 },
+                                { label: "Social & Physical Development", score: assessmentResult[0]?.social_and_physical_development || 0 }
+                            ];
+
+                            conductDevelopment.forEach((item, index) => {
+                                const { grade, comment } = getGradeAndComment(item.score);
+
+                                doc.text(`${item.label}: ${grade} - ${comment}`, startX, currentY + index * 15);
+                            });
+
+                            // Finish PDF Document
+                            doc.end();
+                        });
+                });
+        });
     });
 }
+
+
 
 // Route Definitions for downloading and viewing 
 app.get('/api/viewResult/:studentID', (req, res) => generateStudentReport(req, res));
