@@ -1169,7 +1169,7 @@ function generateStudentReport(req, res, saveToFile = false) {
                                 doc.pipe(res);
                             }
 
-                            // School Header Section
+                            // School Header Section (Same as before)
                             const margin = 20;
                             const logoWidth = 80;
                             const logoHeight = 80;
@@ -1196,7 +1196,7 @@ function generateStudentReport(req, res, saveToFile = false) {
                             );
                             doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
 
-                            // Student Information Section
+                            // Student Information Section (Same as before)
                             doc.moveDown();
                             const infoStartX = 50;
                             let infoCurrentY = doc.y;
@@ -1227,14 +1227,14 @@ function generateStudentReport(req, res, saveToFile = false) {
 
                             infoCurrentY += studentInfoRows.length * 15;
 
-                            // Subject Table without vertical lines
+                            // Subject Table without vertical lines (Same as before)
                             doc.moveDown().fontSize(8);
                             const startX = 50;
                             let currentY = doc.y + 20;
                             const cellHeight = 15;
                             const cellWidth = 50;
 
-                            // Draw table headers with percentages
+                            // Draw table headers with percentages (Same as before)
                             doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
                             doc.text('Subject', startX, currentY, { width: 100, align: 'center', bold: true });
                             doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center', bold: true });
@@ -1259,7 +1259,7 @@ function generateStudentReport(req, res, saveToFile = false) {
                             doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
                             currentY += 5;
 
-                            // Render each subject in a new row
+                            // Render each subject in a new row (Same as before)
                             let totalScore = 0;
                             subjectsResult.forEach((subject, index) => {
                                 const rowY = currentY + index * cellHeight;
@@ -1286,12 +1286,18 @@ function generateStudentReport(req, res, saveToFile = false) {
                             currentY += subjectsResult.length * cellHeight + 5;
                             doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
 
-                            // Conduct and Development Section
+                            // Add Total and Average scores
+                            currentY += 10;
+                            doc.fontSize(10).text(`Total Score: ${totalScore}`, startX, currentY);
+                            const averageScore = totalScore / subjectsResult.length;
+                            doc.text(`Average Score: ${averageScore.toFixed(2)}`, startX + 200, currentY);
+
+                            // Conduct and Development Section (Same as before)
                             currentY += 20;
                             doc.fontSize(10).text('Conduct and Development:', startX, currentY);
                             currentY += 15;
 
-                            // Grading Scale for Conduct and Development
+                            // Grading Scale for Conduct and Development (Same as before)
                             const conductDevelopment = [
                                 { label: "Academic Responsibility", score: assessmentResult[0]?.academic_responsibility || 0 },
                                 { label: "Respect and Discipline", score: assessmentResult[0]?.respect_and_discipline || 0 },
@@ -1312,7 +1318,6 @@ function generateStudentReport(req, res, saveToFile = false) {
         });
     });
 }
-
 
 
 // Route Definitions for downloading and viewing 
