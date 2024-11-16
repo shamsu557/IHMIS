@@ -598,7 +598,7 @@ function loadStudents(className) {
                 students.forEach(student => {
                     studentList.append(`
                         <li>
-                            ${student.studentID} - ${student.firstname} ${student.othername ? student.othername + ' ' : ''} ${student.surname} - ${student.guardianPhone}
+                            ${student.studentID} - ${student.firstname}  ${student.surname} ${student.othername ? student.othername + ' ' : ''} - ${student.guardianPhone}
                             <div class="action-buttons">
                                 <button class="edit-btn btn-warning" data-id="${student.studentID}" data-firstname="${student.firstname}" data-othername="${student.othername}" data-surname="${student.surname}" data-guardianphone="${student.guardianPhone}" data-class="${student.class}" data-subjects="${student.subjects}" data-studentPicture="${student.picture}">Edit</button>
                                 <button class="delete-btn btn-danger" data-id="${student.studentID}">Delete</button>

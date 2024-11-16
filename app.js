@@ -1127,7 +1127,7 @@ function getGradeAndComment(score) {
     if (score >= 40) return { grade: 'D', comment: 'Pass' };
     return { grade: 'F', comment: 'Fail' };
 }
-
+//generate report
 function generateStudentReport(req, res, saveToFile = false) {
     const { studentID } = req.params;
     const { term, session } = req.query;
@@ -1202,7 +1202,10 @@ function generateStudentReport(req, res, saveToFile = false) {
                             let infoCurrentY = doc.y;
 
                             const studentInfoRows = [
-                                { label: "Student Name", value: studentResult[0].name },
+                                { 
+                                    label: "Student Name", 
+                                    value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
+                                },                                
                                 { label: "Admission No", value: studentID },
                                 { label: "Class", value: studentClass },
                                 { label: "Term", value: term },

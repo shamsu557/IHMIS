@@ -170,7 +170,7 @@ function loadStudents(className, term, session) {
                 students.forEach(student => {
                     studentList.append(`
                         <li>
-                            ${student.studentID} - ${student.firstname} ${student.surname}
+                            ${student.studentID} - ${student.firstname} ${student.surname} ${student.othername ? student.othername + ' ' : ''}
                             <a href="/api/viewResult/${student.studentID}?term=${term}&session=${session}" class="view-link">View Result</a>
                             |
                             <a href="/api/downloadResult/${student.studentID}?term=${term}&session=${session}" class="download-link">Download Result</a>
