@@ -1080,21 +1080,22 @@ app.post('/form-master-login', (req, res) => {
 app.post('/form-master/submit-assessment', (req, res) => {
     const { term, session, assessments } = req.body;
 
-    const assessmentQueries = assessments.map(({ studentID, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment }) => {
+    const assessmentQueries = assessments.map(({ studentID, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment, attendance }) => {
         return new Promise((resolve, reject) => {
-            // Insert or update the assessment without calculating averages
+            // Insert or update the assessment including the attendance field
             const insertQuery = `
-                INSERT INTO form_master_assessments (studentID, term, session, academic_responsibility, respect_and_discipline, punctuality_and_personal_organization, social_and_physical_development)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO form_master_assessments (studentID, term, session, academic_responsibility, respect_and_discipline, punctuality_and_personal_organization, social_and_physical_development, attendance)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE 
                     academic_responsibility = VALUES(academic_responsibility),
                     respect_and_discipline = VALUES(respect_and_discipline),
                     punctuality_and_personal_organization = VALUES(punctuality_and_personal_organization),
-                    social_and_physical_development = VALUES(social_and_physical_development)
+                    social_and_physical_development = VALUES(social_and_physical_development),
+                    attendance = VALUES(attendance)
             `;
 
             db.query(insertQuery, [
-                studentID, term, session, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment
+                studentID, term, session, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment, attendance
             ], (err, results) => {
                 if (err) return reject(err);
                 resolve(results);
@@ -1109,6 +1110,7 @@ app.post('/form-master/submit-assessment', (req, res) => {
             res.status(500).json({ message: 'Failed to save assessment data' });
         });
 });
+
 
 // School Information
 const schoolInfo = {
@@ -1127,7 +1129,16 @@ function getGradeAndComment(score) {
     if (score >= 40) return { grade: 'D', comment: 'Pass' };
     return { grade: 'F', comment: 'Fail' };
 }
-//generate report
+// Helper function for Conduct and Development grading scale
+function getConductGrade(score) {
+    if (score === 4) return 'Exemplary';
+    if (score === 3) return 'Above Average';
+    if (score === 2) return 'Average';
+    if (score === 1) return 'Below Average';
+    return 'No Assessment';
+}
+
+// Generate student report function
 function generateStudentReport(req, res, saveToFile = false) {
     const { studentID } = req.params;
     const { term, session } = req.query;
@@ -1205,7 +1216,7 @@ function generateStudentReport(req, res, saveToFile = false) {
                                 { 
                                     label: "Student Name", 
                                     value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
-                                },                                
+                                },                                 
                                 { label: "Admission No", value: studentID },
                                 { label: "Class", value: studentClass },
                                 { label: "Term", value: term },
@@ -1295,24 +1306,60 @@ function generateStudentReport(req, res, saveToFile = false) {
                             const averageScore = totalScore / subjectsResult.length;
                             doc.text(`Average Score: ${averageScore.toFixed(2)}`, startX + 200, currentY);
 
-                            // Conduct and Development Section (Same as before)
-                            currentY += 20;
-                            doc.fontSize(10).text('Conduct and Development:', startX, currentY);
-                            currentY += 15;
+                     // Conduct and Development and Grading Scale Tables
+currentY += 20;
+doc.fontSize(10).text('Attitude and Values Towards:', startX, currentY);
+doc.fontSize(10).text('Grading Scale:', startX + 350, currentY); // Adjust for scale column start
+currentY += 15;
 
-                            // Grading Scale for Conduct and Development (Same as before)
-                            const conductDevelopment = [
-                                { label: "Academic Responsibility", score: assessmentResult[0]?.academic_responsibility || 0 },
-                                { label: "Respect and Discipline", score: assessmentResult[0]?.respect_and_discipline || 0 },
-                                { label: "Punctuality & Organization", score: assessmentResult[0]?.punctuality_and_personal_organization || 0 },
-                                { label: "Social & Physical Development", score: assessmentResult[0]?.social_and_physical_development || 0 }
-                            ];
+// Table Data
+const conductCategories = [
+    { label: "Academic Responsibility", scoreKey: "academic_responsibility" },
+    { label: "Respect & Discipline", scoreKey: "respect_and_discipline" },
+    { label: "Punctuality & Organization", scoreKey: "punctuality_and_personal_organization" },
+    { label: "Social & Physical Development", scoreKey: "social_and_physical_development" },
+];
 
-                            conductDevelopment.forEach((item, index) => {
-                                const { grade, comment } = getGradeAndComment(item.score);
+const gradingScale = [
+    [4, 'Exemplary'],
+    [3, 'Above Average'],
+    [2, 'Average'],
+    [1, 'Below Average']
+];
 
-                                doc.text(`${item.label}: ${grade} - ${comment}`, startX, currentY + index * 15);
-                            });
+// Define maximum rows for alignment
+const maxRows = Math.max(conductCategories.length, gradingScale.length);
+
+// Draw rows for both tables
+for (let i = 0; i < maxRows; i++) {
+    const rowY = currentY + i * 15;
+
+    // Alternating row colors
+    if (i % 2 === 0) {
+        doc.rect(startX, rowY, 300, 15).fill('#F8F8F8'); // Conduct and Development background
+        doc.rect(startX + 350, rowY, 300, 15).fill('#F8F8F8'); // Grading Scale background
+    }
+
+    // Conduct and Development Table
+    if (i < conductCategories.length) {
+        const category = conductCategories[i];
+        const score = assessmentResult[0]?.[category.scoreKey];
+        doc.fillColor('black')
+            .fontSize(10).text(category.label, startX + 5, rowY + 2, { align: 'left' })
+            .text(score, startX + 200, rowY + 2, { align: 'left' });
+    }
+
+    // Grading Scale Table
+    if (i < gradingScale.length) {
+        const [score, comment] = gradingScale[i];
+        doc.fillColor('black')
+            .fontSize(10).text(score, startX + 355, rowY + 2, { align: 'left' })
+            .text(comment, startX + 400, rowY + 2, { align: 'left' });
+    }
+}
+
+// Update currentY after tables
+currentY += maxRows * 15 + 20;
 
                             // Finish PDF Document
                             doc.end();
@@ -1321,6 +1368,7 @@ function generateStudentReport(req, res, saveToFile = false) {
         });
     });
 }
+
 
 
 // Route Definitions for downloading and viewing 

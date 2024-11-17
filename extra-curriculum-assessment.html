@@ -467,39 +467,54 @@ button {
                     ${student.firstname} ${student.surname} (ID: ${student.studentID})
                 </label>
             </div>
-            <div class="form-row mt-2">
-                <div class="form-group col-md-6">
-                    <label>Academic Responsibility</label>
-                    <input type="text" maxlength="1" class="form-control form-control-score" name="academicResponsibility" required>
-                </div>
-                <div class="form-group col-md-6">
-                    <label>Respect and Discipline</label>
-                    <input type="text" maxlength="1" class="form-control form-control-score" name="respectAndDiscipline" required>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label>Punctuality and Personal Organization</label>
-                    <input type="text" maxlength="1" class="form-control form-control-score" name="punctuality" required>
-                </div>
-                <div class="form-group col-md-6">
-                    <label>Social and Physical Development</label>
-                    <input type="text" maxlength="1" class="form-control form-control-score" name="socialDevelopment" required>
-                </div>
-            </div>
+           <div class="form-row mt-2">
+    <div class="form-group col-md-6">
+        <label>Academic Responsibility</label>
+        <input type="text" maxlength="1" class="form-control form-control-score" name="academicResponsibility" required>
+    </div>
+    <div class="form-group col-md-6">
+        <label>Respect and Discipline</label>
+        <input type="text" maxlength="1" class="form-control form-control-score" name="respectAndDiscipline" required>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label>Punctuality and Personal Organization</label>
+        <input type="text" maxlength="1" class="form-control form-control-score" name="punctuality" required>
+    </div>
+    <div class="form-group col-md-6">
+        <label>Social and Physical Development</label>
+        <input type="text" maxlength="1" class="form-control form-control-score" name="socialDevelopment" required>
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label>Attendance</label>
+        <input type="text" class="form-control form-control-score" name="attendance" required> <!-- Removed maxlength -->
+    </div>
+</div>
+
             <input type="hidden" name="studentID" value="${student.studentID}">
         `;
         container.appendChild(studentDiv);
     });
     
-    // Restrict input to numbers only
-    document.querySelectorAll('.form-control-score').forEach(input => {
-        input.addEventListener('input', function() {
-            this.value = this.value.replace(/[^1-5]/g, ''); // Allow only 1 to 5
-        });
+   // Restrict input to numbers only
+document.querySelectorAll('.form-control-score').forEach(input => {
+    input.addEventListener('input', function() {
+        if (this.name === 'attendance') {
+            // Allow values from 0 to 120 for Attendance
+            this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numeric characters
+            if (this.value !== "" && parseInt(this.value, 10) > 120) {
+                this.value = '120'; // Cap at 120
+            }
+        } else {
+            // Restrict other fields to 1 to 4
+            this.value = this.value.replace(/[^1-4]/g, ''); // Allow only 1 to 4
+        }
     });
-}
-
+});
+        }
 document.getElementById('submitBtn').addEventListener('click', async () => {
     const term = document.getElementById('termSelect').value;
     const session = document.getElementById('sessionSelect').value;
@@ -510,8 +525,16 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
             academicResponsibility: studentDiv.querySelector('input[name="academicResponsibility"]').value,
             respectAndDiscipline: studentDiv.querySelector('input[name="respectAndDiscipline"]').value,
             punctuality: studentDiv.querySelector('input[name="punctuality"]').value,
-            socialDevelopment: studentDiv.querySelector('input[name="socialDevelopment"]').value
+            socialDevelopment: studentDiv.querySelector('input[name="socialDevelopment"]').value,
+            attendance: studentDiv.querySelector('input[name="attendance"]').value
+
         }));
+        // Check if any students are selected
+    if (assessments.length === 0) {
+        alert('Please select at least one student');
+        return; // Stop the form submission if no student is selected
+    }
+
 
     try {
         const response = await fetch('/form-master/submit-assessment', {
