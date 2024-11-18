@@ -215,41 +215,44 @@ button {
   font-size: 24px;
 }
 
+ /* Remove default dropdown caret */
+  .dropdown-toggle::after {
+    content: none;
+  }
 
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background-color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 5px;
-  list-style: none;
-  padding: 0;
-  z-index: 1000;
-}
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    list-style: none;
+    padding: 0;
+    z-index: 1000;
+  }
 
-.dropdown-menu.show {
-  display: block;
-}
+  .dropdown-menu.show {
+    display: block;
+  }
 
-.dropdown-menu li {
-  padding: 8px 16px;
-}
+  .dropdown-menu li {
+    padding: 8px 16px;
+  }
 
-.dropdown-menu li:hover {
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
+  .dropdown-menu li:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
 
-.dropdown-item {
-  text-decoration: none;
-  color: #000;
-}
+  .dropdown-item {
+    text-decoration: none;
+    color: #000;
+  }
 
-.dropdown-item:hover {
-  text-decoration: none;
-  color: #007bff;
-}
-
+  .dropdown-item:hover {
+    text-decoration: none;
+    color: #007bff;
+  }
 #myBtn {
   display: none;
   position: fixed;
@@ -393,26 +396,50 @@ button {
         cancelButton.style.display = "block"; // Show cancel button
         menuIcon.classList.add("hidden"); // Hide menu icon completely
     }
-}
-     // Wait for the DOM to load
-  document.addEventListener('DOMContentLoaded', () => {
-    // Get the dropdown button and menu
-    const dropdownToggle = document.querySelector('.dropdown-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
+}  
 
-    // Toggle dropdown menu visibility on button click
-    dropdownToggle.addEventListener('click', () => {
-      dropdownMenu.classList.toggle('show');
+document.addEventListener('DOMContentLoaded', () => {
+  const dropdownToggle = document.querySelector('.dropdown-toggle');
+  const dropdownMenu = document.querySelector('.dropdown-menu');
+  const dropdownItems = dropdownMenu.querySelectorAll('li');
+
+  // Show dropdown on hover over the toggle
+  dropdownToggle.addEventListener('mouseover', () => {
+    dropdownMenu.classList.add('show');
+  });
+
+  // Keep the dropdown visible when hovering over the menu itself
+  dropdownMenu.addEventListener('mouseover', () => {
+    dropdownMenu.classList.add('show');
+  });
+
+  // Hide dropdown when mouse leaves both toggle and menu
+  dropdownToggle.addEventListener('mouseout', () => {
+    dropdownMenu.classList.remove('show');
+  });
+
+  dropdownMenu.addEventListener('mouseout', () => {
+    dropdownMenu.classList.remove('show');
+  });
+
+  // Navigate to the correct page and hide dropdown when an item is clicked
+  dropdownItems.forEach(item => {
+    item.addEventListener('click', (event) => {
+      const targetPage = event.target.getAttribute('data-target'); // Get the target URL
+      if (targetPage) {
+        dropdownMenu.classList.remove('show'); // Hide the dropdown
+        window.location.href = targetPage; // Navigate to the target page
+      }
     });
+  });
 
-    // Hide dropdown if clicked outside
+    // Hide dropdown if clicked anywhere outside the button or menu
     document.addEventListener('click', (event) => {
       if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
         dropdownMenu.classList.remove('show');
       }
     });
   });
-   
     // Back to top button functionality
     window.onscroll = function() { scrollFunction() };
 

@@ -197,6 +197,21 @@ button {
 .footer i {
   font-size: 24px;
 }
+/* Close button styling */
+.close-btn {
+    display: block;
+    width: 100px;
+    margin: 20px auto;
+    text-align: center;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
     #myBtn {
   display: none;
   position: fixed;
@@ -442,6 +457,9 @@ button {
         <button type="submit" class="btn btn-success btn-block" >Submit Student</button>
     </div> 
     </form>
+   
+<button class="close-btn text-center" onclick="goBack()">Close</button>
+   
   </div> 
  <!-- Footer -->
  <div class="footer bg-light mt-5">
@@ -564,6 +582,10 @@ function scrollFunction() {
 function topFunction() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+}
+    // Close button functionality
+function goBack() {
+window.history.back();
 }
 
   </script>

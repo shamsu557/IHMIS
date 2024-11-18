@@ -216,3 +216,21 @@ margin-left: 10px; /* Adds space between the student's name and the links */
 color:#c2ddf8 ;
 text-decoration: none;
 }
+  /* Close button styling */
+  .close-btn {
+    display: block;
+    width: 100px;
+    margin: 20px auto;
+    text-align: center;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    background-color: #c82333;
+}
