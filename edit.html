@@ -285,7 +285,7 @@ button {
         </select>
     </div>
 
-    <button id="view-students" type="button" class="btn btn-success">View Students</button>
+    <button id="view-students" type="button" class="btn btn-success w-100">View Students</button>
 
     <!-- New button to go back to class selection -->
     <button id="back-to-selection" type="button" class="btn btn-secondary mt-3" style="display: none;">Back to Class Selection</button>
@@ -757,29 +757,39 @@ const updatedStudent = {
     picture: $('#studentPicture').prop('files')[0]
 };
 
-
-$(document).ready(function() {
+$(document).ready(function () {
+    // Load class options into the dropdown
     loadClassOptions();
 
-    $('#view-students').click(function() {
+    // Event handler for "View Students" button
+    $('#view-students').click(function () {
         const classSelection = $('#class-selection').val();
         const selectedClassText = $('#class-selection option:selected').text();
 
         if (classSelection) {
+            // Load students for the selected class
             loadStudents(classSelection);
+
+            // Hide class selection and show selected class header
             $('#select-class-header, #view-students, #class-label, #class-selection').hide();
-            $('#selected-class-header').text(`${selectedClassText} Students:`).show();
+            $('#selected-class-header')
+                .addClass('small text-muted')
+                .text(`Class: ${selectedClassText} Students`)
+                .show();
             $('#back-to-selection').show();
         } else {
             alert('Please select a class.');
         }
     });
-});
 
-$('#back-to-selection').click(function() {
-    $('#selected-class-header, #student-list').hide();
-    $('#student-list').empty();
-    $('#select-class-header, #view-students, #class-label, #class-selection').show();
+    // Event handler for "Back to Class" button
+    $('#back-to-selection').click(function () {
+        // Reset to initial view
+        $('#selected-class-header').hide().removeClass('small text-muted');
+        $('#select-class-header, #view-students, #class-label, #class-selection').show();
+        $('#back-to-selection').hide();
+        $('#student-list').empty(); // Clear student list
+    });
 });
 
 window.onscroll = function() { scrollFunction() };
