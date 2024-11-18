@@ -1111,7 +1111,6 @@ app.post('/form-master/submit-assessment', (req, res) => {
         });
 });
 
-
 // School Information
 const schoolInfo = {
     name: 'IMAM HAFSIN MODEL INTERNATIONAL SCHOOL',
@@ -1360,6 +1359,22 @@ for (let i = 0; i < maxRows; i++) {
 
 // Update currentY after tables
 currentY += maxRows * 15 + 20;
+// Add Signature Section
+currentY += 40; // Add some space before the signature section
+
+// Text indicating who is signing
+doc.font('Helvetica').fontSize(12).text('Signed by:', startX, currentY);
+currentY += 30;
+
+// Line for the signature
+doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
+currentY += 10;
+
+// Add the signer's designation below the line
+doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+currentY += 20;
+
+
 
                             // Finish PDF Document
                             doc.end();
@@ -1368,12 +1383,224 @@ currentY += maxRows * 15 + 20;
         });
     });
 }
+// for fetching sessions from the subjects table
+app.get('/api/fetchSessions', (req, res) => {
+    db.query('SELECT DISTINCT session FROM subjects ORDER BY session', (err, results) => {
+        if (err) {
+            console.error('Error fetching sessions:', err);
+            return res.status(500).json({ error: 'Failed to fetch sessions' });
+        }
+        // Send back the session data
+        res.json(results.map(result => result.session));
+    });
+});
 
 
+// Generate sessional result
+function generateSessionalResult(req, res, saveToFile = false) {
+    const { studentID } = req.params;
+    const { session } = req.query;
+
+    if (!studentID || !session) {
+        return res.status(400).json({ error: 'Missing required parameters: studentID or session' });
+    }
+
+    db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, studentResult) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error fetching student', details: err });
+        }
+        if (studentResult.length === 0) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        const studentClass = studentResult[0].class;
+
+        db.query('SELECT COUNT(*) as count FROM students WHERE class = ?', [studentClass], (err, studentCountResult) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error fetching student count', details: err });
+            }
+
+            const totalStudents = studentCountResult[0].count;
+
+            db.query(`
+                SELECT term, subjectName, SUM(firstCA) AS firstCA, SUM(secondCA) AS secondCA,
+                       SUM(thirdCA) AS thirdCA, SUM(exams) AS exams, SUM(total) AS total
+                FROM subjects
+                WHERE studentID = ? AND session = ?
+                GROUP BY term, subjectName
+                ORDER BY term`, [studentID, session], (err, subjectsResult) => {
+                    if (err) {
+                        return res.status(500).json({ error: 'Database error fetching subjects', details: err });
+                    }
+
+                    db.query(`
+                        SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
+                               social_and_physical_development, attendance, term
+                        FROM form_master_assessments
+                        WHERE studentID = ? AND session = ?
+                        ORDER BY term`, [studentID, session], (err, assessmentsResult) => {
+                            if (err) {
+                                return res.status(500).json({ error: 'Database error fetching assessments', details: err });
+                            }
+
+                            // Calculate total attendance
+                            let totalAttendance = 0;
+                            assessmentsResult.forEach(assessment => {
+                                totalAttendance += assessment.attendance;
+                            });
+
+                            // Initialize PDF
+                            const doc = new PDFDocument({ layout: 'portrait', margin: 20 });
+                            const filename = `Sessional_Report_${studentID}_${session}.pdf`;
+
+                            if (saveToFile) {
+                                doc.pipe(fs.createWriteStream(filename));
+                            } else {
+                                res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                                res.setHeader('Content-Type', 'application/pdf');
+                                doc.pipe(res);
+                            }
+
+                            // Header Section
+                            const margin = 20;
+                            const logoWidth = 80;
+                            const textStartX = logoWidth + 2 * margin;
+
+                            try {
+                                doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth });
+                            } catch (imageError) {
+                                console.error("Failed to load logo image:", imageError);
+                                doc.text("(Logo unavailable)", margin, margin);
+                            }
+
+                            doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                            doc.font('Helvetica').fontSize(12)
+                                .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+                                .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+                                .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+
+                            doc.font('Helvetica-Bold').fontSize(14).text(
+                                `Sessional Report Sheet for ${session} Academic Session`,
+                                margin,
+                                margin + 80,
+                                { width: doc.page.width - 2 * margin, align: 'center' }
+                            );
+                            doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
+
+                            // Calculate cumulative total and average
+                            let cumulativeTotal = 0;
+                            subjectsResult.forEach(subject => {
+                                cumulativeTotal += subject.total;
+                            });
+
+                            const average = cumulativeTotal / subjectsResult.length;
+                            const status = average >= 50 ? 'Pass' : 'Fail';
+
+                            // Student Info Section
+                            const infoStartX = 50;
+                            let infoCurrentY = doc.y + 20;
+
+                            const studentInfoRows = [
+                                { 
+                                    label: "Student Name", 
+                                    value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
+                                },
+                                { label: "Admission No", value: studentID },
+                                { label: "Class", value: studentClass },
+                                { label: "Session", value: session },
+                                { label: "Total Students", value: totalStudents },
+                                { label: "Total Attendance", value: totalAttendance },
+                                { label: "End of The Year Average", value: average.toFixed(2) },
+                                { label: "Status", value: status },
+                            ];
+
+                            studentInfoRows.forEach((row, index) => {
+                                const rowY = infoCurrentY + index * 15;
+
+                                if (index % 2 === 0) {
+                                    doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                                }
+
+                                doc.fontSize(10).fillColor('black')
+                                    .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
+                                    .text(row.value, infoStartX + 200, rowY + 4, { align: 'left' });
+                            });
+
+                            infoCurrentY += studentInfoRows.length * 15;
+                            // Draw horizontal line after student info section
+                            doc.moveTo(infoStartX, infoCurrentY + 10).lineTo(doc.page.width - infoStartX, infoCurrentY + 10).stroke();
+
+                            // Adjust currentY for the next section
+                            infoCurrentY += 20;
+
+
+                          // Subjects Table
+doc.moveDown().fontSize(8);
+const startX = 50;
+let currentY = doc.y + 20;
+
+doc.text('Term', startX, currentY, { bold: true });
+doc.text('Subject', startX + 100, currentY, { bold: true });
+doc.text('1st CA', startX + 200, currentY, { bold: true });
+doc.text('2nd CA', startX + 250, currentY, { bold: true });
+doc.text('3rd CA', startX + 300, currentY, { bold: true });
+doc.text('Exam', startX + 350, currentY, { bold: true });
+doc.text('Total', startX + 400, currentY, { bold: true });
+
+currentY += 15;
+
+subjectsResult.forEach(subject => {
+    doc.text(subject.term, startX, currentY);
+    doc.text(subject.subjectName, startX + 100, currentY);
+    doc.text(subject.firstCA, startX + 200, currentY);
+    doc.text(subject.secondCA, startX + 250, currentY);
+    doc.text(subject.thirdCA, startX + 300, currentY);
+    doc.text(subject.exams, startX + 350, currentY);
+    doc.text(subject.total, startX + 400, currentY);
+
+    currentY += 15;
+});
+
+// Add horizontal line after the table
+doc.moveTo(startX, currentY + 4)
+   .lineTo(doc.page.width - startX, currentY + 4) // Line spans full width with same margins
+   .stroke();
+
+// Display Cumulative Total and Session Average after table
+currentY += 10; // Adjust spacing below the line
+doc.moveDown().fontSize(8);
+doc.text(`Cumulative Total: ${cumulativeTotal}`, startX, currentY);
+doc.text(`Session Average: ${average.toFixed(2)}`, startX + 200, currentY);
+
+// Add Signature Section
+currentY += 40; // Add some space before the signature section
+
+// Text indicating who is signing
+doc.font('Helvetica').fontSize(12).text('Signed by:', startX, currentY);
+currentY += 30;
+
+// Line for the signature
+doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
+currentY += 10;
+
+// Add the signer's designation below the line
+doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+currentY += 20;
+
+                            // Finalize PDF
+                            doc.end();
+                        });
+                });
+        });
+    });
+}
 
 // Route Definitions for downloading and viewing 
 app.get('/api/viewResult/:studentID', (req, res) => generateStudentReport(req, res));
 app.get('/api/downloadResult/:studentID', (req, res) => generateStudentReport(req, res, true));
+// Sessional result routes
+app.get('/api/sessionReport/view/:studentID', (req, res) => generateSessionalResult(req, res));
+app.get('/api/sessionReport/download/:studentID', (req, res) => generateSessionalResult(req, res, true));
 
 
 const PORT = process.env.PORT || 3000;
