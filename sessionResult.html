@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="view.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-light bg-white text-dark fixed-top">
+    <img src="educap.jfif" alt="Logo" class="circular-img">
+    <span class="navbar-brand mx-auto text-dark">Session Results</span>
+    <img src="logo.jpg" alt="Logo" class="circular-img">
+</nav>
+
+<div class="container mt-5 pt-5">
+    <h1 class="text-center">Generate End-of-Year Report</h1>
+
+    <!-- Class and Student Selection -->
+    <div id="classSelection" class="card shadow mt-4 p-4">
+        <div class="form-group">
+            <label for="class-selection">Class:</label>
+            <select id="class-selection" class="form-control" required>
+                <option value="" disabled selected>Select Class</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sessionSelect">Session:</label>
+            <select class="form-control" id="sessionSelect" required>
+                <option value="2024/2025">2024/2025</option>
+                <option value="2025/2026">2025/2026</option>
+                <option value="2026/2027">2026/2027</option>
+            </select>
+        </div>
+
+
+        <button id="load-students" class="btn btn-success btn-block">Load Students</button>
+    </div>
+
+    <!-- Students List -->
+    <div id="students-section" class="mt-4" style="display: none;">
+        <h4 id="class-header" class="text-center"></h4>
+        <ul id="students-list" class="list-group"></ul>
+        <button id="back-button" class="btn btn-secondary mt-3">Back to Class Selection</button>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Load Classes
+    function loadClasses() {
+        $.ajax({
+            url: '/api/fetchClasses',
+            method: 'GET',
+            success: function (classes) {
+                const classDropdown = $('#class-selection');
+                classDropdown.empty().append('<option value="" disabled selected>Select Class</option>');
+                classes.forEach(cls => classDropdown.append(`<option value="${cls}">${cls}</option>`));
+            },
+            error: function () {
+                alert('Failed to load classes.');
+            }
+        });
+    }
+
+    // Load Students for Selected Class
+    $('#load-students').click(function () {
+        const selectedClass = $('#class-selection').val();
+
+        if (!selectedClass) {
+            alert('Please select a class.');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/fetchStudents',
+            method: 'POST',
+            data: JSON.stringify({ class: selectedClass }),
+            contentType: 'application/json',
+            success: function (students) {
+                const studentsList = $('#students-list');
+                studentsList.empty();
+
+                if (students.length) {
+                    students.forEach(student => {
+                        studentsList.append(`
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${student.studentID} - ${student.firstname} ${student.surname} ${student.othername ? student.othername + ' ' : ''}
+                                <div>
+                                    <button class="btn btn-primary btn-sm view-result" data-id="${student.studentID}">View Result</button>
+                                    |
+                                    <button class="btn btn-success btn-sm download-result" data-id="${student.studentID}">Download</button>
+                                </div>
+                            </li>
+                        `);
+                    });
+
+                    $('#class-header').text(`Class: ${selectedClass}`);
+                    $('#classSelection').hide();
+                    $('#students-section').show();
+                } else {
+                    alert('No students found.');
+                }
+            },
+            error: function () {
+                alert('Failed to load students.');
+            }
+        });
+    });
+
+    // Back Button
+    $('#back-button').click(function () {
+        $('#students-section').hide();
+        $('#classSelection').show();
+        $('#students-list').empty();
+    });
+
+    // View Result
+    $(document).on('click', '.view-result', function () {
+        const studentID = $(this).data('id');
+        const session = $('#sessionSelect').val(); // Get selected session
+
+        if (!session) {
+            alert('Please select a session.');
+            return;
+        }
+
+        window.location.href = `/api/sessionReport/view/${studentID}?session=${encodeURIComponent(session)}`;
+    });
+
+    // Download Result
+    $(document).on('click', '.download-result', function () {
+        const studentID = $(this).data('id');
+        const session = $('#sessionSelect').val(); // Get selected session
+
+        if (!session) {
+            alert('Please select a session.');
+            return;
+        }
+
+        window.location.href = `/api/sessionReport/download/${studentID}?session=${encodeURIComponent(session)}`;
+    });
+
+ // Load Sessions
+function loadSessions() {
+    $.ajax({
+        url: '/api/fetchSessions',
+        method: 'GET',
+        success: function (sessions) {
+            console.log("Sessions loaded:", sessions);  // Log the sessions returned
+            const sessionDropdown = $('#sessionSelect');
+            sessionDropdown.empty().append('<option value="" disabled selected>Select Session</option>');
+            sessions.forEach(session => sessionDropdown.append(`<option value="${session}">${session}</option>`));
+        },
+        error: function (xhr, status, error) {
+            console.error('Failed to load sessions:', error); // Log any errors
+            alert('Failed to load sessions. Please try again later.');
+        }
+    });
+}
+
+
+    // Initialize
+    loadClasses();
+    loadSessions();
+});
+
+</script>
+
+</body>
+</html>

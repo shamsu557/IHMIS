@@ -214,7 +214,43 @@ button {
 .footer i {
   font-size: 24px;
 }
-    #myBtn {
+
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu li {
+  padding: 8px 16px;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.dropdown-item {
+  text-decoration: none;
+  color: #000;
+}
+
+.dropdown-item:hover {
+  text-decoration: none;
+  color: #007bff;
+}
+
+#myBtn {
   display: none;
   position: fixed;
   bottom: 15px;
@@ -231,8 +267,7 @@ button {
 
 #myBtn:hover {
   background-color: #555;
-}
-    
+}    
   </style>
 </head>
 <body>
@@ -283,9 +318,24 @@ button {
         <li>Edit student information</li>
         <li>View existing students</li>
       </ul>
-      <button class="btn btn-primary" onclick="window.location.href='add.html'">Add Student</button>
-      <button class="btn btn-warning" onclick="window.location.href='edit.html'">Edit Student</button>
-      <button class="btn btn-info" onclick="window.location.href='view.html'">View Students</button>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="window.location.href='add.html'">Add Student</button>
+        |
+        <button class="btn btn-warning" onclick="window.location.href='edit.html'">Edit Student</button>
+        |
+      
+        <!-- Dropdown Button -->
+        <div class="btn-group">
+          <button class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            View Students
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="view.html">View Terminal Results</a></li>
+            <li><a class="dropdown-item" href="sessionResult.html">View Sessional Results</a></li>
+          </ul>
+        </div>
+      </div>
+      
     </div>
   </div>
   <br><br>
@@ -344,7 +394,24 @@ button {
         menuIcon.classList.add("hidden"); // Hide menu icon completely
     }
 }
-    
+     // Wait for the DOM to load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get the dropdown button and menu
+    const dropdownToggle = document.querySelector('.dropdown-toggle');
+    const dropdownMenu = document.querySelector('.dropdown-menu');
+
+    // Toggle dropdown menu visibility on button click
+    dropdownToggle.addEventListener('click', () => {
+      dropdownMenu.classList.toggle('show');
+    });
+
+    // Hide dropdown if clicked outside
+    document.addEventListener('click', (event) => {
+      if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  });
    
     // Back to top button functionality
     window.onscroll = function() { scrollFunction() };
