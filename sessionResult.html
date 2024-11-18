@@ -47,10 +47,12 @@
 
     <!-- Students List -->
     <div id="students-section" class="mt-4" style="display: none;">
+          <!-- back to class selection -->
+          <button id="back-button" type="button" class="btn btn-success mt-3">Back to Class Selection</button>
         <h4 id="class-header" class="text-center"></h4>
         <ul id="students-list" class="list-group"></ul>
-        <button id="back-button" class="btn btn-secondary mt-3">Back to Class Selection</button>
     </div>
+    <button class="close-btn text-center" onclick="goBack()">Close</button>
 </div>
 
 <script>
@@ -173,6 +175,10 @@ function loadSessions() {
     loadSessions();
 });
 
+    // Close button functionality
+function goBack() {
+window.history.back();
+}
 </script>
 
 </body>
