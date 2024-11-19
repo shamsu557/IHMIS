@@ -1395,7 +1395,6 @@ app.get('/api/fetchSessions', (req, res) => {
     });
 });
 
-
 // Generate sessional result
 function generateSessionalResult(req, res, saveToFile = false) {
     const { studentID } = req.params;
@@ -1462,22 +1461,26 @@ function generateSessionalResult(req, res, saveToFile = false) {
                             }
 
                             // Header Section
-                            const margin = 20;
+                            const margin = 15;
                             const logoWidth = 80;
-                            const textStartX = logoWidth + 2 * margin;
-
+                            const logoHeight = 80;
+                            const textStartX = logoWidth + margin-20;
                             try {
-                                doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth });
+                                doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
                             } catch (imageError) {
                                 console.error("Failed to load logo image:", imageError);
                                 doc.text("(Logo unavailable)", margin, margin);
                             }
 
-                            doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                            // School Info centered
+                            doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, {
+                                align: 'center',
+                                width: doc.page.width - logoWidth - 2 * margin,
+                            });
                             doc.font('Helvetica').fontSize(12)
-                                .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+                                .text(schoolInfo.address, textStartX, margin + 30, { align: 'center' })
                                 .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
-                                .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+                                .text(schoolInfo.phone, textStartX, margin + 60, { align: 'center' });
 
                             doc.font('Helvetica-Bold').fontSize(14).text(
                                 `Sessional Report Sheet for ${session} Academic Session`,
@@ -1519,60 +1522,61 @@ function generateSessionalResult(req, res, saveToFile = false) {
 
                                 if (index % 2 === 0) {
                                     doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                                } else {
+                                    doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#FFFFFF');
                                 }
 
-                                doc.fontSize(10).fillColor('black')
+                                doc.fillColor('black')
+                                    .fontSize(10)
                                     .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
                                     .text(row.value, infoStartX + 200, rowY + 4, { align: 'left' });
                             });
 
                             infoCurrentY += studentInfoRows.length * 15;
-                            // Draw horizontal line after student info section
                             doc.moveTo(infoStartX, infoCurrentY + 10).lineTo(doc.page.width - infoStartX, infoCurrentY + 10).stroke();
-
-                            // Adjust currentY for the next section
                             infoCurrentY += 20;
 
+                            // Subjects Table
+                            doc.moveDown().fontSize(8);
+                            const startX = 50;
+                            let currentY = doc.y + 20;
 
-                          // Subjects Table
-doc.moveDown().fontSize(8);
-const startX = 50;
-let currentY = doc.y + 20;
+                            doc.text('Term', startX, currentY, { bold: true });
+                            doc.text('Subject', startX + 100, currentY, { bold: true });
+                            doc.text('1st CA', startX + 200, currentY, { bold: true });
+                            doc.text('2nd CA', startX + 250, currentY, { bold: true });
+                            doc.text('3rd CA', startX + 300, currentY, { bold: true });
+                            doc.text('Exam', startX + 350, currentY, { bold: true });
+                            doc.text('Total', startX + 400, currentY, { bold: true });
 
-doc.text('Term', startX, currentY, { bold: true });
-doc.text('Subject', startX + 100, currentY, { bold: true });
-doc.text('1st CA', startX + 200, currentY, { bold: true });
-doc.text('2nd CA', startX + 250, currentY, { bold: true });
-doc.text('3rd CA', startX + 300, currentY, { bold: true });
-doc.text('Exam', startX + 350, currentY, { bold: true });
-doc.text('Total', startX + 400, currentY, { bold: true });
+                            currentY += 15;
 
-currentY += 15;
+                            subjectsResult.forEach((subject, index) => {
+                                if (index % 2 === 0) {
+                                    doc.rect(startX, currentY, doc.page.width - 2 * startX, 15).fill('#E8F6F3');
+                                } else {
+                                    doc.rect(startX, currentY, doc.page.width - 2 * startX, 15).fill('#FFFFFF');
+                                }
+                                doc.fillColor('black')
+                                    .text(subject.term, startX, currentY)
+                                    .text(subject.subjectName, startX + 100, currentY)
+                                    .text(subject.firstCA, startX + 200, currentY)
+                                    .text(subject.secondCA, startX + 250, currentY)
+                                    .text(subject.thirdCA, startX + 300, currentY)
+                                    .text(subject.exams, startX + 350, currentY)
+                                    .text(subject.total, startX + 400, currentY);
 
-subjectsResult.forEach(subject => {
-    doc.text(subject.term, startX, currentY);
-    doc.text(subject.subjectName, startX + 100, currentY);
-    doc.text(subject.firstCA, startX + 200, currentY);
-    doc.text(subject.secondCA, startX + 250, currentY);
-    doc.text(subject.thirdCA, startX + 300, currentY);
-    doc.text(subject.exams, startX + 350, currentY);
-    doc.text(subject.total, startX + 400, currentY);
+                                currentY += 15;
+                            });
 
-    currentY += 15;
-});
+                            // Add horizontal line after the table
+                            doc.moveTo(startX, currentY + 4).lineTo(doc.page.width - startX, currentY + 4).stroke();
 
-// Add horizontal line after the table
-doc.moveTo(startX, currentY + 4)
-   .lineTo(doc.page.width - startX, currentY + 4) // Line spans full width with same margins
-   .stroke();
-
-// Display Cumulative Total and Session Average after table
-currentY += 10; // Adjust spacing below the line
-doc.moveDown().fontSize(8);
-doc.text(`Cumulative Total: ${cumulativeTotal}`, startX, currentY);
-doc.text(`Session Average: ${average.toFixed(2)}`, startX + 200, currentY);
-
-// Add Signature Section
+                            // Display Cumulative Total and Session Average after table
+                            currentY += 10;
+                            doc.text(`Cumulative Total: ${cumulativeTotal}`, startX, currentY);
+                            doc.text(`Session Average: ${average.toFixed(2)}`, startX + 200, currentY);
+                            // Add Signature Section
 currentY += 40; // Add some space before the signature section
 
 // Text indicating who is signing
@@ -1584,7 +1588,7 @@ doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
 currentY += 10;
 
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Head of Department (HOD)', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
                             // Finalize PDF
