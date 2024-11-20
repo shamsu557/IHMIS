@@ -1179,68 +1179,67 @@ function generateStudentReport(req, res, saveToFile = false) {
                                 doc.pipe(res);
                             }
 
-                            // School Header Section (Same as before)
-                            const margin = 20;
-                            const logoWidth = 80;
-                            const logoHeight = 80;
-                            const textStartX = logoWidth + 2 * margin;
-
-                            try {
-                                doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
-                            } catch (imageError) {
-                                console.error("Failed to load logo image:", imageError);
-                                doc.text("(Logo unavailable)", margin, margin);
-                            }
-
-                            doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
-                            doc.font('Helvetica').fontSize(12)
-                                .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
-                                .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
-                                .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
-
-                            doc.font('Helvetica-Bold').fontSize(14).text(
-                                `Report Sheet for ${term} ${session} Academic Session`,
-                                margin,
-                                margin + 80,
-                                { width: doc.page.width - 2 * margin, align: 'center' }
-                            );
-                            doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
-
-                            // Student Information Section (Same as before)
-                            doc.moveDown();
-                            const infoStartX = 50;
-                            let infoCurrentY = doc.y;
-
-                            const studentInfoRows = [
-                                { 
-                                    label: "Student Name", 
-                                    value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
-                                },                                 
-                                { label: "Admission No", value: studentID },
-                                { label: "Class", value: studentClass },
-                                { label: "Term", value: term },
-                                { label: "Session", value: session },
-                                { label: "Total Students", value: totalStudents },
-                                { label: "Attendance", value: assessmentResult.length > 0 ? assessmentResult[0].attendance : "N/A" }
-                            ];
-
-                            studentInfoRows.forEach((row, index) => {
-                                const rowY = infoCurrentY + index * 15;
-
-                                // Set alternating background color
-                                if (index % 2 === 0) {
-                                    doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
-                                }
-
-                                // Draw text
-                                doc.fontSize(10).fillColor('black')
-                                    .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
-                                    .text(row.value, infoStartX + 200, rowY + 4, { width: doc.page.width - 2 * infoStartX - 200, align: 'left' });
-                            });
-
-                            infoCurrentY += studentInfoRows.length * 15;
-
-                            // Subject Table without vertical lines (Same as before)
+                             // School Header Section (Same as before)
+                             const margin = 20;
+                             const logoWidth = 80;
+                             const logoHeight = 80;
+                             const textStartX = logoWidth + 2 * margin;
+ 
+                             try {
+                                 doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
+                             } catch (imageError) {
+                                 console.error("Failed to load logo image:", imageError);
+                                 doc.text("(Logo unavailable)", margin, margin);
+                             }
+ 
+                             doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                             doc.font('Helvetica').fontSize(12)
+                                 .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+                                 .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+                                 .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+ 
+                             doc.font('Helvetica-Bold').fontSize(14).text(
+                                 `Report Sheet for ${term} ${session} Academic Session`,
+                                 margin,
+                                 margin + 80,
+                                 { width: doc.page.width - 2 * margin, align: 'center' }
+                             );
+                             doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
+ 
+                             // Student Information Section (Same as before)
+                             doc.moveDown();
+                             const infoStartX = 50;
+                             let infoCurrentY = doc.y;
+ 
+                             const studentInfoRows = [
+                                 { 
+                                     label: "Student Name", 
+                                     value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
+                                 },                                 
+                                 { label: "Admission No", value: studentID },
+                                 { label: "Class", value: studentClass },
+                                 { label: "Term", value: term },
+                                 { label: "Session", value: session },
+                                 { label: "Total Students", value: totalStudents },
+                                 { label: "Attendance", value: assessmentResult.length > 0 ? assessmentResult[0].attendance : "N/A" }
+                             ];
+ 
+                             studentInfoRows.forEach((row, index) => {
+                                 const rowY = infoCurrentY + index * 15;
+ 
+                                 // Set alternating background color
+                                 if (index % 2 === 0) {
+                                     doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                                 }
+ 
+                                 // Draw text
+                                 doc.fontSize(10).fillColor('black')
+                                     .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
+                                     .text(row.value, infoStartX + 200, rowY + 4, { width: doc.page.width - 2 * infoStartX - 200, align: 'left' });
+                             });
+ 
+                             infoCurrentY += studentInfoRows.length * 15;
+                              // Subject Table without vertical lines (Same as before)
                             doc.moveDown().fontSize(8);
                             const startX = 50;
                             let currentY = doc.y + 20;
@@ -1378,6 +1377,7 @@ currentY += 20;
 
                             // Finish PDF Document
                             doc.end();
+                            if (saveToFile) res.download(filename);
                         });
                 });
         });
