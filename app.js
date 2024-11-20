@@ -1365,9 +1365,9 @@ currentY += 40; // Add some space before the signature section
 doc.font('Helvetica').fontSize(12).text('Signed by:', startX, currentY);
 currentY += 30;
 
-// Line for the signature
+// Line for the signature and the date on the same row
 doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
-currentY += 10;
+doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust Y-coordinate for proper alignment
 
 // Add the signer's designation below the line
 doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
