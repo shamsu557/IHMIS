@@ -26,37 +26,43 @@
 </nav>
 
 <!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
-  <!-- Toggler for mobile view -->
-  <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+<nav class="navbar navbar-expand-lg navbar-light bg-light text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
       <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
-  </button>
-  <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
   
-
-  <!-- Collapsible navbar items -->
-  <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+    <!-- Collapsible navbar items -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav">
-          <li class="nav-item">
-              <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-danger" id="resultManagementLink"  href="resultmanagement.html">Academic Grade</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-danger" id="resultManagementLink"  href="extra-curriculum-assessment.html">Conduct and Development</a>
-          </li>
-          <!-- Download ID Card -->
-          <li class="nav-item">
-            <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Staff ID Card</a>
+        <!-- Home -->
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
         </li>
-          
-          <!-- Logout -->
-          <li class="nav-item">
-              <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
+  
+        <li class="nav-item dropdown">
+            <a class="nav-link text-danger dropdown-toggle" href="#" id="resultManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
+              Result Management
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="resultManagementDropdown">
+              <li><a class="dropdown-item" href="resultmanagement.html">Academic Assesesment</a></li>
+              <li><a class="dropdown-item" href="extra-curriculum-assessment.html"> Behavioural Assesesment</a></li>
+            </ul>
           </li>
+          
+  
+        <!-- Download ID Card -->
+        <li class="nav-item">
+          <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Staff ID Card</a>
+        </li>
+  
+        <!-- Logout -->
+        <li class="nav-item">
+          <a class="nav-link ml-5" href="/logout" id="logout">Logout</a>
+        </li>
       </ul>
-  </div>
+    </div>  
 </nav>
 
     <!-- Staff Profile Section -->
@@ -160,3 +166,5 @@
     <script src="staff_dashboard.js"></script>
 </body>
 </html>
+
+ 

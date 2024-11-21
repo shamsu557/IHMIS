@@ -213,6 +213,16 @@
     display: none !important; /* Forcefully hide the element */
 }
 
+/* Remove caret space entirely */
+.nav-item .dropdown-toggle::after {
+    display: none; /* Hide the default caret */
+  }
+  
+  /* Adjust padding if necessary */
+  .nav-item .dropdown-toggle {
+    padding-right: 0;
+  }
+  
    /* Additional spacing for page content */
 body {
     padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
