@@ -13,20 +13,28 @@
     <link rel="stylesheet" href="view.css"> <!-- Link to your CSS file -->
 </head>
 <body>
-
-<!-- First Navbar (Images and Admin Dashboard Text) -->
-<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+   <!-- First Navbar (Images and Admin Dashboard Text) -->
+   <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <!-- Left image (Education Cap) -->
     <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
-    <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
-    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
-</nav>
-
-<!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
-    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
-        <span class="navbar-toggler-icon"></span>
-    </button>
     
+    <!-- Navbar brand (Admin Dashboard text) centered -->
+    <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
+    
+    <!-- Right image logo -->
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar (Navbar Items) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    
+  
+    <!-- Collapsible navbar items -->
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -34,16 +42,16 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link text-danger" href="student_management.html">Students Management</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="staff_management.html">Staff Management</a>
-            </li>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
+              </li>
         </ul>
+        <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
-</nav>
-
+  </nav>
 <div class="center-container bg-light mt-auto">
-    <h1 id="select-class-header" class="text-center">Select Class and View Students</h1>
+    <h5 id="select-class-header" class="text-center">Select Class and View Students</h5>
 
     <div id="classSelection" class="card shadow mt-4 p-4">
         <div class="form-group">
