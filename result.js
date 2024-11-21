@@ -16,6 +16,48 @@ function toggleNavbar() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdownToggle = document.querySelector('#resultManagementDropdown'); // ID of the main dropdown toggle
+    const dropdownMenu = document.querySelector('.dropdown-menu[aria-labelledby="resultManagementDropdown"]'); // Menu linked to the toggle
+    const dropdownItems = dropdownMenu.querySelectorAll('a.dropdown-item'); // Items inside the dropdown menu
+  
+    // Show dropdown on hover over the toggle
+    dropdownToggle.addEventListener('mouseover', () => {
+      dropdownMenu.classList.add('show');
+    });
+  
+    // Keep the dropdown visible when hovering over the menu itself
+    dropdownMenu.addEventListener('mouseover', () => {
+      dropdownMenu.classList.add('show');
+    });
+  
+    // Hide dropdown when mouse leaves both toggle and menu
+    dropdownToggle.addEventListener('mouseout', () => {
+      dropdownMenu.classList.remove('show');
+    });
+  
+    dropdownMenu.addEventListener('mouseout', () => {
+      dropdownMenu.classList.remove('show');
+    });
+  
+    // Navigate to the correct page and hide dropdown when an item is clicked
+    dropdownItems.forEach(item => {
+      item.addEventListener('click', (event) => {
+        const targetPage = item.getAttribute('href'); // Get the target URL
+        if (targetPage) {
+          dropdownMenu.classList.remove('show'); // Hide the dropdown
+          window.location.href = targetPage; // Navigate to the target page
+        }
+      });
+    });
+  
+    // Hide dropdown if clicked anywhere outside the button or menu
+    document.addEventListener('click', (event) => {
+      if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('show');
+      }
+    });
+  });
 async function validateStaff() {
     const staffIdentifier = document.getElementById("staffIdentifier").value;
     const password = document.getElementById("password").value;
