@@ -1239,7 +1239,7 @@ function generateStudentReport(req, res, saveToFile = false) {
                              });
  
                              infoCurrentY += studentInfoRows.length * 15;
-                              // Subject Table without vertical lines (Same as before)
+                              // Subject Table for terminal results
                             doc.moveDown().fontSize(8);
                             const startX = 50;
                             let currentY = doc.y + 20;
@@ -1539,38 +1539,78 @@ db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, studen
                        doc.moveTo(infoStartX, infoCurrentY + 10).lineTo(doc.page.width - infoStartX, infoCurrentY + 10).stroke();
                        infoCurrentY += 20;
 
-                       // Subjects Table
-                       doc.moveDown().fontSize(8);
-                       const startX = 50;
-                       let currentY = doc.y + 20;
+// Subject Table for sessional results
+doc.moveDown().fontSize(8);
+const startX = 50;
+let currentY = doc.y + 10; // Start position (reduced for heading adjustment)
+const cellHeight = 15;
+const headerHeight = 20;
 
-                       doc.text('Term', startX, currentY, { bold: true });
-                       doc.text('Subject', startX + 100, currentY, { bold: true });
-                       doc.text('1st CA', startX + 200, currentY, { bold: true });
-                       doc.text('2nd CA', startX + 250, currentY, { bold: true });
-                       doc.text('3rd CA', startX + 300, currentY, { bold: true });
-                       doc.text('Exam', startX + 350, currentY, { bold: true });
-                       doc.text('Total', startX + 400, currentY, { bold: true });
+// Column width adjustments
+const termWidth = 60;
+const subjectWidth = 120;
+const caWidth = 50;
+const examWidth = 55;
+const totalWidth = 60;
+const gradeWidth = 60;
 
-                       currentY += 15;
+// Draw table headers
+doc.fontSize(9).fillColor('black')
+   .text('Term', startX, currentY - 5, { width: termWidth, align: 'center' }) // Move headers slightly upwards
+   .text('Subject', startX + termWidth, currentY - 5, { width: subjectWidth, align: 'center' })
+   .text('1st CA', startX + termWidth + subjectWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('2nd CA', startX + termWidth + subjectWidth + caWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('3rd CA', startX + termWidth + subjectWidth + 2 * caWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('Exam', startX + termWidth + subjectWidth + 3 * caWidth, currentY - 5, { width: examWidth, align: 'center' })
+   .text('Total', startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY - 5, { width: totalWidth, align: 'center' })
+   .text('Grade', startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY - 5, { width: gradeWidth, align: 'center' });
 
-                       subjectsResult.forEach((subject, index) => {
-                           if (index % 2 === 0) {
-                               doc.rect(startX, currentY, doc.page.width - 2 * startX, 15).fill('#E8F6F3');
-                           } else {
-                               doc.rect(startX, currentY, doc.page.width - 2 * startX, 15).fill('#FFFFFF');
-                           }
-                           doc.fillColor('black')
-                               .text(subject.term, startX, currentY)
-                               .text(subject.subjectName, startX + 100, currentY)
-                               .text(subject.firstCA, startX + 200, currentY)
-                               .text(subject.secondCA, startX + 250, currentY)
-                               .text(subject.thirdCA, startX + 300, currentY)
-                               .text(subject.exams, startX + 350, currentY)
-                               .text(subject.total, startX + 400, currentY);
+// Draw percentage row
+currentY += headerHeight - 5; // Move percentage row closer to headers
+doc.fontSize(8)
+   .text('(10%)', startX + termWidth + subjectWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(10%)', startX + termWidth + subjectWidth + caWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(10%)', startX + termWidth + subjectWidth + 2 * caWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(70%)', startX + termWidth + subjectWidth + 3 * caWidth, currentY, { width: examWidth, align: 'center' })
+   .text('(100%)', startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY, { width: totalWidth, align: 'center' }); // Add percentage for total column
 
-                           currentY += 15;
-                       });
+// Line after percentage row
+doc.moveTo(startX, currentY + 10).lineTo(doc.page.width - startX, currentY + 10).stroke(); // Move the line below the text
+
+currentY += headerHeight;
+
+// Helper function for grades
+function getGrade(score) {
+    if (score >= 70) return 'A';
+    if (score >= 60) return 'B';
+    if (score >= 50) return 'C';
+    if (score >= 40) return 'D';
+    return 'F';
+}
+
+// Iterate over subjects and draw rows
+subjectsResult.forEach((subject, index) => {
+    const total = Number(subject.firstCA || 0) + Number(subject.secondCA || 0) + Number(subject.thirdCA || 0) + Number(subject.exams || 0);
+    const grade = getGrade(total);
+
+    const isEvenRow = index % 2 === 0;
+    doc.rect(startX, currentY, termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth + gradeWidth, cellHeight)
+       .fill(isEvenRow ? '#E8F6F3' : '#FFFFFF')
+       .stroke();
+
+    doc.fillColor('black')
+       .text(subject.term, startX, currentY, { width: termWidth, align: 'center' })
+       .text(subject.subjectName, startX + termWidth, currentY + 3, { width: subjectWidth, align: 'center' })
+       .text(subject.firstCA, startX + termWidth + subjectWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.secondCA, startX + termWidth + subjectWidth + caWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.thirdCA, startX + termWidth + subjectWidth + 2 * caWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.exams, startX + termWidth + subjectWidth + 3 * caWidth, currentY + 3, { width: examWidth, align: 'center' })
+       .text(total.toFixed(2), startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
+       .text(grade, startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY + 3, { width: gradeWidth, align: 'center' });
+
+    currentY += cellHeight;
+});
+
 
                        // Add horizontal line after the table
                        doc.moveTo(startX, currentY + 4).lineTo(doc.page.width - startX, currentY + 4).stroke();
