@@ -251,16 +251,15 @@ button {
 .close-btn{
     margin-left: 47%;
 }
-
-/* Mobile view adjustments */
+/* Mobile adjustments for layout */
 @media (max-width: 576px) {
-    /* Body and background */
+    /* Adjust body for mobile screens */
     body {
         background-color: white;
-        padding-top: 100px; /* Adjust padding to avoid overlap with fixed navbar */
+        padding-top: 100px;
     }
 
-    /* Centered container adjustments */
+    /* Centered container for small screens */
     .center-container {
         max-width: 100%;
         margin: 0 auto;
@@ -270,13 +269,13 @@ button {
         background-color: white;
     }
 
-    /* Scrollable modal body */
+    /* Scrollable modal */
     .modal-body-scroll {
-        max-height: 300px; /* Reduce max-height for better scrolling experience */
+        max-height: 300px;
         overflow-y: auto;
     }
 
-    /* Circular images */
+    /* Adjust circular images */
     .fixed-image, .circular-img {
         width: 40px;
         height: 40px;
@@ -284,38 +283,28 @@ button {
         border-radius: 50%;
     }
 
-      /* Navbar adjustments */
-      .first-navbar {
-        padding: 5px;
+    /* Navbar adjustments for small screens */
+    .first-navbar {
         top: 0;
-        background-color: #f8f9fa;
+        padding: 0 8px;
     }
 
     .second-navbar {
         top: 50px;
-        padding: 15px;
-        height: auto;
+        padding: 15px 10px;
+        height: 40px;
     }
 
-    /* Center navbar toggler on mobile */
     .navbar-toggler {
-        position: relative;
-        left: 0;
-        margin: auto;
-        transform: none;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
-    .navbar-toggler-icon {
-        filter: invert(1); /* Dark toggler icon */
-    }
-
-    /* Cancel button styling for mobile */
     .cancel-btn {
-        display: block;
+        position: absolute;
+        top: 8px;
+        right: 8px;
         font-size: 1.25rem;
-        color: #dbe2e8;
-        top: 5px;
-        right: 5px;
     }
 
     /* Footer adjustments */
