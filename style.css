@@ -1,61 +1,312 @@
+/* Fixed Circular Images */
+.fixed-image, .circular-img {
+  width: 55px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 50%;
+}
 
-    /* Footer style */
-    .form-control { 
-        margin-bottom: 15px;
-      }
-      
-      .footer {
-        background: #f8f9fa;
-        color: #343a40;
-        padding: 10px;
-        text-align: center;
-        display: flex;
-        justify-content: center; /* Center horizontally */
-        align-items: center;     /* Center vertically */
-        flex-direction: column;  /* Stack items vertically */
-      }
-      
-      .footer .row {
-        width: 100%; /* Ensure row takes up the full width */
-        display: flex;
-        justify-content: center; /* Center horizontally */
-        align-items: center;     /* Center vertically if necessary */
-        margin: 0;
-      }
-      
-      .footer .col {
-        padding: 0;
-        text-align: center; /* Ensure content in columns is centered */
-      }
-      
-      .footer p {
-        margin: 0;
-      }
-      
-      .footer a {
-        color: #007bff;
-        text-decoration: none;
-      }
-      
-      .footer i {
-        font-size: 24px;
-      }
-      #myBtn {
-        display: none;
-        position: fixed;
-        bottom: 15px;
-        right: 30px;
-        z-index: 99;
-        border: none;
-        outline: none;
-        background-color: rgb(210, 210, 233);
-        color: white;
-        cursor: pointer;
-        padding: 15px;
-        border-radius: 4px;
-      }
-      
-      #myBtn:hover {
-        background-color: #555;
-      }
-      
+
+/* Main container for content */
+.container {
+  max-width: 80%; /* Container takes 80% of the screen width */
+  margin-top: 70px;
+  flex: 1;
+}
+
+.center-container{
+  margin-top: 70px;
+  flex: 1;
+}
+/* First Navbar - Contains images and text */
+.first-navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030; /* Ensures it stays above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: #f8f9fa; /* Light background */
+}
+
+/* Second Navbar - Contains menu items */
+.second-navbar {
+  position: fixed;
+  top: 60px; /* Positioned right below the first navbar */
+  width: 100%;
+  z-index: 1029; /* Slightly lower than the first navbar */
+  display: flex;
+  padding: 24px 14px;
+  background-color: #f8f9fa; /* Light background */
+  height: 50px;
+  justify-content: space-between;
+}
+
+.second-navbar .navbar-nav .nav-item {
+  margin-right: 20px; /* Adds space between each nav item */
+}
+
+.second-navbar .navbar-nav .nav-item:last-child {
+  margin-right: 0; /* Removes margin from the last item for alignment */
+}
+
+/* Center align menu toggler on mobile */
+.navbar-toggler {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Menu link styles */
+.navbar-nav .nav-item .nav-link {
+  color: #343a40 !important; /* Dark text color */
+  line-height: 1.8;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect for link */
+.navbar-nav .nav-item .nav-link:hover {
+  color: #e4e8ec !important; /* Slightly darker on hover */
+  background-color: rgba(255, 254, 254, 0.5) !important;
+}
+
+/* Mobile adjustments for layout */
+@media (max-width: 576px) {
+  /* Adjust body for mobile screens */
+  body {
+    background-color: white;
+    padding-top: 100px;
+  }
+
+  /* Centered container for small screens */
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: white;
+  }
+
+  /* Scrollable modal */
+  .modal-body-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  /* Adjust circular images */
+  .fixed-image, .circular-img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  /* Navbar adjustments for small screens */
+  .first-navbar {
+    top: 0;
+    padding: 0 8px;
+  }
+
+  .second-navbar {
+    top: 50px;
+    padding: 15px 10px;
+    height: 40px;
+  }
+
+  .navbar-toggler {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .cancel-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1.25rem;
+  }
+
+  /* Footer adjustments */
+  .footer {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .footer .row {
+    flex-direction: column;
+  }
+
+  .footer i {
+    font-size: 20px;
+  }
+
+  #myBtn {
+    bottom: 10px;
+    right: 20px;
+    padding: 10px;
+  }
+
+  button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+  display: none;
+}
+
+.hidden {
+  display: none !important; /* Forcefully hide the element */
+}
+
+body {
+  background-color: white;
+  margin-top: 140px; /* Ensure the body content is separated from the fixed navbars */
+}
+
+/* Remove default dropdown caret */
+.dropdown-toggle::after {
+  content: none;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu li {
+  padding: 8px 16px;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.dropdown-item {
+  text-decoration: none;
+  color: #000;
+}
+
+.dropdown-item:hover {
+  text-decoration: none;
+  color: #007bff;
+}
+
+/* Container Styling */
+.container {
+  max-width: 400px;
+  margin: 100px auto; /* Add vertical spacing from the top and center horizontally */
+  padding: 50px; /* Increase padding for better spacing inside the container */
+  flex: 1; /* Ensures that the container grows and takes up available space */
+}
+
+/* Flexbox to ensure footer sticks to the bottom */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  max-width: 400px;
+  margin-top: 70px;
+  flex: 1; /* Ensures that the container grows and takes up available space */
+}
+
+.form-control {
+  margin-bottom: 15px;
+}
+.center-container{
+  margin-top: 70px;
+}
+/* Footer Styling */
+/* Footer Styling */
+.footer {
+  background: #f8f9fa;
+  color: #343a40;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  flex-direction: column;  /* Stack items vertically */
+  margin-top: auto; /* Pushes the footer down naturally without being too far */
+  padding-bottom: 20px; /* Reduce bottom padding to bring it closer */
+}
+
+.footer .row {
+  width: 100%; /* Ensure row takes up the full width */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically if necessary */
+  margin: 0;
+}
+
+.footer .col {
+  padding: 0;
+  text-align: center; /* Ensure content in columns is centered */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer i {
+  font-size: 24px;
+}
+
+/* Scroll to top button */
+#myBtn {
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  right: 30px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  background-color: rgb(210, 210, 233);
+  color: white;
+  cursor: pointer;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+#myBtn:hover {
+  background-color: #555;
+}
+
+/* Button Styling */
+button {
+  padding: 10px 15px;
+  background-color: #202122;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #a6a6a9;
+}
