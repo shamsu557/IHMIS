@@ -52,69 +52,71 @@
         </ul>
     </div>
   </nav>
-  <div class="center-container mt-auto bg-light">
-    <div id="resultManagementHeader" class="mt-5 text-center">
-        <h3>Cumulative Result Entry</h3>
-        <p> Login With Your Staff Credentials To Select your class and subject to enter student scores.</p>
+  
+  <div class="center-container">
+    <div class=" mt-5">
+        <div id="resultManagementHeader" class="mt-5 text-center">
+            <h3>Cumulative Result Entry</h3>
+            <p> Login With Your Staff Credentials To Select your class and subject to enter student scores.</p>
+        </div>
+    
+        <div id="loginForm" class="mb-4">
+            <input type="text" id="staffIdentifier" class="form-control mb-2" placeholder="Enter Staff ID">
+            <input type="password" id="password" class="form-control mb-2" placeholder="Enter Password">
+            <button onclick="validateStaff()" class="btn btn-primary btn-block">Login</button>
+            <p id="loginError" class="text-danger"></p>
+        </div>
+        <div id="selectionForm" style="display: none;">
+            <select id="classSelect" class="form-control mb-2">
+                <option value="">Select Class</option>
+            </select>
+            <select id="subjectSelect" class="form-control mb-2">
+                <option value="">Select Subject</option>
+            </select>
+            <select id="termSelect" class="form-control mb-2">
+                <option value="First Term">First Term</option>
+                <option value="Second Term">Second Term</option>
+                <option value="Third Term">Third Term</option>
+            </select>
+            <select id="sessionSelect" class="form-control mb-2">
+                <option value="2024/2025">2024/2025</option>
+                <option value="2025/2026">2025/2026</option>
+                <option value="2026/2027">2026/2027</option>
+            </select>
+            <!-- Button to View Students -->
+    <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
+    
+    <!-- Div to Display Student List -->
+    <div id="student-list">
+        <!-- This section will be populated dynamically via JavaScript -->
+        <div id="student-info" style="display: none;">
+            <h3 id="class-name" style="font-size: 14px;"></h3>
+            <h3 id="subject-name" style="font-size: 14px;"></h3>
+            <h3 id="term-name" style="font-size: 14px;"></h3>
+            <h3 id="session-name" style="font-size: 14px;"></h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Select</th> <!-- New column for checkbox -->
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>1st Test</th>
+                        <th>2nd Test</th>
+                        <th>3rd Test</th>
+                        <th>Exam</th>
+                    </tr>
+                </thead>
+                <tbody id="student-tbody">
+                    <!-- Rows will be appended here via JavaScript -->
+                </tbody>
+            </table>
+            <!-- Submit Scores Button -->
+            <button id="submit-scores" class="btn btn-primary" style="margin-top: 20px;" onclick="submitScores()">Submit Scores</button>
+        </div>
+        <div id="no-students-message" style="display: none;">
+            <p>No students found in this class.</p>
+        </div>
     </div>
-
-    <div id="loginForm" class="mb-4">
-        <input type="text" id="staffIdentifier" class="form-control mb-2" placeholder="Enter Staff ID">
-        <input type="password" id="password" class="form-control mb-2" placeholder="Enter Password">
-        <button onclick="validateStaff()" class="btn btn-primary btn-block">Login</button>
-        <p id="loginError" class="text-danger"></p>
-    </div>
-    <div id="selectionForm" style="display: none;">
-        <select id="classSelect" class="form-control mb-2">
-            <option value="">Select Class</option>
-        </select>
-        <select id="subjectSelect" class="form-control mb-2">
-            <option value="">Select Subject</option>
-        </select>
-        <select id="termSelect" class="form-control mb-2">
-            <option value="First Term">First Term</option>
-            <option value="Second Term">Second Term</option>
-            <option value="Third Term">Third Term</option>
-        </select>
-        <select id="sessionSelect" class="form-control mb-2">
-            <option value="2024/2025">2024/2025</option>
-            <option value="2025/2026">2025/2026</option>
-            <option value="2026/2027">2026/2027</option>
-        </select>
-        <!-- Button to View Students -->
-<button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
-
-<!-- Div to Display Student List -->
-<div id="student-list">
-    <!-- This section will be populated dynamically via JavaScript -->
-    <div id="student-info" style="display: none;">
-        <h3 id="class-name" style="font-size: 14px;"></h3>
-        <h3 id="subject-name" style="font-size: 14px;"></h3>
-        <h3 id="term-name" style="font-size: 14px;"></h3>
-        <h3 id="session-name" style="font-size: 14px;"></h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Select</th> <!-- New column for checkbox -->
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>1st Test</th>
-                    <th>2nd Test</th>
-                    <th>3rd Test</th>
-                    <th>Exam</th>
-                </tr>
-            </thead>
-            <tbody id="student-tbody">
-                <!-- Rows will be appended here via JavaScript -->
-            </tbody>
-        </table>
-        <!-- Submit Scores Button -->
-        <button id="submit-scores" class="btn btn-primary" style="margin-top: 20px;" onclick="submitScores()">Submit Scores</button>
-    </div>
-    <div id="no-students-message" style="display: none;">
-        <p>No students found in this class.</p>
-    </div>
-</div>
 </div></div></div>
 
 
