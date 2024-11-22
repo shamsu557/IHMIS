@@ -1,22 +1,169 @@
-.navbar-nav {
-  margin: auto;
-}
-.navbar-brand {
-margin-left: 15px !important; /* Removes any left margin */
-padding-left: 5px !important; /* Removes any left padding */
-display: flex; /* Aligns image and text horizontally */
-align-items: center; /* Vertically centers the content */
+/* Fixed Circular Images */
+.fixed-image, .circular-img {
+  width: 55px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
-
-.navbar-brand img {
-margin-right: 10px; /* Optional: adds space between the logo and text */
+/* First Navbar - Contains images and text */
+/* First Navbar - Contains images and text */
+.first-navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030; /* Ensures it stays above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: #f8f9fa; /* Light background */
 }
 
-.navbar {
-padding-left: 0; /* Ensures the navbar itself doesn't push content */
+/* Second Navbar - Contains menu items */
+.second-navbar {
+  position: fixed;
+  top: 60px; /* Positioned right below the first navbar */
+  width: 100%;
+  z-index: 1029; /* Slightly lower than the first navbar */
+  display: flex;
+  padding: 24px 14px;
+  background-color: #f8f9fa; /* Light background */
+  height: 50px;
+  justify-content: space-between;
+}
+.second-navbar .navbar-nav .nav-item {
+  margin-right: 20px; /* Adds space between each nav item */
 }
 
+.second-navbar .navbar-nav .nav-item:last-child {
+  margin-right: 0; /* Removes margin from the last item for alignment */
+}
+
+/* Center align menu toggler on mobile */
+.navbar-toggler {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Menu link styles */
+.navbar-nav .nav-item .nav-link {
+  color: #343a40 !important; /* Dark text color */
+  line-height: 1.8;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Hover effect for link */
+.navbar-nav .nav-item .nav-link:hover {
+  color: #e4e8ec !important; /* Slightly darker on hover */
+  background-color: rgba(255, 254, 254, 0.5) !important;
+}
+/* Mobile view - Keep background light */
+@media (max-width: 992px) {
+  .navbar-collapse {
+      background-color: #f8f9fa; /* Light background for mobile menu */
+  }
+
+  .navbar-nav .nav-item .nav-link {
+      color: #343a40 !important; /* Dark text color */
+  }
+
+  .navbar-toggler-icon {
+      filter: invert(1); /* Dark toggler icon for light background */
+  }
+}
+
+/* Large screen styles */
+@media (min-width: 992px) {
+  .navbar-collapse {
+      justify-content: center;
+  }
+
+  /* Hide the toggler on large screens */
+  .navbar-toggler {
+      display: none;
+  }
+}
+/* Cancel button styles */
+.cancel-btn {
+  display: none; /* Hidden by default */
+  background: transparent;
+  border: none;
+  font-size: 1.5rem; /* Adjust size as needed */
+  color: #dbe2e8; /* Color of the icon */
+  position: absolute;
+  top: 10px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  cursor: pointer;
+}
+/*to hide the menu icon*/
+.hidden {
+  display: none !important; /* Forcefully hide the element */
+}
+
+/* Show the cancel button in mobile view */
+@media (max-width: 992px) {
+  .cancel-btn {
+      display: block; /* Show when navbar is toggled */
+  }
+}
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+  display: none;
+}
+.hidden {
+  display: none !important; /* Forcefully hide the element */
+}
+body {
+          background-color: white;
+          margin-top: 140px; /* Ensure the body content is separated from the fixed navbars */
+      }
+       /* Remove default dropdown caret */
+  .dropdown-toggle::after {
+    content: none;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    list-style: none;
+    padding: 0;
+    z-index: 1000;
+  }
+
+  .dropdown-menu.show {
+    display: block;
+  }
+
+  .dropdown-menu li {
+    padding: 8px 16px;
+  }
+
+  .dropdown-menu li:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+  }
+
+  .dropdown-item {
+    text-decoration: none;
+    color: #000;
+  }
+
+  .dropdown-item:hover {
+    text-decoration: none;
+    color: #007bff;
+  }
+  .container {
+    max-width: 400px;
+    margin: 100px auto; /* Add vertical spacing from the top and center horizontally */
+    padding: 50px; /* Increase padding for better spacing inside the container */
+    flex: 1; /* Ensures that the container grows and takes up available space */
+  }
+  
      /* Flexbox to ensure footer sticks to the bottom */
      body {
        display: flex;
@@ -91,3 +238,15 @@ padding-left: 0; /* Ensures the navbar itself doesn't push content */
   background-color: #555;
 }
 
+button {
+  padding: 10px 15px;
+  background-color: #202122;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+button:hover {
+  background-color: #a6a6a9;
+}
