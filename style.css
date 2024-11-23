@@ -14,10 +14,7 @@
   flex: 1;
 }
 
-.center-container{
-  margin-top: 70px;
-  flex: 1;
-}
+
 /* First Navbar - Contains images and text */
 .first-navbar {
   position: fixed;
@@ -233,7 +230,7 @@ body {
   margin-bottom: 15px;
 }
 .center-container{
-  margin-top: 70px;
+  margin-top: 120px;
 }
 /* Footer Styling */
 /* Footer Styling */
