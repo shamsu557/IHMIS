@@ -8,6 +8,8 @@ const multer = require('multer'); // Add multer for file handling
 const app = express();
 const saltRounds = 10; // Define salt rounds for bcrypt hashing
 const session = require('express-session');
+const PDFDocument = require('pdfkit');
+const { Table } = require('pdfkit-table');
 
 app.use(session({
     secret: 'a45A7ZMpVby14qNkWxlSwYGaSUv1d64x', // Replace with your secret key
@@ -412,31 +414,32 @@ app.post('/api/getStudents', (req, res) => {
 // DELETE student endpoint
 app.delete('/api/deleteStudent/:studentID', (req, res) => {
     const studentID = req.params.studentID;
-    const { staffEmailOrID, password } = req.body;
+    const { username, password } = req.body;
 
-    const checkStaffQuery = `
-        SELECT * FROM teachers
-        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
+    // Query the admins table to verify username and password
+    const checkAdminQuery = `
+        SELECT * FROM admins
+        WHERE username = ?
     `;
 
-    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
+    db.query(checkAdminQuery, [username], (err, adminResults) => {
         if (err) {
-            console.error('Error verifying staff:', err);
-            return res.status(500).json({ message: 'Error verifying staff credentials' });
+            console.error('Error verifying admin:', err);
+            return res.status(500).json({ message: 'Error verifying admin credentials' });
         }
 
-        if (staffResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        if (adminResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect username or password' });
         }
 
-        const staff = staffResults[0];
+        const admin = adminResults[0];
 
-        // Ensure staff password exists and appears hashed
-        if (!staff.password || !staff.password.startsWith('$2')) {
+        // Ensure admin password exists and appears hashed
+        if (!admin.password || !admin.password.startsWith('$2')) {
             return res.status(500).json({ message: 'Error: Invalid password format in the database' });
         }
 
-        bcrypt.compare(password, staff.password, (err, isMatch) => {
+        bcrypt.compare(password, admin.password, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords:', err);
                 return res.status(500).json({ message: 'Error verifying password' });
@@ -464,48 +467,70 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
-// Endpoint for editing a student
+//edit student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     const {
-        id, firstname, othername, surname, guardianPhone, class: studentClass,
+        id, firstname, othername, surname, guardianPhone, studentClass,
         subjects, staffEmailOrID, password
     } = req.body;
 
     const studentPicture = req.file ? req.file.filename : null;
 
-    const updateStudentQuery = `
-        UPDATE students SET 
-            firstname = ?, 
-            othername = ?, 
-            surname = ?, 
-            guardianPhone = ?, 
-            class = ?, 
-            studentPicture = COALESCE(?, studentPicture)
-        WHERE studentID = ?
+    // Start with a base query
+    let updateStudentQuery = `UPDATE students SET `;
+    let queryValues = [];
+
+    // Conditionally add fields to the query
+    if (firstname) {
+        updateStudentQuery += `firstname = ?, `;
+        queryValues.push(firstname);
+    }
+    if (othername) {
+        updateStudentQuery += `othername = ?, `;
+        queryValues.push(othername);
+    }
+    if (surname) {
+        updateStudentQuery += `surname = ?, `;
+        queryValues.push(surname);
+    }
+    if (guardianPhone) {
+        updateStudentQuery += `guardianPhone = ?, `;
+        queryValues.push(guardianPhone);
+    }
+    if (studentClass) {
+        updateStudentQuery += `class = ?, `;
+        queryValues.push(studentClass);
+    }
+    if (studentPicture) {
+        updateStudentQuery += `studentPicture = ?, `;
+        queryValues.push(studentPicture);
+    }
+
+    // Trim the trailing comma and space from the query
+    updateStudentQuery = updateStudentQuery.slice(0, -2);
+
+    // Add the WHERE clause to update the specific student
+    updateStudentQuery += ` WHERE studentID = ?`;
+    queryValues.push(id);
+
+    const checkAdminQuery = `
+        SELECT * FROM admins
+        WHERE (username = ? OR email = ?)
     `;
 
-    const checkStaffQuery = `
-        SELECT * FROM teachers
-        WHERE (staff_id = ? OR email = ?) AND role IN ('Senior Master', 'Form Master')
-    `;
-
-    db.query(checkStaffQuery, [staffEmailOrID, staffEmailOrID], (err, staffResults) => {
+    db.query(checkAdminQuery, [staffEmailOrID, staffEmailOrID], (err, adminResults) => {
         if (err) {
-            console.error('Error verifying staff:', err);
-            return res.status(500).json({ message: 'Error verifying staff credentials' });
+            console.error('Error verifying admin:', err);
+            return res.status(500).json({ message: 'Error verifying admin credentials' });
         }
 
-        if (staffResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect credentials or insufficient permissions' });
+        if (adminResults.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
         }
 
-        const staff = staffResults[0];
+        const admin = adminResults[0];
 
-        if (!staff.password || !staff.password.startsWith('$2')) {
-            return res.status(500).json({ message: 'Error: Invalid password format in the database' });
-        }
-
-        bcrypt.compare(password, staff.password, (err, isMatch) => {
+        bcrypt.compare(password, admin.password, (err, isMatch) => {
             if (err) {
                 console.error('Error comparing passwords:', err);
                 return res.status(500).json({ message: 'Error verifying password' });
@@ -516,23 +541,24 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
             }
 
             // Proceed to update the student if credentials are correct
-            db.query(updateStudentQuery, [
-                firstname, othername, surname, guardianPhone, studentClass, studentPicture, id
-            ], (err) => {
+            db.query(updateStudentQuery, queryValues, (err) => {
                 if (err) {
                     console.error('Error updating student in database:', err);
                     return res.status(500).json({ message: 'Error updating student.' });
                 }
 
+                // If subjects are provided, update them
                 if (subjects) {
                     const subjectsArray = subjects.split(',').map(subj => subj.trim());
 
+                    // Delete existing subjects for the student
                     db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
                         if (err) {
                             console.error('Error clearing subjects from database:', err);
                             return res.status(500).json({ message: 'Error updating subjects.' });
                         }
 
+                        // Insert new subjects for the student
                         const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
                         const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
                             db.query(insertSubjectQuery, [id, subject], (err) => {
@@ -545,9 +571,10 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                         }));
 
+                        // Wait for all insertions to complete
                         Promise.all(insertPromises)
                             .then(() => {
-                                res.status(200).json({ message: 'Student updated successfully.' });
+                                res.status(200).json({ message: 'Student updated successfully with new subjects.' });
                             })
                             .catch(err => {
                                 console.error('Error updating subjects:', err);
@@ -555,6 +582,7 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
                             });
                     });
                 } else {
+                    // If no subjects were provided, just update the student without modifying subjects
                     res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
                 }
             });
@@ -562,7 +590,7 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     });
 });
 
-// Route teacher for login for result
+
 // Route teacher for login for result
 app.post('/result_login', (req, res) => {
     const { staffIdentifier, password } = req.body;
@@ -739,7 +767,7 @@ app.post('/creation', (req, res) => {
                         console.error('Error inserting admin into database:', err);
                         return res.status(500).json({ success: false, message: 'Server error' });
                     }
-                    res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.', redirectUrl: '/adminLogin' });
+                    res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.' });
                 }
             );
         });
@@ -875,6 +903,754 @@ app.delete('/api/delete-admin/:id', (req, res) => {
         });
     });
 });
+// Fetch teacher details by id
+app.get('/teacher/:id', (req, res) => {
+    const teacherId = req.params.id;
+    const query = 'SELECT staff_id, name, email, phone FROM teachers WHERE id = ?';
+    
+    // Use db.query() instead of db.execute()
+    db.query(query, [teacherId], (err, results) => {
+        if (err) {
+            console.error('Error fetching teacher data:', err);
+            return res.status(500).json({ success: false, message: 'Failed to fetch teacher data.' });
+        }
+
+        if (results.length > 0) {
+            res.json({ success: true, teacher: results[0] });
+        } else {
+            res.status(404).json({ success: false, message: 'Teacher not found.' });
+        }
+    });
+});
+//edit staff
+// Edit staff with separate handling for subjects and classes
+app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
+    const staffId = req.params.staff_id;
+    const teacherData = JSON.parse(req.body.teacherData);
+    const { name, email, phone, role, qualification, formClass, subjects, classes } = teacherData;
+    const profilePicture = req.file ? req.file.filename : null;
+
+    // Prepare the update columns and values
+    let updateColumns = [];
+    let updateValues = [];
+
+    if (name) updateColumns.push('name'), updateValues.push(name);
+    if (email) updateColumns.push('email'), updateValues.push(email);
+    if (phone) updateColumns.push('phone'), updateValues.push(phone);
+    if (role) updateColumns.push('role'), updateValues.push(role);
+    if (qualification) updateColumns.push('qualification'), updateValues.push(qualification);
+    if (formClass) updateColumns.push('formClass'), updateValues.push(formClass);
+    if (profilePicture) updateColumns.push('profile_picture'), updateValues.push(profilePicture);
+
+    // Add staff ID for WHERE clause
+    const query = `UPDATE teachers SET ${updateColumns.map(col => `${col} = ?`).join(', ')} WHERE staff_id = ?`;
+    updateValues.push(staffId);
+
+    db.query(query, updateValues, (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: 'Failed to update teacher data.' });
+        if (result.affectedRows === 0) return res.status(404).json({ success: false, message: 'Teacher not found or no changes made.' });
+
+        db.query('SELECT id FROM teachers WHERE staff_id = ?', [staffId], (err, rows) => {
+            if (err) return res.status(500).json({ success: false, message: 'Failed to retrieve teacher ID.' });
+            if (rows.length === 0) return res.status(404).json({ success: false, message: 'Teacher not found.' });
+
+            const teacherId = rows[0].id;
+
+            // Separate handling for updating subjects
+            const updateSubjects = () => {
+                return new Promise((resolve, reject) => {
+                    if (!subjects) return resolve(); // No subjects to update
+
+                    db.query('DELETE FROM teacher_subjects WHERE teacher_id = ?', [teacherId], (err) => {
+                        if (err) return reject(err);
+
+                        const subjectQueries = subjects.map(subject => {
+                            return new Promise((subResolve, subReject) => {
+                                db.query('INSERT INTO teacher_subjects (teacher_id, subject) VALUES (?, ?)', [teacherId, subject], (err) => {
+                                    if (err) subReject(err);
+                                    else subResolve();
+                                });
+                            });
+                        });
+
+                        Promise.all(subjectQueries)
+                            .then(() => resolve())
+                            .catch(reject);
+                    });
+                });
+            };
+
+            // Separate handling for updating classes
+            const updateClasses = () => {
+                return new Promise((resolve, reject) => {
+                    if (!classes) return resolve(); // No classes to update
+
+                    db.query('DELETE FROM teacher_classes WHERE teacher_id = ?', [teacherId], (err) => {
+                        if (err) return reject(err);
+
+                        const classQueries = classes.map(classItem => {
+                            return new Promise((classResolve, classReject) => {
+                                db.query('INSERT INTO teacher_classes (teacher_id, class) VALUES (?, ?)', [teacherId, classItem], (err) => {
+                                    if (err) classReject(err);
+                                    else classResolve();
+                                });
+                            });
+                        });
+
+                        Promise.all(classQueries)
+                            .then(() => resolve())
+                            .catch(reject);
+                    });
+                });
+            };
+
+            // Execute both update functions independently
+            Promise.all([updateSubjects(), updateClasses()])
+                .then(() => res.json({ success: true, message: 'Teacher data updated successfully.' }))
+                .catch(err => res.status(500).json({ success: false, message: 'Failed to update subjects or classes.' }));
+        });
+    });
+});
+
+// for view students page
+// Endpoint to get students by class
+app.post('/api/fetchStudents', (req, res) => {
+    const { class: className } = req.body;
+    const query = 'SELECT * FROM students WHERE class = ?'; // Replace with your actual table name
+    db.query(query, [className], (err, results) => {
+        if (err) {
+            console.error('Error fetching students:', err);
+            return res.status(500).send('Server Error');
+        }
+        res.json(results);
+    });
+});
+
+// Endpoint to get classes
+app.get('/api/fetchClasses', (req, res) => {
+    const query = 'SELECT DISTINCT class FROM students'; // Replace with your actual table name
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching classes:', err);
+            return res.status(500).send('Server Error');
+        }
+        const classes = results.map(row => row.class);
+        res.json(classes);
+    });
+});
+
+// Form Master Login Route
+app.post('/form-master-login', (req, res) => {
+    const { identifier, password } = req.body;
+    const query = `SELECT * FROM teachers WHERE (email = ? OR staff_id = ?) AND role = 'Form Master'`;
+
+    db.query(query, [identifier, identifier], async (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).send("Internal server error");
+        }
+        if (results.length === 0) return res.status(401).json({ message: "Invalid credentials" });
+
+        const formMaster = results[0];
+        const isPasswordMatch = await bcrypt.compare(password, formMaster.password);
+
+        if (!isPasswordMatch) return res.status(401).json({ message: "Invalid password" });
+
+        // Login successful - fetch students in the form master's assigned class
+        const formClass = formMaster.formClass;
+        const staffId = formMaster.staff_id; // Include the staff_id in the response
+        const studentsQuery = `SELECT * FROM students WHERE class = ?`;
+
+        db.query(studentsQuery, [formClass], (err, students) => {
+            if (err) {
+                console.error('Error fetching students:', err);
+                return res.status(500).json({ message: "Error fetching students" });
+            }
+
+            res.json({
+                message: "Login successful",
+                formClass: formClass, // Ensure the frontend receives the assigned class
+                staffId: staffId,
+                students: students // List of students in the form master's assigned class
+            });
+        });
+    });
+});
+
+app.post('/form-master/submit-assessment', (req, res) => {
+    const { term, session, assessments } = req.body;
+
+    const assessmentQueries = assessments.map(({ studentID, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment, attendance }) => {
+        return new Promise((resolve, reject) => {
+            // Insert or update the assessment including the attendance field
+            const insertQuery = `
+                INSERT INTO form_master_assessments (studentID, term, session, academic_responsibility, respect_and_discipline, punctuality_and_personal_organization, social_and_physical_development, attendance)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                    academic_responsibility = VALUES(academic_responsibility),
+                    respect_and_discipline = VALUES(respect_and_discipline),
+                    punctuality_and_personal_organization = VALUES(punctuality_and_personal_organization),
+                    social_and_physical_development = VALUES(social_and_physical_development),
+                    attendance = VALUES(attendance)
+            `;
+
+            db.query(insertQuery, [
+                studentID, term, session, academicResponsibility, respectAndDiscipline, punctuality, socialDevelopment, attendance
+            ], (err, results) => {
+                if (err) return reject(err);
+                resolve(results);
+            });
+        });
+    });
+
+    Promise.all(assessmentQueries)
+        .then(() => res.status(200).json({ message: 'Assessment data saved successfully' }))
+        .catch(error => {
+            console.error('Error saving assessments:', error);
+            res.status(500).json({ message: 'Failed to save assessment data' });
+        });
+});
+
+// School Information
+const schoolInfo = {
+    name: 'IMAM HAFSIN MODEL INTERNATIONAL SCHOOL',
+    logoPath: 'logo.jpg', // Update with the actual path to the school logo
+    address: '622, Yakasai Street, Tal\'udu G/Kaya',
+    email: 'imamhafsin@gmail.com',
+    phone: '08030999939939399'
+};
+
+// Helper function for grades and comments
+function getGradeAndComment(score) {
+    if (score >= 70) return { grade: 'A', comment: 'Excellent' };
+    if (score >= 60) return { grade: 'B', comment: 'Very Good' };
+    if (score >= 50) return { grade: 'C', comment: 'Good' };
+    if (score >= 40) return { grade: 'D', comment: 'Pass' };
+    return { grade: 'F', comment: 'Fail' };
+}
+// Helper function for Conduct and Development grading scale
+function getConductGrade(score) {
+    if (score === 4) return 'Exemplary';
+    if (score === 3) return 'Above Average';
+    if (score === 2) return 'Average';
+    if (score === 1) return 'Below Average';
+    return 'No Assessment';
+}
+
+// Generate student report function
+function generateStudentReport(req, res, saveToFile = false) {
+    const { studentID } = req.params;
+    const { term, session } = req.query;
+
+    db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, studentResult) => {
+        if (err) return res.status(500).json({ error: 'Database error fetching student', details: err });
+        if (studentResult.length === 0) return res.status(404).json({ error: 'Student not found' });
+
+        const studentClass = studentResult[0].class;
+
+        db.query('SELECT COUNT(*) as count FROM students WHERE class = ?', [studentClass], (err, studentCountResult) => {
+            if (err) return res.status(500).json({ error: 'Database error fetching student count', details: err });
+
+            const totalStudents = studentCountResult[0].count;
+
+            db.query(`
+                SELECT subjectName, firstCA, secondCA, thirdCA, exams, total, examGrade
+                FROM subjects
+                WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+                (err, subjectsResult) => {
+                    if (err) return res.status(500).json({ error: 'Database error fetching subjects', details: err });
+
+                    db.query(`
+                        SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
+                               social_and_physical_development, attendance
+                        FROM form_master_assessments
+                        WHERE studentID = ? AND term = ? AND session = ?`, [studentID, term, session],
+                        (err, assessmentResult) => {
+                            if (err) return res.status(500).json({ error: 'Database error fetching assessment', details: err });
+
+                            let doc = new PDFDocument({ layout: session === 'whole session' ? 'landscape' : 'portrait' });
+                            const filename = `Student_Report_${studentID}.pdf`;
+
+                            if (saveToFile) {
+                                doc.pipe(fs.createWriteStream(filename));
+                            } else {
+                                res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                                res.setHeader('Content-Type', 'application/pdf');
+                                doc.pipe(res);
+                            }
+
+                             // School Header Section (Same as before)
+                             const margin = 20;
+                             const logoWidth = 80;
+                             const logoHeight = 80;
+                             const textStartX = logoWidth + 2 * margin;
+ 
+                             try {
+                                 doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
+                             } catch (imageError) {
+                                 console.error("Failed to load logo image:", imageError);
+                                 doc.text("(Logo unavailable)", margin, margin);
+                             }
+ 
+                             doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, { align: 'center' });
+                             doc.font('Helvetica').fontSize(12)
+                                 .text(schoolInfo.address, textStartX, margin + 25, { align: 'center' })
+                                 .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+                                 .text(schoolInfo.phone, textStartX, margin + 55, { align: 'center' });
+ 
+                             doc.font('Helvetica-Bold').fontSize(14).text(
+                                 `Report Sheet for ${term} ${session} Academic Session`,
+                                 margin,
+                                 margin + 80,
+                                 { width: doc.page.width - 2 * margin, align: 'center' }
+                             );
+                             doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
+ 
+                             // Student Information Section (Same as before)
+                             doc.moveDown();
+                             const infoStartX = 50;
+                             let infoCurrentY = doc.y;
+ 
+                             const studentInfoRows = [
+                                 { 
+                                     label: "Student Name", 
+                                     value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
+                                 },                                 
+                                 { label: "Admission No", value: studentID },
+                                 { label: "Class", value: studentClass },
+                                 { label: "Term", value: term },
+                                 { label: "Session", value: session },
+                                 { label: "Total Students", value: totalStudents },
+                                 { label: "Attendance", value: assessmentResult.length > 0 ? assessmentResult[0].attendance : "N/A" }
+                             ];
+ 
+                             studentInfoRows.forEach((row, index) => {
+                                 const rowY = infoCurrentY + index * 15;
+ 
+                                 // Set alternating background color
+                                 if (index % 2 === 0) {
+                                     doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                                 }
+ 
+                                 // Draw text
+                                 doc.fontSize(10).fillColor('black')
+                                     .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
+                                     .text(row.value, infoStartX + 200, rowY + 4, { width: doc.page.width - 2 * infoStartX - 200, align: 'left' });
+                             });
+ 
+                             infoCurrentY += studentInfoRows.length * 15;
+                              // Subject Table for terminal results
+                            doc.moveDown().fontSize(8);
+                            const startX = 50;
+                            let currentY = doc.y + 20;
+                            const cellHeight = 15;
+                            const cellWidth = 50;
+
+                            // Draw table headers with percentages (Same as before)
+                            doc.moveTo(startX, currentY - 5).lineTo(startX + 500, currentY - 5).stroke();
+                            doc.text('Subject', startX, currentY, { width: 100, align: 'center', bold: true });
+                            doc.text('1st CA', startX + 100, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('2nd CA', startX + 150, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('3rd CA', startX + 200, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Exam', startX + 250, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Total', startX + 300, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Grade', startX + 350, currentY, { width: cellWidth, align: 'center', bold: true });
+                            doc.text('Comment', startX + 400, currentY, { width: 100, align: 'center', bold: true });
+
+                            // Move down for percentages
+                            currentY += 10;
+
+                            // Draw percentages below each column header
+                            doc.text('(10%)', startX + 100, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
+                            doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
+
+                            // Move to the first row position
+                            currentY += 10;
+                            doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
+                            currentY += 5;
+
+                            // Render each subject in a new row (Same as before)
+                            let totalScore = 0;
+                            subjectsResult.forEach((subject, index) => {
+                                const rowY = currentY + index * cellHeight;
+
+                                // Set alternating row background colors
+                                if (index % 2 === 0) {
+                                    doc.rect(startX, rowY, 500, cellHeight).fill('#F0F0F0');
+                                }
+
+                                const { grade, comment } = getGradeAndComment(subject.total);
+                                totalScore += subject.total;
+
+                                doc.fontSize(8).fillColor('black')
+                                    .text(subject.subjectName, startX, rowY + 4, { width: 100, align: 'center' })
+                                    .text(subject.firstCA, startX + 100, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.secondCA, startX + 150, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.thirdCA, startX + 200, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.exams, startX + 250, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(subject.total, startX + 300, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(grade, startX + 350, rowY + 4, { width: cellWidth, align: 'center' })
+                                    .text(comment, startX + 400, rowY + 4, { width: 100, align: 'center' });
+                            });
+
+                            currentY += subjectsResult.length * cellHeight + 5;
+                            doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
+
+                            // Add Total and Average scores
+                            currentY += 10;
+                            doc.fontSize(10).text(`Total Score: ${totalScore}`, startX, currentY);
+                            const averageScore = totalScore / subjectsResult.length;
+                            doc.text(`Average Score: ${averageScore.toFixed(2)}`, startX + 200, currentY);
+
+                     // Conduct and Development and Grading Scale Tables
+currentY += 20;
+doc.fontSize(10).text('Attitude and Values Towards:', startX, currentY);
+doc.fontSize(10).text('Grading Scale:', startX + 350, currentY); // Adjust for scale column start
+currentY += 15;
+
+// Table Data
+const conductCategories = [
+    { label: "Academic Responsibility", scoreKey: "academic_responsibility" },
+    { label: "Respect & Discipline", scoreKey: "respect_and_discipline" },
+    { label: "Punctuality & Organization", scoreKey: "punctuality_and_personal_organization" },
+    { label: "Social & Physical Development", scoreKey: "social_and_physical_development" },
+];
+
+const gradingScale = [
+    [4, 'Exemplary'],
+    [3, 'Above Average'],
+    [2, 'Average'],
+    [1, 'Below Average']
+];
+
+// Define maximum rows for alignment
+const maxRows = Math.max(conductCategories.length, gradingScale.length);
+
+// Draw rows for both tables
+for (let i = 0; i < maxRows; i++) {
+    const rowY = currentY + i * 15;
+
+    // Alternating row colors
+    if (i % 2 === 0) {
+        doc.rect(startX, rowY, 300, 15).fill('#F8F8F8'); // Conduct and Development background
+        doc.rect(startX + 350, rowY, 300, 15).fill('#F8F8F8'); // Grading Scale background
+    }
+
+    // Conduct and Development Table
+    if (i < conductCategories.length) {
+        const category = conductCategories[i];
+        const score = assessmentResult[0]?.[category.scoreKey];
+        doc.fillColor('black')
+            .fontSize(10).text(category.label, startX + 5, rowY + 2, { align: 'left' })
+            .text(score, startX + 200, rowY + 2, { align: 'left' });
+    }
+
+    // Grading Scale Table
+    if (i < gradingScale.length) {
+        const [score, comment] = gradingScale[i];
+        doc.fillColor('black')
+            .fontSize(10).text(score, startX + 355, rowY + 2, { align: 'left' })
+            .text(comment, startX + 400, rowY + 2, { align: 'left' });
+    }
+}
+
+// Update currentY after tables
+currentY += maxRows * 15 + 20;
+// Add Signature Section
+currentY += 40; // Add some space before the signature section
+
+// Text indicating who is signing
+doc.font('Helvetica').fontSize(12).text('Signed by:', startX, currentY);
+currentY += 30;
+
+// Line for the signature and the date on the same row
+doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
+doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust Y-coordinate for proper alignment
+
+// Add the signer's designation below the line
+doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+currentY += 20;
+
+
+
+                            // Finish PDF Document
+                            doc.end();
+                            if (saveToFile) res.download(filename);
+                        });
+                });
+        });
+    });
+}
+// for fetching sessions from the subjects table
+app.get('/api/fetchSessions', (req, res) => {
+    db.query('SELECT DISTINCT session FROM subjects ORDER BY session', (err, results) => {
+        if (err) {
+            console.error('Error fetching sessions:', err);
+            return res.status(500).json({ error: 'Failed to fetch sessions' });
+        }
+        // Send back the session data
+        res.json(results.map(result => result.session));
+    });
+});
+
+// Generate sessional result
+function generateSessionalResult(req, res, saveToFile = false) {
+   // Assuming studentID and session are provided via params and query
+const { studentID } = req.params;
+const { session } = req.query;
+
+if (!studentID || !session) {
+    return res.status(400).json({ error: 'Missing required parameters: studentID or session' });
+}
+
+db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, studentResult) => {
+    if (err) {
+        return res.status(500).json({ error: 'Database error fetching student', details: err });
+    }
+    if (studentResult.length === 0) {
+        return res.status(404).json({ error: 'Student not found' });
+    }
+
+    const studentClass = studentResult[0].class;
+
+    db.query('SELECT COUNT(*) as count FROM students WHERE class = ?', [studentClass], (err, studentCountResult) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error fetching student count', details: err });
+        }
+
+        const totalStudents = studentCountResult[0].count;
+
+        db.query(`
+            SELECT term, subjectName, SUM(firstCA) AS firstCA, SUM(secondCA) AS secondCA,
+                   SUM(thirdCA) AS thirdCA, SUM(exams) AS exams, SUM(total) AS total
+            FROM subjects
+            WHERE studentID = ? AND session = ?
+            GROUP BY term, subjectName
+            ORDER BY term`, [studentID, session], (err, subjectsResult) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Database error fetching subjects', details: err });
+                }
+
+                db.query(`
+                    SELECT academic_responsibility, respect_and_discipline, punctuality_and_personal_organization,
+                           social_and_physical_development, attendance, term
+                    FROM form_master_assessments
+                    WHERE studentID = ? AND session = ?
+                    ORDER BY term`, [studentID, session], (err, assessmentsResult) => {
+                        if (err) {
+                            return res.status(500).json({ error: 'Database error fetching assessments', details: err });
+                        }
+
+                        // Calculate total attendance
+                        let totalAttendance = 0;
+                        assessmentsResult.forEach(assessment => {
+                            totalAttendance += assessment.attendance;
+                        });
+
+                         // Initialize PDF document
+                         const doc = new PDFDocument({ layout: 'portrait', margin: 20 });
+                         const filename = `Sessional_Report_${studentID}_${session}.pdf`;
+
+                         // Conditionally set response headers
+                         if (saveToFile) {
+                             res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+                         } else {
+                             res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+                         }
+                         res.setHeader('Content-Type', 'application/pdf');
+
+                         // Pipe the generated PDF to the response
+                         doc.pipe(res);
+                       // Header Section
+                       const margin = 15;
+                       const logoWidth = 80;
+                       const logoHeight = 80;
+                       const textStartX = logoWidth + margin-20;
+                       try {
+                           doc.image(schoolInfo.logoPath, margin, margin, { width: logoWidth, height: logoHeight });
+                       } catch (imageError) {
+                           console.error("Failed to load logo image:", imageError);
+                           doc.text("(Logo unavailable)", margin, margin);
+                       }
+
+                       // School Info centered
+                       doc.font('Helvetica-Bold').fontSize(16).text(schoolInfo.name, textStartX, margin, {
+                           align: 'center',
+                           width: doc.page.width - logoWidth - 3 * margin,
+                       });
+                       doc.font('Helvetica').fontSize(12)
+                           .text(schoolInfo.address, textStartX, margin + 30, { align: 'center' })
+                           .text(schoolInfo.email, textStartX, margin + 40, { align: 'center' })
+                           .text(schoolInfo.phone, textStartX, margin + 53, { align: 'center' });
+
+                       doc.font('Helvetica-Bold').fontSize(14).text(
+                           `Sessional Report Sheet for ${session} Academic Session`,
+                           margin,
+                           margin + 80,
+                           { width: doc.page.width - 2 * margin, align: 'center' }
+                       );
+                       doc.moveTo(margin, margin + 100).lineTo(doc.page.width - margin, margin + 100).stroke();
+
+                       // Calculate cumulative total and average
+                       let cumulativeTotal = 0;
+                       subjectsResult.forEach(subject => {
+                           cumulativeTotal += subject.total;
+                       });
+
+                       const average = cumulativeTotal / subjectsResult.length;
+                       const status = average >= 50 ? 'Pass' : 'Fail';
+
+                       // Student Info Section
+                       const infoStartX = 50;
+                       let infoCurrentY = doc.y + 20;
+
+                       const studentInfoRows = [
+                           { 
+                               label: "Student Name", 
+                               value: `${studentResult[0].firstname} ${studentResult[0].surname}${studentResult[0].othername ? ' ' + studentResult[0].othername : ''}` 
+                           },
+                           { label: "Admission No", value: studentID },
+                           { label: "Class", value: studentClass },
+                           { label: "Session", value: session },
+                           { label: "Total Students", value: totalStudents },
+                           { label: "Total Attendance", value: totalAttendance },
+                           { label: "End of The Year Average", value: average.toFixed(2) },
+                           { label: "Status", value: status },
+                       ];
+
+                       studentInfoRows.forEach((row, index) => {
+                           const rowY = infoCurrentY + index * 15;
+
+                           if (index % 2 === 0) {
+                               doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#F0F0F0');
+                           } else {
+                               doc.rect(infoStartX, rowY, doc.page.width - 2 * infoStartX, 15).fill('#FFFFFF');
+                           }
+
+                           doc.fillColor('black')
+                               .fontSize(10)
+                               .text(row.label, infoStartX, rowY + 4, { width: 200, align: 'left' })
+                               .text(row.value, infoStartX + 200, rowY + 4, { align: 'left' });
+                       });
+
+                       infoCurrentY += studentInfoRows.length * 15;
+                       doc.moveTo(infoStartX, infoCurrentY + 10).lineTo(doc.page.width - infoStartX, infoCurrentY + 10).stroke();
+                       infoCurrentY += 20;
+
+// Subject Table for sessional results
+doc.moveDown().fontSize(8);
+const startX = 50;
+let currentY = doc.y + 10; // Start position (reduced for heading adjustment)
+const cellHeight = 15;
+const headerHeight = 20;
+
+// Column width adjustments
+const termWidth = 60;
+const subjectWidth = 120;
+const caWidth = 50;
+const examWidth = 55;
+const totalWidth = 60;
+const gradeWidth = 60;
+
+// Draw table headers
+doc.fontSize(9).fillColor('black')
+   .text('Term', startX, currentY - 5, { width: termWidth, align: 'center' }) // Move headers slightly upwards
+   .text('Subject', startX + termWidth, currentY - 5, { width: subjectWidth, align: 'center' })
+   .text('1st CA', startX + termWidth + subjectWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('2nd CA', startX + termWidth + subjectWidth + caWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('3rd CA', startX + termWidth + subjectWidth + 2 * caWidth, currentY - 5, { width: caWidth, align: 'center' })
+   .text('Exam', startX + termWidth + subjectWidth + 3 * caWidth, currentY - 5, { width: examWidth, align: 'center' })
+   .text('Total', startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY - 5, { width: totalWidth, align: 'center' })
+   .text('Grade', startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY - 5, { width: gradeWidth, align: 'center' });
+
+// Draw percentage row
+currentY += headerHeight - 5; // Move percentage row closer to headers
+doc.fontSize(8)
+   .text('(10%)', startX + termWidth + subjectWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(10%)', startX + termWidth + subjectWidth + caWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(10%)', startX + termWidth + subjectWidth + 2 * caWidth, currentY, { width: caWidth, align: 'center' })
+   .text('(70%)', startX + termWidth + subjectWidth + 3 * caWidth, currentY, { width: examWidth, align: 'center' })
+   .text('(100%)', startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY, { width: totalWidth, align: 'center' }); // Add percentage for total column
+
+// Line after percentage row
+doc.moveTo(startX, currentY + 10).lineTo(doc.page.width - startX, currentY + 10).stroke(); // Move the line below the text
+
+currentY += headerHeight;
+
+// Helper function for grades
+function getGrade(score) {
+    if (score >= 70) return 'A';
+    if (score >= 60) return 'B';
+    if (score >= 50) return 'C';
+    if (score >= 40) return 'D';
+    return 'F';
+}
+
+// Iterate over subjects and draw rows
+subjectsResult.forEach((subject, index) => {
+    const total = Number(subject.firstCA || 0) + Number(subject.secondCA || 0) + Number(subject.thirdCA || 0) + Number(subject.exams || 0);
+    const grade = getGrade(total);
+
+    const isEvenRow = index % 2 === 0;
+    doc.rect(startX, currentY, termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth + gradeWidth, cellHeight)
+       .fill(isEvenRow ? '#E8F6F3' : '#FFFFFF')
+       .stroke();
+
+    doc.fillColor('black')
+       .text(subject.term, startX, currentY, { width: termWidth, align: 'center' })
+       .text(subject.subjectName, startX + termWidth, currentY + 3, { width: subjectWidth, align: 'center' })
+       .text(subject.firstCA, startX + termWidth + subjectWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.secondCA, startX + termWidth + subjectWidth + caWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.thirdCA, startX + termWidth + subjectWidth + 2 * caWidth, currentY + 3, { width: caWidth, align: 'center' })
+       .text(subject.exams, startX + termWidth + subjectWidth + 3 * caWidth, currentY + 3, { width: examWidth, align: 'center' })
+       .text(total.toFixed(2), startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
+       .text(grade, startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY + 3, { width: gradeWidth, align: 'center' });
+
+    currentY += cellHeight;
+});
+
+
+                       // Add horizontal line after the table
+                       doc.moveTo(startX, currentY + 4).lineTo(doc.page.width - startX, currentY + 4).stroke();
+
+                       // Display Cumulative Total and Session Average after table
+                       currentY += 10;
+                       doc.text(`Cumulative Total: ${cumulativeTotal}`, startX, currentY);
+                       doc.text(`Session Average: ${average.toFixed(2)}`, startX + 200, currentY);
+                       // Add Signature Section
+currentY += 40; // Add some space before the signature section
+
+// Text indicating who is signing
+doc.font('Helvetica').fontSize(12).text('Signed by:', startX, currentY);
+currentY += 30;
+
+// Line for the signature and the date on the same row
+doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
+doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust Y-coordinate for proper alignment
+
+currentY += 10;
+
+// Add the signer's designation below the line
+doc.font('Helvetica-Bold').fontSize(14).text('Head of Department (HOD)', startX, currentY, { width: 500, align: 'left' });
+currentY += 20;
+
+                        
+                        doc.end(); // Finish the document
+                        if (saveToFile) res.download(filename);
+                    });
+            });
+    });
+});
+}
+
+// Route Definitions for downloading and viewing 
+app.get('/api/viewResult/:studentID', (req, res) => generateStudentReport(req, res));
+app.get('/api/downloadResult/:studentID', (req, res) => generateStudentReport(req, res, true));
+// Sessional result routes
+app.get('/api/sessionReport/view/:studentID', (req, res) => generateSessionalResult(req, res));
+app.get('/api/sessionReport/download/:studentID', (req, res) => generateSessionalResult(req, res, true));
 
 
 const PORT = process.env.PORT || 3000;

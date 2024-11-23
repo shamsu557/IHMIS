@@ -101,9 +101,7 @@ document.getElementById("teacherSignupForm").addEventListener("submit", async fu
         const result = await response.json();
 
         if (response.ok) {
-            alert(`Signup successful! Your staff ID is: ${result.staffId}`);
-            // Optionally redirect to another page after successful signup
-            window.location.href = "/login"; // Update this as necessary
+            alert(`Signup successful! Your staff ID is: ${result.staffId}`);           
         } else {
             // Handle errors (e.g., display validation errors or server messages)
             alert(result.message || "Signup failed. Please try again.");

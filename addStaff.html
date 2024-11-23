@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Signup</title>
+    <!-- Bootstrap 5 CSS CDN -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <!-- First Navbar (Images and Admin Dashboard Text) -->
+ <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <!-- Left image (Education Cap) -->
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    
+    <!-- Navbar brand (Admin Dashboard text) centered -->
+    <span class="navbar-brand mx-auto text-dark">Staff&nbsp;&nbsp;Management</span>
+    
+    <!-- Right image logo -->
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar (Navbar Items) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <!-- Toggler for mobile view -->
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+    
+  
+    <!-- Collapsible navbar items -->
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" id="resultManagementLink"  href="student_management.html">Students Management</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+  
+    <div class="center-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3>Teacher Signup</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="teacherSignupForm" action="/teacher-signup" method="POST" enctype="multipart/form-data">
+                            <!-- Name field -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <!-- Email field -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="row mb-3">
+                                <!-- Phone Number field -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone">Phone Number</label>
+                                        <input type="text" class="form-control" id="phone" name="phone">
+                                    </div>
+                                </div>
+                                <!-- Password field -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                           <!-- Role selection: Teacher or Form Master -->
+<div class="mb-3">
+    <label for="role" class="form-label">Role</label>
+    <select class="form-select" id="role" name="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Senior Master">Senior Master</option>
+        <option value="Form Master">Form Master</option>
+    </select>
+</div>
+<div class="mb-3" id="class-selection" style="display: none;">
+    <label for="class" class="form-label">Class (Form Master)</label>
+    <select class="form-select" id="formClass" name="formClass">
+        <option value="" disabled selected>Select Class</option>
+        <option value="Pre-Nursery">Pre-Nursery</option>
+        <option value="Nursery One">Nursery 1</option>
+        <option value="Nursery Two">Nursery 2</option>
+        <option value="Primary One">Primary 1</option>
+        <option value="Primary Two">Primary 2</option>
+        <option value="Primary Three">Primary 3</option>
+        <option value="Primary Four">Primary 4</option>
+        <option value="Primary Five">Primary 5</option>
+        <option value="Primary Six">Primary 6</option>
+        <option value="JSS One">JSS 1</option>
+        <option value="JSS Two">JSS 2</option>
+        <option value="JSS Three">JSS 3</option>
+        <option value="SSS One">SSS 1</option>
+        <option value="SSS Two">SSS 2</option>
+        <option value="SSS Three">SSS 3</option>
+    </select>
+</div>
+<div class="mb-3">
+    <label class="form-label">Subjects Teaching</label><br>
+    <div><small class="text-muted">Please select all the subjects you are currently teaching by checking the boxes below.</small></div>
+
+    <!-- Alphabetized list of Pre-Nursery, Nursery, Primary, and Secondary Subjects -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="agric-science" name="subjects[]" value="Agricultural Science">
+        <label class="form-check-label" for="agric-science">Agricultural Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="basic-science" name="subjects[]" value="Basic Science">
+        <label class="form-check-label" for="basic-science">Basic Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="biology" name="subjects[]" value="Biology">
+        <label class="form-check-label" for="biology">Biology</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="chemistry" name="subjects[]" value="Chemistry">
+        <label class="form-check-label" for="chemistry">Chemistry</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="computer-studies-primary" name="subjects[]" value="Computer Studies">
+        <label class="form-check-label" for="computer-studies-primary">Computer Studies</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="creativity" name="subjects[]" value="Creativity">
+        <label class="form-check-label" for="creativity">Creativity</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="cultural-and-creative-arts" name="subjects[]" value="Cultural and Creative Arts">
+        <label class="form-check-label" for="cultural-and-creative-arts">Cultural and Creative Arts</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="civic-education" name="subjects[]" value="Civic Education">
+        <label class="form-check-label" for="civic-education">Civic Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="economics" name="subjects[]" value="Economics">
+        <label class="form-check-label" for="economics">Economics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="english" name="subjects[]" value="English Language">
+        <label class="form-check-label" for="english">English Language</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="government" name="subjects[]" value="Government">
+        <label class="form-check-label" for="government">Government</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="health-education" name="subjects[]" value="Health Education">
+        <label class="form-check-label" for="health-education">Health Education</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="literacy" name="subjects[]" value="Literacy">
+        <label class="form-check-label" for="literacy">Literacy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="literature" name="subjects[]" value="Literature in English">
+        <label class="form-check-label" for="literature">Literature in English</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="mathematics" name="subjects[]" value="Mathematics">
+        <label class="form-check-label" for="mathematics">Mathematics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="numeracy" name="subjects[]" value="Numeracy">
+        <label class="form-check-label" for="numeracy">Numeracy</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="phonics" name="subjects[]" value="Phonics">
+        <label class="form-check-label" for="phonics">Phonics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="physics" name="subjects[]" value="Physics">
+        <label class="form-check-label" for="physics">Physics</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="rhymes" name="subjects[]" value="Rhymes">
+        <label class="form-check-label" for="rhymes">Rhymes</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="science" name="subjects[]" value="Science">
+        <label class="form-check-label" for="science">Science</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="social-studies" name="subjects[]" value="Social Studies">
+        <label class="form-check-label" for="social-studies">Social Studies</label>
+    </div>
+
+    <!-- Arabic and Islamic Studies (placed at the bottom) -->
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="arabic" name="subjects[]" value="Arabic">
+        <label class="form-check-label" for="arabic">Arabic (العربية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="islamic-studies" name="subjects[]" value="Islamic Studies">
+        <label class="form-check-label" for="islamic-studies">Islamic Studies (الدراسات الإسلامية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="quranic-studies" name="subjects[]" value="Quranic Studies">
+        <label class="form-check-label" for="quranic-studies">Quranic Studies (دراسات القرآن)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="tafsir" name="subjects[]" value="Tafsir">
+        <label class="form-check-label" for="tafsir">Tafsir (تفسير)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="hadith" name="subjects[]" value="Hadith">
+        <label class="form-check-label" for="hadith">Hadith (الحديث)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="fiqh" name="subjects[]" value="Fiqh">
+        <label class="form-check-label" for="fiqh">Fiqh (الفقه)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="seerah" name="subjects[]" value="Seerah">
+        <label class="form-check-label" for="seerah">Seerah (السيرة النبوية)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="aqeedah" name="subjects[]" value="Aqeedah">
+        <label class="form-check-label" for="aqeedah">Aqeedah (العقيدة)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="tajweed" name="subjects[]" value="Tajweed">
+        <label class="form-check-label" for="tajweed">Tajweed (التجويد)</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="arabic-grammar" name="subjects[]" value="Arabic Grammar">
+        <label class="form-check-label" for="arabic-grammar">Arabic Grammar (النحو العربي)</label>
+    </div>
+</div>
+
+                                            <!-- Classes teaching using checkboxes -->
+                                         <!-- Classes teaching -->
+                <div class="mb-3">
+                    <label for="classes" class="form-label">Classes Teaching</label>
+                    <div><small class="text-muted">Please select all the classes you are currently teaching by checking the boxes below.</small>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="pre-nursery" name="classes[]" value="Pre-Nursery">
+                        <label class="form-check-label" for="pre-nursery">Pre-Nursery</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="nursery-1" name="classes[]" value="Nursery One">
+                        <label class="form-check-label" for="nursery-1">Nursery 1</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="nursery-2" name="classes[]" value="Nursery Two">
+                        <label class="form-check-label" for="nursery-2">Nursery 2</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-1" name="classes[]" value="Primary One">
+                        <label class="form-check-label" for="primary-1">Primary 1</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-2" name="classes[]" value="Primary Two">
+                        <label class="form-check-label" for="primary-2">Primary 2</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-3" name="classes[]" value="Primary Three">
+                        <label class="form-check-label" for="primary-3">Primary 3</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-4" name="classes[]" value="Primary Four">
+                        <label class="form-check-label" for="primary-4">Primary 4</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-5" name="classes[]" value="Primary Five">
+                        <label class="form-check-label" for="primary-5">Primary 5</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="primary-6" name="classes[]" value="Primary Six">
+                        <label class="form-check-label" for="primary-6">Primary 6</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="jss-1" name="classes[]" value="JSS One">
+                        <label class="form-check-label" for="jss-1">JSS 1</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="jss-2" name="classes[]" value="JSS Two">
+                        <label class="form-check-label" for="jss-2">JSS 2</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="jss-3" name="classes[]" value="JSS Three">
+                        <label class="form-check-label" for="jss-3">JSS 3</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ss-1" name="classes[]" value="SSS One">
+                        <label class="form-check-label" for="ss-1">SS 1</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ss-2" name="classes[]" value="SSS Two">
+                        <label class="form-check-label" for="ss-2">SS 2</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ss-3" name="classes[]" value="SSS Three">
+                        <label class="form-check-label" for="ss-3">SS 3</label>
+                    </div>
+                    
+                </div>
+                
+                           <!-- Highest Qualification Dropdown -->
+<div class="mb-3">
+    <label for="qualification" class="form-label">Highest Qualification</label>
+    <select class="form-select" id="qualification" name="qualification" required>
+        <option value="" disabled selected>Select Qualification</option>
+        <option value="Diploma">Diploma</option>
+        <option value="HND">HND</option>
+        <option value="BSc">BSc</option>
+        <option value="Master">Master</option>
+        <option value="NCE">NCE</option>
+        <option value="PhD">PhD</option>
+    </select>
+    <!-- Additional Specification Field -->
+    <!-- Input field for other qualification -->
+   
+</div>
+
+                            <!-- Profile Picture Upload -->
+                            <div class="mb-3">
+                                <label for="profilePicture" class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*" required>
+                            </div>
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary w-100">Signup</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ <!-- Footer -->
+ <div class="footer bg-light mt-5">
+    <div class="row text-center py-3">
+      <div class="col-md-4">
+        <p><strong>Imam Hafsin Model International School</strong></p>
+        <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+        <p>Email: imamhafsin@gmail.com</p>
+        <p>Phone: 08030999939939399</p>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-instagram"></i> Instagram
+        </a>
+        <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+      <div class="col-md-4">
+        <p>&copy; IHMIS 2024</p>
+        <p>All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+ 
+<!-- Back to top button -->
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+   <script src="teachears-signup.js"></script>
+  </body>
+  </html>
+  
