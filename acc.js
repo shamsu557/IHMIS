@@ -59,44 +59,63 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 $(document).ready(function() {
-  // Handle the form submission for forgot password
-  $('#forgotPasswordForm').on('submit', function(e) {
-    e.preventDefault();
-    const identifier = $('input[name="identifier"]').val(); // Handles both email and staff ID
+ // Handle the form submission for forgot password
+$('#forgotPasswordForm').on('submit', function(e) {
+  e.preventDefault();
+  const identifier = $('input[name="identifier"]').val(); // Handles both email and staff ID
 
-    $.post('/forgot-password', { identifier }, function(response) {
-      if (response.success) {
-        // Show the reset password form if identifier is valid
-        $('#resetIdentifier').val(identifier);
-        $('#forgotPasswordForm').hide();
-        $('#resetPasswordForm').show();
-        $('#message').hide(); // Hide any previous messages
-      } else {
-        $('#message').text(response.message).show();
-      }
-    }, 'json');
-  });
-
-  // Handle the form submission for resetting the password
-  $('#resetPasswordForm').on('submit', function(e) {
-    e.preventDefault();
-    const identifier = $('#resetIdentifier').val();
-    const newPassword = $('input[name="newPassword"]').val();
-    const confirmPassword = $('input[name="confirmPassword"]').val();
-
-    if (newPassword !== confirmPassword) {
-      $('#message').text('Passwords do not match.').show();
-      return;
-    }
-
-    $.post('/reset-password', { identifier, newPassword }, function(response) {
+  $.post('/forgot-password', { identifier }, function(response) {
+    if (response.success) {
+      // Show the security question form if identifier is valid
+      $('#securityQuestionLabel').text(response.securityQuestion);  // Display the fetched security question
+      $('#securityQuestionForm').show();
+      $('#forgotPasswordForm').hide();
+      $('#message').hide(); // Hide any previous messages
+    } else {
       $('#message').text(response.message).show();
-      if (response.success) {
-        // Redirect to login page after 3 seconds if successful
-        setTimeout(() => window.location.href = '/login', 3000);
-      }
-    }, 'json');
-  });
+    }
+  }, 'json');
+});
+
+// Handle the form submission for the security question answer
+$('#securityQuestionForm').on('submit', function(e) {
+  e.preventDefault();
+  const identifier = $('input[name="identifier"]').val(); // Handle both email and staff ID
+  const securityAnswer = $('input[name="securityAnswer"]').val().toUpperCase().trim();
+
+  $.post('/verify-security-answer', { identifier, securityAnswer }, function(response) {
+    if (response.success) {
+      // Show the reset password form if the answer is correct
+      $('#resetIdentifier').val(identifier);
+      $('#securityQuestionForm').hide();
+      $('#resetPasswordForm').show();
+    } else {
+      $('#message').text(response.message).show();
+    }
+  }, 'json');
+});
+
+// Handle the form submission for resetting the password
+$('#resetPasswordForm').on('submit', function(e) {
+  e.preventDefault();
+  const identifier = $('#resetIdentifier').val();
+  const newPassword = $('input[name="newPassword"]').val();
+  const confirmPassword = $('input[name="confirmPassword"]').val();
+
+  if (newPassword !== confirmPassword) {
+    $('#message').text('Passwords do not match.').show();
+    return;
+  }
+
+  $.post('/reset-password', { identifier, newPassword }, function(response) {
+    $('#message').text(response.message).show();
+    if (response.success) {
+      // Redirect to login page after 3 seconds if successful
+      setTimeout(() => window.location.href = '/login', 3000);
+    }
+  }, 'json');
+});
+
 
   // Back-to-top button functionality
   const mybutton = document.getElementById("myBtn");
