@@ -6,38 +6,14 @@
   border-radius: 50%;
 }
 
+
 /* Main container for content */
 .container {
-  max-width: 450px; /* Maximum width for larger screens */
-  width: 90%; /* Adjusted to 90% of the screen width for responsiveness */
-  margin: 120px auto; /* Ensure it's not covered by the navbar (adjusted top margin) */
-  padding: 30px; /* Improved spacing inside */
-  flex: 1; /* Ensures the container grows and takes up available space */
-  background-color: #fff; /* Optional: background color */
-  border-radius: 10px; /* Subtle rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for better aesthetics */
+  max-width: 80%; /* Container takes 80% of the screen width */
+  margin-top: 70px;
+  flex: 1;
 }
 
-/* Centered container for specific layouts */
-.center-container {
-  max-width: 450px; /* Increased maximum width for readability */
-  width: 95%; /* Responsive width for better adaptability */
-  margin: 130px auto; /* Ensure it's not covered by the navbar */
-  padding: 20px; /* Improved padding for spacing */
-  text-align: center; /* Center-align content */
-  background-color: #f9f9f9; /* Optional: slight background color for differentiation */
-  border-radius: 8px; /* Rounded edges */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-/* Responsive adjustments for center-container */
-@media (max-width: 768px) {
-  .center-container {
-    margin-top: 80px;
-    padding: 15px;
-    max-width: 95%;
-  }
-}
 
 /* First Navbar - Contains images and text */
 .first-navbar {
@@ -95,112 +71,20 @@
 
 /* Mobile adjustments for layout */
 @media (max-width: 576px) {
-  body {
-    background-color: white;
-    padding-top: 100px;
-  }
-  .container {
-    max-width: 95%; /* Almost full width for smaller screens */
-    margin: 0 auto;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-  }
-
-  .center-container {
-    margin-top: 60px;
-    padding: 15px;
-    text-align: left; /* Change alignment for better fit */
-  }
-
-  .fixed-image, .circular-img {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-
-  .first-navbar {
-    top: 0;
-    padding: 0 8px;
-  }
-
-  .second-navbar {
-    top: 50px;
-    padding: 15px 10px;
-    height: 40px;
-  }
-}
-
-/* Scrollable modal */
-.modal-body-scroll {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Hide the menu icon by default when navbar is shown */
-.navbar-toggler-icon.hidden {
-  display: none;
-}
-
-.hidden {
-  display: none !important; /* Forcefully hide the element */
-}
-
-body {
-  background-color: white;
-  margin-top: 140px; /* Ensure the body content is separated from the fixed navbars */
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;
-}
-
-/* Remove default dropdown caret */
-.dropdown-toggle::after {
-  content: none;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  background-color: white;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 5px;
-  list-style: none;
-  padding: 0;
-  z-index: 1000;
-}
-
-.dropdown-menu.show {
-  display: block;
-}
-
-.dropdown-menu li {
-  padding: 8px 16px;
-}
-
-.dropdown-menu li:hover {
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-
-.dropdown-item {
-  text-decoration: none;
-  color: #000;
-}
-
-.dropdown-item:hover {
-  text-decoration: none;
-  color: #007bff;
-}
-
-/* Mobile adjustments for layout */
-@media (max-width: 576px) {
   /* Adjust body for mobile screens */
   body {
     background-color: white;
     padding-top: 100px;
+  }
+
+  /* Centered container for small screens */
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: white;
   }
 
   /* Scrollable modal */
@@ -267,7 +151,88 @@ body {
   }
 }
 
+/* Hide the menu icon by default when navbar is shown */
+.navbar-toggler-icon.hidden {
+  display: none;
+}
 
+.hidden {
+  display: none !important; /* Forcefully hide the element */
+}
+
+body {
+  background-color: white;
+  margin-top: 140px; /* Ensure the body content is separated from the fixed navbars */
+}
+
+/* Remove default dropdown caret */
+.dropdown-toggle::after {
+  content: none;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  list-style: none;
+  padding: 0;
+  z-index: 1000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-menu li {
+  padding: 8px 16px;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.dropdown-item {
+  text-decoration: none;
+  color: #000;
+}
+
+.dropdown-item:hover {
+  text-decoration: none;
+  color: #007bff;
+}
+
+/* Container Styling */
+.container {
+  max-width: 400px;
+  margin: 100px auto; /* Add vertical spacing from the top and center horizontally */
+  padding: 50px; /* Increase padding for better spacing inside the container */
+  flex: 1; /* Ensures that the container grows and takes up available space */
+}
+
+/* Flexbox to ensure footer sticks to the bottom */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  max-width: 400px;
+  margin-top: 70px;
+  flex: 1; /* Ensures that the container grows and takes up available space */
+}
+
+.form-control {
+  margin-bottom: 15px;
+}
+.center-container{
+  margin-top: 120px;
+}
+/* Footer Styling */
 /* Footer Styling */
 .footer {
   background: #f8f9fa;
@@ -275,21 +240,37 @@ body {
   padding: 10px;
   text-align: center;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  margin-top: auto;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  flex-direction: column;  /* Stack items vertically */
+  margin-top: auto; /* Pushes the footer down naturally without being too far */
+  padding-bottom: 20px; /* Reduce bottom padding to bring it closer */
 }
 
 .footer .row {
-  width: 100%;
+  width: 100%; /* Ensure row takes up the full width */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically if necessary */
+  margin: 0;
+}
+
+.footer .col {
+  padding: 0;
+  text-align: center; /* Ensure content in columns is centered */
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
 }
 
 .footer i {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 /* Scroll to top button */
