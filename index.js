@@ -82,7 +82,7 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
 });
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring
+    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring 
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
     // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
@@ -111,8 +111,8 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
             }
 
             // Build the SQL query to update the teacher's information
-            const columns = ['name', 'password', 'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns
-            const values = [name, hashedPassword, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
+            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns 
+            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
 
             if (role === 'Form Master') {
                 columns.push('formClass'); // Include formClass if role is 'Form Master'
@@ -255,57 +255,76 @@ app.get('/checkSession', (req, res) => {
 
 // Forgot password endpoint
 app.post('/forgot-password', (req, res) => {
-    const { identifier } = req.body; // Updated variable name for consistency
-
-    // Determine whether the identifier is an email or staff ID
+    const { identifier } = req.body;
+  
     const query = identifier.includes('@') 
-        ? 'SELECT email FROM teachers WHERE email = ?' 
-        : 'SELECT staff_id FROM teachers WHERE staff_id = ?';
-
+      ? 'SELECT security_question FROM teachers WHERE email = ?' 
+      : 'SELECT security_question FROM teachers WHERE staff_id = ?';
+  
     db.query(query, [identifier], (err, result) => {
-        if (err) {
-            console.error('Error checking identifier:', err);
-            return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
-        }
-
-        if (result.length > 0) {
-            res.json({ success: true, message: 'Identifier found. You may now reset your password.' });
-        } else {
-            res.json({ success: false, message: 'Email or Staff ID does not exist.' });
-        }
+      if (err) {
+        console.error('Error fetching security question:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      if (result.length > 0) {
+        res.json({ success: true, securityQuestion: result[0].security_question });
+      } else {
+        res.json({ success: false, message: 'Identifier not found.' });
+      }
     });
-});
-
+  });
+// Verify security answer endpoint
+app.post('/verify-security-answer', (req, res) => {
+    const { identifier, securityAnswer } = req.body;
+  
+    const query = identifier.includes('@') 
+      ? 'SELECT security_answer FROM teachers WHERE email = ?' 
+      : 'SELECT security_answer FROM teachers WHERE staff_id = ?';
+  
+    db.query(query, [identifier], (err, result) => {
+      if (err) {
+        console.error('Error fetching security answer:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      if (result.length > 0 && result[0].security_answer === securityAnswer) {
+        res.json({ success: true });
+      } else {
+        res.json({ success: false, message: 'Incorrect answer. Please try again.' });
+      }
+    });
+  });
+    
 // Reset password endpoint
 app.post('/reset-password', (req, res) => {
     const { identifier, newPassword } = req.body;
-
-    // Hash the new password
+  
     bcrypt.hash(newPassword, saltRounds, (err, hashedPassword) => {
+      if (err) {
+        console.error('Error hashing password:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      const query = identifier.includes('@') 
+        ? 'UPDATE teachers SET password = ? WHERE email = ?' 
+        : 'UPDATE teachers SET password = ? WHERE staff_id = ?';
+  
+      db.query(query, [hashedPassword, identifier], (err, result) => {
         if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+          console.error('Error updating password:', err);
+          return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
         }
-
-        // Determine whether the identifier is an email or staff ID
-        const query = identifier.includes('@') 
-            ? 'UPDATE teachers SET password = ? WHERE email = ?' 
-            : 'UPDATE teachers SET password = ? WHERE staff_id = ?';
-
-        db.query(query, [hashedPassword, identifier], (err, result) => {
-            if (err) {
-                console.error('Error updating password:', err);
-                return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
-            }
-
-            if (result.affectedRows > 0) {
-                res.json({ success: true, message: 'Password updated successfully!', redirectUrl: '/login' });
-            } else {
-                res.json({ success: false, message: 'Failed to update password. Please try again later.' });
-            }
-        });
+  
+        if (result.affectedRows > 0) {
+          res.json({ success: true, message: 'Password updated successfully!' });
+        } else {
+          res.json({ success: false, message: 'Failed to update password. Please try again later.' });
+        }
+      });
     });
-});
+  });
+  
 
 
 // Logout route
