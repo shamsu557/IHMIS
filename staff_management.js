@@ -26,7 +26,7 @@ function fetchStaff() {
                 <li>
                     ${staff.staff_id} - ${staff.name} - ${staff.role} 
                     ${staff.role === 'Form Master' ? `- ${staff.formClass}` : ''} 
-                    - ${staff.email} - ${staff.phone}
+                    - ${staff.email} - ${staff.phone}- ${staff.security_question}- ${staff.security_answer}
                     <button class="btn btn-warning btn-sm" onclick="editStaff(${staff.id})">Edit</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteEntity('staff', ${staff.id})">Delete</button>
                 </li>
