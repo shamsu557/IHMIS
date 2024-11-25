@@ -1388,8 +1388,10 @@ currentY += 30;
 doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
 doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust Y-coordinate for proper alignment
 
+currentY += 10;
+
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Form Master', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
 
@@ -1652,7 +1654,7 @@ doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust 
 currentY += 10;
 
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Head of Department (HOD)', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Director (western education)', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
                         
