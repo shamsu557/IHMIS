@@ -1654,7 +1654,7 @@ doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust 
 currentY += 10;
 
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Director (western education)', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Director (Western Education)', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
                         
