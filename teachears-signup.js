@@ -75,7 +75,9 @@ document.getElementById("teacherSignupForm").addEventListener("submit", async fu
 
     // Create a FormData object to handle form submission
     const formData = new FormData(this);
-
+// Convert security answer to uppercase
+formData.set('security_answer', formData.get('security_answer').toUpperCase().trim());
+formData.set('name', formData.get('name').toUpperCase().trim());
     // Get selected subjects and append them to FormData
     const subjects = [];
     document.querySelectorAll("input[name='subjects[]']:checked").forEach(subject => {
