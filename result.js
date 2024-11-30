@@ -144,17 +144,24 @@ async function loadStudents() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ class: selectedClass })
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const students = await response.json();
 
         const studentTbody = $('#student-tbody');
         const studentInfo = $('#student-info');
         const noStudentsMessage = $('#no-students-message');
 
+        // Clear previous data and hide unnecessary sections
         studentTbody.empty();
         studentInfo.hide();
         noStudentsMessage.hide();
 
         if (students.length > 0) {
+            // Display selected options
             $('#class-name').text(`Class: ${selectedClass}`);
             $('#subject-name').text(`Subject: ${selectedSubject}`);
             $('#term-name').text(`Term: ${selectedTerm}`);
@@ -173,20 +180,16 @@ async function loadStudents() {
                     </tr>
                 `);
             });
-            
-            // Restrict input to numbers only (0-100 if these are score fields)
-            document.querySelectorAll('.score-input').forEach(input => {
-                input.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, ''); // Allow only digits 0-9
-                });
-            });
-            // Ensure only digits can be entered
+
+            // Restrict input to numbers only (0-100)
             $('.score-input').on('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, ''); // Allows only digits
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only digits 0-9
             });
 
+            // Hide the selection header and show score submission UI
             $('#view-students, #subjectSelect, #termSelect, #classSelect, #resultManagementHeader, #sessionSelect').hide();
             $('#submit-scores').show();
+            $('#back-to-selection').show();
         } else {
             noStudentsMessage.show();
         }
@@ -194,26 +197,77 @@ async function loadStudents() {
         console.error('Error loading students:', error);
         alert('Error loading students: ' + error.message);
     }
+
+    // Back to class selection
+    $('#back-to-selection').off('click').on('click', function () {
+        // Hide student table and associated headers
+        $('#student-info').hide();
+        $('#submit-scores').hide();
+
+        // Show class selection fields
+        $('#view-students, #subjectSelect, #termSelect, #classSelect, #resultManagementHeader, #sessionSelect').show();
+
+        // Clear student table
+        $('#student-tbody').empty();
+
+        // Reset any error or no student messages
+        $('#no-students-message').hide();
+
+        // Hide the back-to-selection button
+        $('#back-to-selection').hide();
+    });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     loadClassOptions();
     $('#view-students').on('click', loadStudents);
     $('#submit-scores').on('click', submitScores);
+
+    // Restrict score inputs to their maximum values
+    $(document).on('input', '.score-input', function () {
+        const input = $(this);
+        const name = input.attr('name');
+        const value = parseInt(input.val()) || 0;
+
+        if (name === 'test1' || name === 'test2' || name === 'test3') {
+            if (value > 10) {
+                alert('CA scores cannot exceed 10 marks. Please enter a valid score.');
+                input.val(''); // Clear the field
+            }
+        } else if (name === 'exam') {
+            if (value > 70) {
+                alert('Exam scores cannot exceed 70 marks. Please enter a valid score.');
+                input.val(''); // Clear the field
+            }
+        }
+    });
 });
+
 async function submitScores() {
     const scores = [];
-    const subjectName = document.getElementById("subject-name").innerText.replace('Subject: ', '');
-    const term = document.getElementById("term-name").innerText.replace('Term: ', '');
-    const session = document.getElementById("session-name").innerText.replace('Session: ', '');
+    const subjectName = document.getElementById("subject-name").innerText.replace('Subject: ', '').trim();
+    const term = document.getElementById("term-name").innerText.replace('Term: ', '').trim();
+    const session = document.getElementById("session-name").innerText.replace('Session: ', '').trim();
 
-    $('#student-tbody tr').each(function() {
+    let validScores = true; // Flag to check if all scores are valid
+
+    $('#student-tbody tr').each(function () {
         const checkbox = $(this).find('.student-checkbox')[0];
         if (checkbox.checked) { // Only proceed if the student is checked
             const studentID = checkbox.dataset.id;
             const scoreInputs = $(this).find('.score-input');
 
-            const total = [...scoreInputs].reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+            const caScores = [scoreInputs[0].value, scoreInputs[1].value, scoreInputs[2].value].map(score => parseInt(score) || 0);
+            const examScore = parseInt(scoreInputs[3].value) || 0;
+
+            // Validate CA and Exam scores
+            if (caScores.some(score => score > 10) || examScore > 70) {
+                validScores = false;
+                alert(`Invalid scores for student ID: ${studentID}. Please ensure CAs are max 10 and Exam is max 70.`);
+                return false; // Break out of .each loop
+            }
+
+            const total = caScores.reduce((sum, score) => sum + score, 0) + examScore;
             const examGrade = calculateGrade(total);
 
             scores.push({
@@ -221,15 +275,19 @@ async function submitScores() {
                 subjectName: subjectName,
                 term: term,
                 session: session,
-                firstCA: scoreInputs[0].value,
-                secondCA: scoreInputs[1].value,
-                thirdCA: scoreInputs[2].value,
-                exams: scoreInputs[3].value,
+                firstCA: caScores[0],
+                secondCA: caScores[1],
+                thirdCA: caScores[2],
+                exams: examScore,
                 total: total,
                 examGrade: examGrade
             });
         }
     });
+
+    if (!validScores) {
+        return; // Exit function if any score validation fails
+    }
 
     if (scores.length === 0) {
         alert('Please select at least one student to submit scores.');
@@ -246,13 +304,15 @@ async function submitScores() {
         if (response.ok) {
             alert('Scores updated successfully!');
         } else {
-            throw new Error('Failed to update scores.');
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update scores.');
         }
     } catch (error) {
         console.error('Error updating scores:', error);
         alert('Failed to update scores: ' + error.message);
     }
 }
+
 function calculateGrade(total) {
     if (total >= 70) return 'A';
     else if (total >= 60) return 'B';
@@ -260,6 +320,7 @@ function calculateGrade(total) {
     else if (total >= 40) return 'D';
     return 'F';
 }
+
 function logout() {
     window.location.href = '/logout';
 }

@@ -88,6 +88,7 @@
     
     <!-- Div to Display Student List -->
     <div id="student-list">
+      <button id="back-to-selection" type="button" class="btn btn-info" style="display: none;">Back to Class Selection</button><br><br>
         <!-- This section will be populated dynamically via JavaScript -->
         <div id="student-info" style="display: none;">
             <h3 id="class-name" style="font-size: 14px;"></h3>
@@ -111,15 +112,17 @@
                 </tbody>
             </table>
             <!-- Submit Scores Button -->
-            <button id="submit-scores" class="btn btn-primary" style="margin-top: 20px;" onclick="submitScores()">Submit Scores</button>
+            <button id="submit-scores" class="btn btn-success" style="margin-top: 20px; margin-left: 40%;" onclick="submitScores()">Submit Scores</button>
         </div>
         <div id="no-students-message" style="display: none;">
             <p>No students found in this class.</p>
         </div>
     </div>
-</div></div></div>
+</div></div>
 
-
+</div>
+<br>
+ 
 <br>
 <!-- Footer -->
 <div class="footer bg-light mt-5">
