@@ -1,30 +1,16 @@
 body {
   background-color: white;
 }
-
-/* Main container for content */
 .container {
-  max-width: 450px; /* Increased maximum width for larger screens */
-  width: 90%; /* Adjusted to 90% of the screen width for responsiveness */
-  margin: 70px auto; /* Center horizontally and add vertical spacing */
-  padding: 30px; /* Better spacing inside */
-  flex: 1; /* Ensures that the container grows and takes up available space */
-  background-color: #fff; /* Optional: background color */
-  border-radius: 10px; /* Add subtle rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for better aesthetics */
+max-width: 450px; /* Fixed width for larger screens */
+margin: auto;
+padding: 15px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+border-radius: 10px;
+background: white;
+overflow-x: auto; /* Enable horizontal scrolling */
 }
 
-/* Centered container for specific layouts */
-.center-container {
-  margin-top: 450px;
-  max-width: 800px; /* Increased maximum width for readability */
-  width: 95%; /* Responsive width for better adaptability */
-  padding: 20px; /* Improved padding for spacing */
-  text-align: center; /* Center-align content */
-  background-color: #f9f9f9; /* Optional: slight background color for differentiation */
-  border-radius: 8px; /* Rounded edges */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
 /* Ensure table is responsive */
 table {
 width: 50%; /* Make table take full width of container */
@@ -359,4 +345,17 @@ justify-content: center;
 .navbar-toggler {
 display: none;
 }
+}
+.carousel-inner img {
+  height: 400px;
+  object-fit: cover;
+}
+.director-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.news-section {
+  padding: 20px;
 }
