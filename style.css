@@ -359,3 +359,36 @@ display: none;
 .news-section {
   padding: 20px;
 }
+.hero-section {
+  background: url('students.jfif') no-repeat center center/cover;
+  height: 350px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.hero-section h1 {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 15px 25px;
+  border-radius: 5px;
+}
+.section-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #17a2b8;
+}
+.achievements-container li{
+  list-style: none;
+}
+.profile-pic{
+  width: 180px;
+  height: 230px;
+  object-fit: cover;
+  margin: 0 auto 20px;
+}
+.rounded-circle{
+  width: 160px; 
+  height: 160px; 
+  object-fit: cover;
+}

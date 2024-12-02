@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Imam Hafsin Model International School</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> 
+   <body>
+
+    <!-- First Navbar -->
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    <span class="navbar-brand mx-auto text-dark">Imam&nbsp;&nbsp;Hafsin</span>
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="about.html">About</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link text-danger dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
+                  Login
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                  <li><a class="dropdown-item" href="admin-login.html">As Admin</a></li>
+                  <li><a class="dropdown-item" href="login.html"> As Staff</a></li>
+                  <li><a class="dropdown-item" href="#studentLogin.html"> As Student</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="contact.html">Contact</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>Imam Hafsin Model International School</h1>
+    </div>
+
+    <!-- History of the School -->
+    <div class="history-container text-center my-3">
+        <h2 class="section-title">Our History</h2>
+        <p>
+            Imam Hafsin Model International School was established in 1995 with the aim of providing holistic education 
+            that combines modern academic excellence with Islamic teachings. Starting as a small institution with only 50 students, 
+            the school has grown into a well-respected educational center, offering three distinct sections: Western Education, Islamiyya, and Tahfizz.
+        </p>
+        <p>
+            Over the years, the school has maintained its commitment to nurturing responsible and knowledgeable individuals who excel in both academic and moral spheres. 
+            It has received numerous awards for its outstanding contributions to education and remains a beacon of quality learning in the region.
+        </p>
+    </div>
+
+    <!-- Leadership Section -->
+    <div class="leader-container my-2">
+        <h2 class="section-title">Meet Our Leadership</h2>
+        <div class="row text-center">
+              <!-- Director of Western Education -->
+            <div class="col-md-4">
+                <img src="auwal1.jfif" alt="Director of Western Education" class="profile-pic">
+                <h5>Mrs. Amina Ibrahim</h5>
+                <p>Director of Western Education</p>
+                <p>
+                    Mr. Auwal Muhammad is an experienced educator with a Master's degree in Education. He has been instrumental in 
+                    developing the school's curriculum and ensuring students achieve academic excellence.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <img src="shamsu.jpg" alt="Founder" class="profile-pic">
+                <h5>Mal. Salihu Haruna</h5>
+                <p>Director of Tahfizz Section</p>
+                <p>
+                    An expert in Quranic memorization, Mal. Salihu leads the Tahfizz section with dedication, producing numerous 
+                    hafiz who excel in their understanding of the Quran.
+                </p>
+            </div>
+        
+            <!-- Director of Islamiyya -->
+            <div class="col-md-4">
+                <img src="passport.jpg" alt="Director of Islamiyya" class="profile-pic">
+                <h5>Mal. Usman Abdullahi</h5>
+                <p>Director of Islamiyya Section</p>
+                <p>
+                    Mal. Usman has dedicated his life to teaching Islamic studies. His guidance has helped students gain a deeper 
+                    understanding of Islamic principles and practices.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- School Achievements Section -->
+    <div class="achievements-container text-center my-2">
+        <h2 class="section-title">Our Achievements</h2>
+        <ul>
+            <li>Recognized as the "Best School in Academic Excellence" in 2020 by the Regional Education Board.</li>
+            <li>Produced over 500 graduates who have excelled in various fields including engineering, medicine, and Islamic scholarship.</li>
+            <li>Hosted inter-school Quranic recitation competitions, fostering unity and collaboration among students.</li>
+        </ul>
+    </div>
+
+  <!-- Testimonials Section -->
+<div class="container my-5">
+    <h2 class="section-title">What People Say</h2>
+    <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
+        <div class="carousel-inner">
+            <!-- Testimonial 1 -->
+            <div class="carousel-item active">
+                <div class="text-center">
+                    <img src="shamsu.jpg" alt="Parent" class="rounded-circle" >
+                    <blockquote class="blockquote mt-3">
+                        <p class="mb-0">
+                            "Imam Hafsin Model International School is a place where my child has not only excelled academically but also grown spiritually."
+                        </p>
+                        <footer class="blockquote-footer mt-2">Parent of a Student</footer>
+                    </blockquote>
+                </div>
+            </div>
+            <!-- Testimonial 2 -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <img src="ft1.jpg" alt="Former Student" class="rounded-circle">
+                    <blockquote class="blockquote mt-3">
+                        <p class="mb-0">
+                            "The teachers are highly skilled, and the environment is conducive for learning."
+                        </p>
+                        <footer class="blockquote-footer mt-2">Former Student</footer>
+                    </blockquote>
+                </div>
+            </div>
+            <!-- Testimonial 3 -->
+            <div class="carousel-item">
+                <div class="text-center">
+                    <img src="former.jpeg" alt="Community Member" class="rounded-circle">
+                    <blockquote class="blockquote mt-3">
+                        <p class="mb-0">
+                            "The school's integration of Islamic and Western education is commendable. A truly unique institution!"
+                        </p>
+                        <footer class="blockquote-footer mt-2">Community Member</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+    <!-- Footer -->
+    <div class="footer bg-light mt-5">
+        <div class="row text-center py-3">
+            <div class="col-md-4">
+                <p><strong>Imam Hafsin Model International School</strong></p>
+                <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+                <p>Email: imamhafsin@gmail.com</p>
+                <p>Phone: 08030999939939399</p>
+            </div>
+            <div class="col-md-4">
+                <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+                <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+                <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+                    <i class="fab fa-twitter"></i> Twitter
+                </a>
+                <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+            <div class="col-md-4">
+                <p>&copy; IHMIS 2024</p>
+                <p>All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+<!-- Back to top button -->
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="login.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
