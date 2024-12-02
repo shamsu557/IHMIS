@@ -388,7 +388,7 @@ display: none;
   margin: 0 auto 20px;
 }
 .rounded-circle{
-  width: 160px; 
-  height: 160px; 
+  width: 180px;
   object-fit: cover;
+  margin: 0 auto 20px;
 }
