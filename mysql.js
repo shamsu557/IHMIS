@@ -1,12 +1,22 @@
 const mysql = require('mysql');
 
 // MySQL database connection configuration
+// const dbConfig = {
+//     host: process.env.DB_HOST || 'localhost',  // Use environment variable or default
+//     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
+//     user: process.env.DB_USER || 'root',               // MySQL username from environment
+//     password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
+//     database: process.env.DB_NAME || 'school_database'            // Database name from environment
+// };
+
+
+// MySQL database connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',  // Use environment variable or default
+    host: process.env.DB_HOST || '192.250.234.159',  // Use environment variable or default
     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
-    user: process.env.DB_USER || 'root',               // MySQL username from environment
+    user: process.env.DB_USER || 'frankama_frankama',               // MySQL username from environment
     password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
-    database: process.env.DB_NAME || 'school_database'            // Database name from environment
+    database: process.env.DB_NAME || 'frankama_dsbase'            // Database name from environment
 };
 
 // Create MySQL connection
@@ -45,6 +55,8 @@ module.exports = db;
 //     email VARCHAR(255) NOT NULL UNIQUE,
 //     password VARCHAR(255) NOT NULL,
 //     role VARCHAR(100) NOT NULL,
+        // security_question VARCHAR(255)
+        // security_answer VARCHAR(255)
  //    phone VARCHAR(20) NOT NUL UNIQUE, -- Phone number must be unique
 //     formClass VARCHAR(50),
 //     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
@@ -99,7 +111,7 @@ module.exports = db;
 // ('TEMP002', 'Jane Smith', 'fadimatusani2021@gmail.com', 'placeholderpassword2', 'Teacher', '0809990099090', 'Form B', 'HND', 'default.jpg', NOW()),
 // ('TEMP003', 'Alice Johnson', 'shamsusabocom@gmail.com', 'placeholderpassword3', 'Teacher', '08003333333', 'Form C', 'Master', 'default.jpg', NOW());
 // -- Create form_master_assessments table to store assessments
-// //CREATE TABLE  form_master_assessments (
+// // CREATE TABLE form_master_assessments (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     studentID VARCHAR(50) NOT NULL,  -- Primary identifier for the student
 //     term ENUM('First Term', 'Second Term', 'Third Term') DEFAULT 'First Term',
@@ -110,8 +122,9 @@ module.exports = db;
 //     respect_and_discipline TINYINT NOT NULL CHECK (respect_and_discipline BETWEEN 1 AND 5),
 //     punctuality_and_personal_organization TINYINT NOT NULL CHECK (punctuality_and_personal_organization BETWEEN 1 AND 5),
 //     social_and_physical_development TINYINT NOT NULL CHECK (social_and_physical_development BETWEEN 1 AND 5),
+//     attendance TINYINT NOT NULL CHECK (attendance BETWEEN 0 AND 160),
 
-//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Created timestamp
     
 //     -- Ensure the combination of studentID and term is unique
 //     CONSTRAINT unique_student_term UNIQUE (studentID, term),
