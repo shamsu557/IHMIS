@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const nodemailer = require("nodemailer");
 const db = require('./mysql'); // Ensure mysql.js is configured correctly
 const fs = require('fs');
 const multer = require('multer'); // Add multer for file handling
@@ -82,7 +83,7 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
 });
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring
+    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring 
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
     // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
@@ -111,8 +112,8 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
             }
 
             // Build the SQL query to update the teacher's information
-            const columns = ['name', 'password', 'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns
-            const values = [name, hashedPassword, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
+            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns 
+            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
 
             if (role === 'Form Master') {
                 columns.push('formClass'); // Include formClass if role is 'Form Master'
@@ -255,57 +256,76 @@ app.get('/checkSession', (req, res) => {
 
 // Forgot password endpoint
 app.post('/forgot-password', (req, res) => {
-    const { identifier } = req.body; // Updated variable name for consistency
-
-    // Determine whether the identifier is an email or staff ID
+    const { identifier } = req.body;
+  
     const query = identifier.includes('@') 
-        ? 'SELECT email FROM teachers WHERE email = ?' 
-        : 'SELECT staff_id FROM teachers WHERE staff_id = ?';
-
+      ? 'SELECT security_question FROM teachers WHERE email = ?' 
+      : 'SELECT security_question FROM teachers WHERE staff_id = ?';
+  
     db.query(query, [identifier], (err, result) => {
-        if (err) {
-            console.error('Error checking identifier:', err);
-            return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
-        }
-
-        if (result.length > 0) {
-            res.json({ success: true, message: 'Identifier found. You may now reset your password.' });
-        } else {
-            res.json({ success: false, message: 'Email or Staff ID does not exist.' });
-        }
+      if (err) {
+        console.error('Error fetching security question:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      if (result.length > 0) {
+        res.json({ success: true, securityQuestion: result[0].security_question });
+      } else {
+        res.json({ success: false, message: 'Identifier not found.' });
+      }
     });
-});
-
+  });
+// Verify security answer endpoint
+app.post('/verify-security-answer', (req, res) => {
+    const { identifier, securityAnswer } = req.body;
+  
+    const query = identifier.includes('@') 
+      ? 'SELECT security_answer FROM teachers WHERE email = ?' 
+      : 'SELECT security_answer FROM teachers WHERE staff_id = ?';
+  
+    db.query(query, [identifier], (err, result) => {
+      if (err) {
+        console.error('Error fetching security answer:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      if (result.length > 0 && result[0].security_answer === securityAnswer) {
+        res.json({ success: true });
+      } else {
+        res.json({ success: false, message: 'Incorrect answer. Please try again.' });
+      }
+    });
+  });
+    
 // Reset password endpoint
 app.post('/reset-password', (req, res) => {
     const { identifier, newPassword } = req.body;
-
-    // Hash the new password
+  
     bcrypt.hash(newPassword, saltRounds, (err, hashedPassword) => {
+      if (err) {
+        console.error('Error hashing password:', err);
+        return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+      }
+  
+      const query = identifier.includes('@') 
+        ? 'UPDATE teachers SET password = ? WHERE email = ?' 
+        : 'UPDATE teachers SET password = ? WHERE staff_id = ?';
+  
+      db.query(query, [hashedPassword, identifier], (err, result) => {
         if (err) {
-            console.error('Error hashing password:', err);
-            return res.status(500).json({ success: false, message: 'Error processing your request. Please try again.' });
+          console.error('Error updating password:', err);
+          return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
         }
-
-        // Determine whether the identifier is an email or staff ID
-        const query = identifier.includes('@') 
-            ? 'UPDATE teachers SET password = ? WHERE email = ?' 
-            : 'UPDATE teachers SET password = ? WHERE staff_id = ?';
-
-        db.query(query, [hashedPassword, identifier], (err, result) => {
-            if (err) {
-                console.error('Error updating password:', err);
-                return res.status(500).json({ success: false, message: 'Server error occurred. Please try again later.' });
-            }
-
-            if (result.affectedRows > 0) {
-                res.json({ success: true, message: 'Password updated successfully!', redirectUrl: '/login' });
-            } else {
-                res.json({ success: false, message: 'Failed to update password. Please try again later.' });
-            }
-        });
+  
+        if (result.affectedRows > 0) {
+          res.json({ success: true, message: 'Password updated successfully!' });
+        } else {
+          res.json({ success: false, message: 'Failed to update password. Please try again later.' });
+        }
+      });
     });
-});
+  });
+  
 
 
 // Logout route
@@ -696,6 +716,14 @@ app.post('/api/submitScores', (req, res) => {
 
     // Prepare to collect promises for each update
     const updatePromises = scores.map(score => {
+        // Validate scores
+        if (
+            score.firstCA > 10 || score.secondCA > 10 || score.thirdCA > 10 ||
+            score.exams > 70
+        ) {
+            return Promise.reject(`Invalid score detected for student ID: ${score.studentID}`);
+        }
+
         const values = [
             score.term,
             score.session,
@@ -726,6 +754,7 @@ app.post('/api/submitScores', (req, res) => {
             res.status(200).json({ message: 'Scores updated successfully!', results });
         })
         .catch(error => {
+            console.error('Error updating scores:', error);
             res.status(500).json({ error });
         });
 });
@@ -767,7 +796,7 @@ app.post('/creation', (req, res) => {
                         console.error('Error inserting admin into database:', err);
                         return res.status(500).json({ success: false, message: 'Server error' });
                     }
-                    res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.', redirectUrl: '/adminLogin' });
+                    res.json({ success: true, message: 'Admin created successfully! They can now access the dashboard.' });
                 }
             );
         });
@@ -1369,8 +1398,10 @@ currentY += 30;
 doc.moveTo(startX, currentY).lineTo(startX + 200, currentY).stroke();
 doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust Y-coordinate for proper alignment
 
+currentY += 10;
+
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Authorized Representative', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Form Master', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
 
@@ -1633,7 +1664,7 @@ doc.text('Date: _____________________', startX + 300, currentY - 10); // Adjust 
 currentY += 10;
 
 // Add the signer's designation below the line
-doc.font('Helvetica-Bold').fontSize(14).text('Head of Department (HOD)', startX, currentY, { width: 500, align: 'left' });
+doc.font('Helvetica-Bold').fontSize(14).text('Director (Western Education)', startX, currentY, { width: 500, align: 'left' });
 currentY += 20;
 
                         
@@ -1652,7 +1683,55 @@ app.get('/api/downloadResult/:studentID', (req, res) => generateStudentReport(re
 app.get('/api/sessionReport/view/:studentID', (req, res) => generateSessionalResult(req, res));
 app.get('/api/sessionReport/download/:studentID', (req, res) => generateSessionalResult(req, res, true));
 
+//NodeMailer for contact
+app.post("/send-message", (req, res) => {
+    const { name, email, message } = req.body;
 
+    // Validate input fields
+    if (!name || !email || !message) {
+        return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Validate email format
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Please provide a valid email address." });
+    }
+
+    // Nodemailer transporter configuration
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "1440shamsusabo@gmail.com", // Your Gmail address
+            pass: "xgxw lgas frhh ugiq", // App password
+        },
+    });
+
+    // Email options
+    const mailOptions = {
+        from: `"${name}" <${email}>`,
+        to: "1440shamsusabo@gmail.com", // Recipient email
+        subject: `New Contact Form Submission from ${name}`,
+        text: `You have a new message from your website contact form:
+        
+Name: ${name}
+Email: ${email}
+Message: ${message}`,
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error("Error sending email:", error);
+            return res.status(500).json({ error: "Failed to send your message. Please try again later." });
+        }
+        console.log("Email sent: " + info.response);
+        return res.status(200).json({ message: "Your message has been sent successfully!" });
+    });
+});
+
+
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Imam Hafsin Model International School</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="style.css"> 
+ </head>
+<body>
+       <!-- First Navbar -->
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    <span class="navbar-brand mx-auto text-dark">Imam&nbsp;&nbsp;Hafsin</span>
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="about.html">About</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link text-danger dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
+                  Login
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                  <li><a class="dropdown-item" href="admin-login.html">As Admin</a></li>
+                  <li><a class="dropdown-item" href="login.html"> As Staff</a></li>
+                  <li><a class="dropdown-item" href="#studentLogin.html"> As Student</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="contact.html">Contact</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+    <!-- Header -->
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Contact Us</h1>
+    </header>
+
+    <!-- Main Content -->
+    <div class="contact-container my-4">
+        <div class="row">
+            <!-- Map and Address Section -->
+            <div class="col-lg-6">
+                <h2>Our Location</h2>
+                <p><strong>School Address:</strong></p>
+                <p>622, Yakasai Street, Tal'udu G/Kaya Gwale LGA, Kano State</p>
+                <p><strong>Email:</strong> imamhafsin@gmail.com</p>
+                <p><strong>Phone:</strong> 08030999939939399</p>
+
+                <!-- Map Embed -->
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15697.027116225127!2d8.514878604778054!3d12.003850218089407!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x11ae8253dd79c6df%3A0xdef54db26ed2b2b7!2sYakasai%20Rd%2C%20Kano!5e0!3m2!1sen!2sng!4v1698755432123!5m2!1sen!2sng" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Contact Form Section -->
+            <div class="col-lg-6">
+                <h2>Get in Touch</h2>
+                <form id="contactForm" method="POST" action="/send-message">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Your Full Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+   <!-- Footer -->
+   <div class="footer bg-light mt-5">
+    <div class="row text-center py-3">
+        <div class="col-md-4">
+            <p><strong>Imam Hafsin Model International School</strong></p>
+            <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+            <p>Email: imamhafsin@gmail.com</p>
+            <p>Phone: 08030999939939399</p>
+        </div>
+        <div class="col-md-4">
+            <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-instagram"></i> Instagram
+            </a>
+            <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+            <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+        <div class="col-md-4">
+            <p>&copy; IHMIS 2024</p>
+            <p>All rights reserved.</p>
+        </div>
+    </div>
+</div>
+<!-- Back to top button -->
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="contact.js"></script>
+</body>
+</html>
