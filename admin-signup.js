@@ -107,3 +107,7 @@ document.getElementById('signupForm').addEventListener('submit', function(event)
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
   }
+// Close button functionality
+function goBack() {
+    window.history.back();
+    }
