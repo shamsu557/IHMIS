@@ -6,15 +6,16 @@
     <title>Staff Dashboard</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="staff_dashboard.css">
+    <meta http-equiv="Expires" content="0" /> 
+  <link rel="stylesheet" href="style.css"> 
 </head>
 </head>
 <body>
     <!-- First Navbar (Images and Admin Dashboard Text) -->
-<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+ <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
   <!-- Left image (Education Cap) -->
   <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
   
@@ -26,33 +27,30 @@
 </nav>
 
 <!-- Second Navbar (Navbar Items) -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light text-dark second-navbar">
-    <!-- Toggler for mobile view -->
-    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+<nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+  <!-- Toggler for mobile view -->
+  <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
       <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
-    </button>
-    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+  </button>
+  <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
   
-    <!-- Collapsible navbar items -->
-    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+
+  <!-- Collapsible navbar items -->
+  <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav">
-        <!-- Home -->
-        <li class="nav-item">
-          <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
-        </li>
-  
-        <li class="nav-item dropdown">
-            <a class="nav-link text-danger dropdown-toggle" href="#" id="resultManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
-              Result Management
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="resultManagementDropdown">
-              <li><a class="dropdown-item" href="resultmanagement.html">Academic Assesesment</a></li>
-              <li><a class="dropdown-item" href="extra-curriculum-assessment.html"> Behavioural Assesesment</a></li>
-            </ul>
+          <li class="nav-item">
+              <a class="nav-link text-danger" href="staff_dashboard.html">Home</a>
           </li>
-          
-  
-        <!-- Download ID Card -->
+          <li class="nav-item dropdown">
+              <a class="nav-link text-danger dropdown-toggle" href="#" id="resultManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
+                Result Management
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="resultManagementDropdown">
+                <li><a class="dropdown-item" href="resultmanagement.html">Academic Assesesment</a></li>
+                <li><a class="dropdown-item" href="extra-curriculum-assessment.html"> Behavioural Assesesment</a></li>
+              </ul>
+            </li>
+             <!-- Download ID Card -->
         <li class="nav-item">
           <a class="nav-link ml-5" href="#" data-toggle="modal" data-target="#idCardModal">Staff ID Card</a>
         </li>
@@ -63,8 +61,9 @@
         </li>
       </ul>
     </div>  
+      </ul>
+  </div>
 </nav>
-
     <!-- Staff Profile Section -->
     <div class="containery profile-card-container">
         <div class="card profile-card text-center">
