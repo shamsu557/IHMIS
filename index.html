@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Imam Hafsin Model International School</title>
+    <title>Imam Hafsin Model International School</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <link rel="stylesheet" href="style.css"> 
@@ -46,58 +46,86 @@
         </ul>
     </div>
   </nav>
-    <!-- Header -->
-    <header class="bg-primary text-white text-center py-4">
-        <h1>Contact Us</h1>
-    </header>
-
-    <!-- Main Content -->
-    <div class="contact-container my-4">
-        <div class="row">
-            <!-- Map and Address Section -->
-            <div class="col-lg-6 text-center">
-                <h2>Our Location</h2>
-                <p><strong>School Address:</strong></p>
-                <p>622, Yakasai Street, Tal'udu G/Kaya Gwale LGA, Kano State</p>
-                <p><strong>Email:</strong> imamhafsin@gmail.com</p>
-                <p><strong>Phone:</strong> 08030999939939399</p>
-
-                <!-- Map Embed -->
-                <div class="map-container">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15697.027116225127!2d8.514878604778054!3d12.003850218089407!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x11ae8253dd79c6df%3A0xdef54db26ed2b2b7!2sYakasai%20Rd%2C%20Kano!5e0!3m2!1sen!2sng!4v1698755432123!5m2!1sen!2sng" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                </div>
+    <!-- Carousel -->
+<div id="schoolCarousel" class="carousel slide mt-auto" data-bs-ride="carousel" data-bs-interval="8000">
+    <div class="carousel-inner">
+        <!-- First Slide with Brief Introduction -->
+        <div class="carousel-item active">
+            <img src="students.jfif" class="d-block w-100" alt="School Image 1">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center bg-transparent">
+                <h5 class="text-info">Welcome to Imam Hafsin Model International School</h5>
+                <p class="text-light bg-transparent px-3 py-2">
+                    Imam Hafsin Model International School provides quality education across three distinct sections: Western Education, Islamiyya, and Tahfizz. 
+                    With dedicated directors leading each section, our mission is to nurture future leaders through a blend of modern and traditional learning.
+                </p>
             </div>
+        </div>
+        <!-- Second Slide for Western Education -->
+        <div class="carousel-item">
+            <img src="students.jfif" class="d-block w-100" alt="Western Education Image">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center bg-transparent">
+                <h5 class="text-info">Western Education Section</h5>
+                <p class="text-light bg-transparent px-3 py-2">
+                    Empowering students with modern education and life skills under the guidance of Mrs. Amina.
+                </p>
+            </div>
+        </div>
+        <!-- Third Slide for Islamiyya -->
+        <div class="carousel-item">
+            <img src="team.jfif" class="d-block w-100" alt="School Image 2">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center bg-transparent">
+                <h5 class="text-info">Islamiyya Section</h5>
+                <p class="text-light bg-transparent px-3 py-2">
+                    Building a strong foundation in Islamic studies under the guidance of Mal. Usman.
+                </p>
+            </div>
+        </div>
+        <!-- Fourth Slide for Tahfizz -->
+        <div class="carousel-item">
+            <img src="students.jfif" class="d-block w-100" alt="School Image 3">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center bg-transparent">
+                <h5 class="text-info">Tahfizz Section</h5>
+                <p class="text-light bg-transparent px-3 py-2">
+                    Focusing on the memorization of the Holy Quran with leadership from Mal. Salihu.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Contact Form Section -->
-            <div class="col-lg-6">
-                <h2>Get in Touch</h2>
-                <form id="contactForm" method="POST" action="/send-message">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Your Full Name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+
+
+    <!-- Directors Section -->
+    <div class="director-container mt-5">
+        <h3 class="text-center text-info bg-light">Meet Our Directors</h3>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <img src="auwal1.jfif" alt="Mr. Auwal Muhammad" class="director-img">
+                <h5>Mr. Auwal Muhammad</h5>
+                <p>Director, Western Education Section</p>
+            </div>
+            <div class="col-md-4">
+                <img src="shamsu.jpg" alt="Mal. Usman" class="director-img">
+                <h5>Mal. Usman</h5>
+                <p>Director, Islamiyya Section</p>
+            </div>
+            <div class="col-md-4">
+                <img src="passport.jpg" alt="Mal. Salihu" class="director-img">
+                <h5>Mal. Salihu</h5>
+                <p>Director, Tahfizz Section</p>
             </div>
         </div>
     </div>
 
+    <!-- News and Feeds -->
+    <div class="news-section mt-5">
+        <h3 class="text-center text-info bg-light ">News and Feeds</h3>
+        <ul>
+            <li>Upcoming PTA meeting scheduled for December 15th.</li>
+            <li>Congratulations to our Tahfizz students on completing their Quran memorization.</li>
+            <li>Western Education Section announces the opening of new science labs.</li>
+        </ul>
+    </div>
    <!-- Footer -->
    <div class="footer bg-light mt-5">
     <div class="row text-center py-3">
