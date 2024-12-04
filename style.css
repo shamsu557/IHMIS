@@ -1,16 +1,23 @@
 body {
   background-color: white;
 }
-.container {
-max-width: 450px; /* Fixed width for larger screens */
+.center-container {
+max-width: 60%; /* Fixed width for larger screens */
 margin: auto;
-padding: 15px;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+padding: 25px;
+box-shadow: 0 7px 13px rgba(0, 0, 0, 0.1);
 border-radius: 10px;
 background: white;
-overflow-x: auto; /* Enable horizontal scrolling */
 }
-
+.container {
+  max-width: 500px; /* Fixed width for larger screens */
+  margin: auto;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: white;
+  }
+  
 /* Ensure table is responsive */
 table {
 width: 50%; /* Make table take full width of container */
@@ -34,7 +41,13 @@ font-size: 16px; /* Font size */
 /* Media query for mobile devices */
 @media (max-width: 480px) {
 .center-container {
-padding: 10px; /* Further reduce padding for mobile */
+/*center-container for small screens */
+  max-width: 450px; /* Fixed width for larger screens */
+  margin: auto;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: white;
 }
 
 td, th {
@@ -259,15 +272,16 @@ background-color: white;
 padding-top: 100px;
 }
 
-/* Centered container for small screens */
-.center-container {
-max-width: 100%;
-margin: 0 auto;
-padding: 15px;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-border-radius: 10px;
-background-color: white;
-}
+/*  container for small screens */
+.container {
+  max-width: 450px; /* Fixed width for larger screens */
+  margin: auto;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background: white;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  }
 
 /* Scrollable modal */
 .modal-body-scroll {

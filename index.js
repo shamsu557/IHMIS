@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const nodemailer = require("nodemailer");
 const db = require('./mysql'); // Ensure mysql.js is configured correctly
 const fs = require('fs');
 const multer = require('multer'); // Add multer for file handling
@@ -715,6 +716,14 @@ app.post('/api/submitScores', (req, res) => {
 
     // Prepare to collect promises for each update
     const updatePromises = scores.map(score => {
+        // Validate scores
+        if (
+            score.firstCA > 10 || score.secondCA > 10 || score.thirdCA > 10 ||
+            score.exams > 70
+        ) {
+            return Promise.reject(`Invalid score detected for student ID: ${score.studentID}`);
+        }
+
         const values = [
             score.term,
             score.session,
@@ -745,6 +754,7 @@ app.post('/api/submitScores', (req, res) => {
             res.status(200).json({ message: 'Scores updated successfully!', results });
         })
         .catch(error => {
+            console.error('Error updating scores:', error);
             res.status(500).json({ error });
         });
 });
@@ -1673,7 +1683,55 @@ app.get('/api/downloadResult/:studentID', (req, res) => generateStudentReport(re
 app.get('/api/sessionReport/view/:studentID', (req, res) => generateSessionalResult(req, res));
 app.get('/api/sessionReport/download/:studentID', (req, res) => generateSessionalResult(req, res, true));
 
+//NodeMailer for contact
+app.post("/send-message", (req, res) => {
+    const { name, email, message } = req.body;
 
+    // Validate input fields
+    if (!name || !email || !message) {
+        return res.status(400).json({ error: "All fields are required." });
+    }
+
+    // Validate email format
+    const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Please provide a valid email address." });
+    }
+
+    // Nodemailer transporter configuration
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "1440shamsusabo@gmail.com", // Your Gmail address
+            pass: "xgxw lgas frhh ugiq", // App password
+        },
+    });
+
+    // Email options
+    const mailOptions = {
+        from: `"${name}" <${email}>`,
+        to: "1440shamsusabo@gmail.com", // Recipient email
+        subject: `New Contact Form Submission from ${name}`,
+        text: `You have a new message from your website contact form:
+        
+Name: ${name}
+Email: ${email}
+Message: ${message}`,
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error("Error sending email:", error);
+            return res.status(500).json({ error: "Failed to send your message. Please try again later." });
+        }
+        console.log("Email sent: " + info.response);
+        return res.status(200).json({ message: "Your message has been sent successfully!" });
+    });
+});
+
+
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
