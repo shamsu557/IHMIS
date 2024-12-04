@@ -261,8 +261,20 @@ border-radius: 4px;
 #myBtn:hover {
 background-color: #555;
 }
-.close-btn{
-margin-left: 47%;
+
+/* Close button styling */
+.close-btn {
+  display: block;
+  width: 100px;
+  margin: 20px auto;
+  text-align: center;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
 }
 /* Mobile adjustments for layout */
 @media (max-width: 576px) {
