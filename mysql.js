@@ -132,3 +132,9 @@ module.exports = db;
 //     -- Foreign key constraint for studentID
 //     CONSTRAINT fk_student FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
+   // CREATE TABLE sessions (
+            //     id VARCHAR(128) NOT NULL PRIMARY KEY,  -- Session ID (128-character string)
+            //     expires DATETIME NOT NULL,            -- Expiration date and time for the session
+            //     data TEXT NOT NULL                    -- Session data stored as a JSON string
+            // );
+
