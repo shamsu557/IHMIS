@@ -148,7 +148,7 @@ td, th {
 /* Cancel button styles */
 .cancel-btn {
     display: none; /* Hidden by default */
-    background: transparent;
+    background: darkgrey;
     border: none;
     font-size: 1.5rem; /* Adjust size as needed */
     color: #121314; /* Color of the icon */

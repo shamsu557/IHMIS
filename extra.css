@@ -152,6 +152,7 @@ body {
     font-size: 24px;
 }
 
+
 /* Scroll to top button */
 #myBtn {
     display: none;
@@ -171,6 +172,18 @@ body {
 #myBtn:hover {
     background-color: #555;
 }
+/* Cancel button styles */
+.cancel-btn {
+    display: none; /* Hidden by default */
+    background: darkgray;
+    border: none;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #141516; /* Color of the icon */
+    position: absolute;
+    top: 10px; /* Adjust top position */
+    right: 10px; /* Adjust right position */
+    cursor: pointer;
+    }
 
 /* Mobile adjustments for layout */
 @media (max-width: 576px) {

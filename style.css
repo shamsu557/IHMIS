@@ -161,7 +161,7 @@ display: none;
 /* Cancel button styles */
 .cancel-btn {
 display: none; /* Hidden by default */
-background: transparent;
+background: darkgray;
 border: none;
 font-size: 1.5rem; /* Adjust size as needed */
 color: #141516; /* Color of the icon */
