@@ -10,13 +10,21 @@ const mysql = require('mysql');
 // };
 
 
+// // MySQL database connection configuration
+// const dbConfig = {
+//     host: process.env.DB_HOST || 'sql3.freesqldatabase.com',  // Use environment variable or default
+//     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
+//     user: process.env.DB_USER || 'sql3749419',               // MySQL username from environment
+//     password: process.env.DB_PASSWORD || 'tSZTsnx4qx',       // MySQL password from environment
+//     database: process.env.DB_NAME || 'sql3749419'            // Database name from environment
+// };
 // MySQL database connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST || 'sql3.freesqldatabase.com',  // Use environment variable or default
+    host: process.env.DB_HOST || 'localhost',  // Use environment variable or default
     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
-    user: process.env.DB_USER || 'sql3749419',               // MySQL username from environment
-    password: process.env.DB_PASSWORD || 'tSZTsnx4qx',       // MySQL password from environment
-    database: process.env.DB_NAME || 'sql3749419'            // Database name from environment
+    user: process.env.DB_USER || 'frankama',               // MySQL username from environment
+    password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
+    database: process.env.DB_NAME || 'frankama_ihmis'            // Database name from environment
 };
 
 // Create MySQL connection
