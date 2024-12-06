@@ -10,7 +10,7 @@
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="student_dashboard.css">
+  <link rel="stylesheet" href="style.css">
   <script>
   window.onload = function() {
         // Prevent back button after logout
@@ -34,94 +34,44 @@
   </script>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand ml-5 pl-5" href="#">
-        <img src="logo.jpg" alt="CompuTech Nexus Academy Logo" height="30" class="mr-2"> Student Dashboard
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <!-- First Navbar -->
+<nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    <span class="navbar-brand mx-auto text-dark">Student&nbsp;&nbsp;Dashboard</span>
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <!-- Courses Registration -->
-            <li class="nav-item dropdown">
-                <a class="nav-link ml-5" href="#" id="navbarDropdownCourses" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Courses Registration
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownCourses">
-                    <a class="dropdown-item" href="#" data-semester="firstSemester">First Semester</a>
-                    <a class="dropdown-item" href="#" data-semester="secondSemester">Second Semester</a>
-                    <a class="dropdown-item" href="#" data-semester="retake">Retake</a>
-                      <a class="dropdown-item" href="#" id="viewRegisteredCourses">View Registered Courses</a>
-                </div>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="student_dashboard.html">Home</a>
             </li>
-            
-            <!-- Tasks -->
-            <li class="nav-item dropdown">
-                <a class="nav-link ml-5" href="#" id="navbarDropdownTasks" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Tasks
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownTasks">
-                    <a class="dropdown-item" href="#">Take Exams</a>
-                    <a class="dropdown-item" href="#">Take Test</a>
-                    <a class="dropdown-item" href="#" id="viewIDCard">View ID Card</a>
-                </div>
+            <li class="nav-item">
+                <a class="dropdown-item" href="#" id="viewIDCard">View ID Card</a>
             </li>
-            
-            <!-- Result -->
-            <li class="nav-item dropdown"> 
-                <a class="nav-link ml-5" href="#" id="navbarDropdownResults" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown">
+                <a class="nav-link text-danger dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding-right: 0;">
                     Result
                 </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownResults">
-                    <a class="dropdown-item" href="#">CA Result</a>
-                    <a class="dropdown-item" href="#">Exam Result</a>
-                </div>
+                <ul class="dropdown-menu" aria-labelledby="loginDropdown">
+                  <li><a class="dropdown-item" href="#">Terminal</a></li>
+                  <li><a class="dropdown-item" href="login.html">Sessional</a></li>
+                </ul>
             </li>
-                      
-            <!-- Logout button -->
-            <li class="nav-item"> 
+             <!-- Logout button -->
+             <li class="nav-item"> 
                 <a class="nav-link ml-5" href="#" id="logout">Logout</a>
             </li>
         </ul>
     </div>
-</nav>
-
-<!-- Courses Selection Page -->
-<div class="container mt-5">
-    <div id="courseSelectionContainer" class="courseSelectionContainer d-none">
-        <h3 id="semesterTitle">Select Courses for <span id="semesterName"></span></h3>
-        <form id="courseSelectionForm">
-            <div id="courseCheckboxes">
-                <!-- Course checkboxes will be dynamically added here -->
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Register Selected Courses</button>
-        </form>
-    </div>
-</div>
-
-<!-- Modal for Registered Courses -->
-<div class="modal fade" id="registeredCoursesModal" tabindex="-1" role="dialog" aria-labelledby="registeredCoursesModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="registeredCoursesModalLabel">Registered Courses</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="registeredCoursesList">
-                <!-- Registered Courses List will be populated here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="downloadCourses">Download Registered Courses</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
   </nav>
+
   <section><!-- Student Profile -->
     <div class="container mt-4">
         <div class="card profile-card">
@@ -185,57 +135,44 @@
         </div>
       </div>
     </div>
-  </div><br><br><br>
-  <footer class="bg-light text-dark pt-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Contact</h5>
-                <p>32Km, Maiduguri Road,<br> Gano 2 Primary School, <br> Dawakin Kudu L.G.A <br>
-                    Kano, Nigeria<br>
-                    Phone: 08030909793<br>
-                    Email: shamsusabo@gmail.com</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Useful Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="apply.html">Apply</a></li>
-                    <li><a href="login.html">Login</a></li>
-                    <li><a href="app_payment.html">Payments</a></li>
-                    
-                    <!-- Add your other navbar links here -->
-                </ul>
-            </div>
-            <div class="col-md-4">
-                <h5>Courses</h5>
-                <ul class="list-unstyled">
-                  <li><a href="#WD">Web Development</a></li>
-                    <li><a href="#CA">Computer Application</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <p>&copy; 2024 CompuTech Nexus Academy</p>
-            </div>
-            <div class="col-md-6 text-right">
-                <a href="https://www.facebook.com/" target="_blank"><i class="fab fa-facebook-square mr-3"></i></a>
-                <a href="https://twitter.com/" target="_blank"><i class="fab fa-twitter-square mr-3"></i></a>
-                <a href="https://www.instagram.com/" target="_blank"><i class="fab fa-instagram-square mr-3"></i></a>
-                <a href="https://web.whatsapp.com/" target="_blank"><i class="fab fa-whatsapp-square mr-3"></i></a>
-            </div>
-        </div>
+  </div>
+  <br><br><br>
+   <!-- Footer -->
+ <div class="footer bg-light mt-5">
+    <div class="row text-center py-3">
+      <div class="col-md-4">
+        <p><strong>Imam Hafsin Model International School</strong></p>
+        <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+        <p>Email: imamhafsin@gmail.com</p>
+        <p>Phone: 08030999939939399</p>
+      </div>
+      <div class="col-md-4">
+        <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-instagram"></i> Instagram
+        </a>
+        <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+          <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+      <div class="col-md-4">
+        <p>&copy; IHMIS 2024</p>
+        <p>All rights reserved.</p>
+      </div>
     </div>
-  </footer>
+  </div>
+  <!-- Back to top button -->
   <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="student_dashboard.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Bootstrap JS, Popper.js, and jQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="student_dashboard.js"></script>
 </body>
 </html>
