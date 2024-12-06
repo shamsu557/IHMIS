@@ -803,6 +803,75 @@ app.post('/creation', (req, res) => {
     });
 });
 
+// Handle student login
+app.post("/studentLogin", (req, res) => {
+    const { studentID, password } = req.body;
+
+    if (!studentID || !password) {
+        return res.status(400).send('Both studentID and password are required.');
+    }
+
+    db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, results) => {
+        if (err) {
+            console.error('Error querying database for student login:', err);
+            return res.status(500).send('Server error');
+        }
+
+        if (results.length === 0) {
+            return res.status(400).send('No student found');
+        }
+
+        const student = results[0];
+
+        // Assuming the password is the studentID (this may need to be changed)
+        if (student.studentID === password) { 
+            req.session.studentID = student.studentID;  // Store the studentID in the session
+
+            // Send a response with a message and redirect URL
+            return res.status(200).json({
+                redirect: "/student_dashboard.html"  // Redirect URL
+            });
+        } else {
+            return res.status(400).send('Incorrect password');
+        }
+    });
+});
+// Populate student details on login
+app.get('/populateStudentDetails', (req, res) => {
+    const studentID = req.session.studentID; // Retrieve studentID from the session
+
+    if (!studentID) {
+        return res.status(400).json({ success: false, message: "Student ID is not available. Please log in again." });
+    }
+
+    // Query the database to fetch student details
+    db.query('SELECT * FROM students WHERE studentID = ?', [studentID], (err, results) => {
+        if (err) {
+            console.error('Error querying database for student details:', err);
+            return res.status(500).json({ success: false, message: "Server error" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: "Student not found" });
+        }
+
+        const student = results[0];
+
+        // Send the student details as a response
+        return res.json({
+            success: true,
+            firstname: student.firstname,
+            surname: student.surname,
+            othername: student.othername || '', // Include othername if available
+            studentID: student.studentID,
+            class: student.class,
+            guardianPhone: student.guardianPhone,
+            studentPicture: student.studentPicture || 'Profile-Black.png' // Default if no picture
+        });
+    });
+});
+
+
 // Admin login page
 app.get('/adminLogin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-login.html'));
@@ -1105,6 +1174,7 @@ app.post('/form-master-login', (req, res) => {
         });
     });
 });
+
 
 app.post('/form-master/submit-assessment', (req, res) => {
     const { term, session, assessments } = req.body;

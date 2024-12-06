@@ -101,6 +101,47 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!username || !password) {
+      alert("Please enter both username and password.");
+      return;
+  }
+
+  try {
+      // Send login credentials to the backend
+      const response = await fetch("/studentLogin", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ studentID: username, password: password }),
+      });
+
+      // Check if login was successful
+      if (response.ok) {
+          const result = await response.json();
+          
+          // Redirect to the student dashboard after successful login
+          if (result.redirect) {
+              window.location.href = result.redirect;
+          } else {
+              alert("Login successful, but no redirect URL found.");
+          }
+      } else {
+          // Handle unsuccessful login with error message
+          const errorMessage = await response.text();
+          alert(errorMessage || "Invalid username or password.");
+      }
+  } catch (error) {
+      console.error("Error during login:", error);
+      alert("An error occurred. Please try again later.");
+  }
+});
 
     // Back to top button functionality
     window.onscroll = function() { scrollFunction() };
