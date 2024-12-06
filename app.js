@@ -871,6 +871,17 @@ app.get('/populateStudentDetails', (req, res) => {
     });
 });
 
+app.post('/studentLogout', (req, res) => {
+    // Destroy the session for the student
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            return res.status(500).send('Logout failed');
+        }
+        res.status(200).send('Student logged out successfully');
+    });
+});
+
 
 // Admin login page
 app.get('/adminLogin', (req, res) => {

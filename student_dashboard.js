@@ -49,22 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Call fetchStudentDetails on page load
     fetchStudentDetails();
 
-    // Event listener for logout
-    const logoutLink = document.getElementById("logout");
-    logoutLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        // Perform logout actions here, such as clearing session and redirecting
-        $.ajax({
-            url: '/logout', // Replace with your logout endpoint
-            type: 'POST',
-            success: function () {
-                window.location.href = "studentLogin.html"; // Redirect to login page after logout
-            },
-            error: function (xhr, status, error) {
-                console.error('Error during logout:', error);
-            }
-        });
-    });
+  
 
     // Event listener for opening ID card modal
     const viewIDCardLink = document.getElementById("viewIDCard");
@@ -86,4 +71,31 @@ document.addEventListener("DOMContentLoaded", function () {
             mybutton.style.display = "none";
         }
     }
+    // Function to scroll to the top of the page
+    function topFunction() {
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE, and Opera
+    }
+    // Attach the click event listener to the button
+    mybutton.addEventListener("click", topFunction);
+});
+// Event listener for student logout
+const logoutLink = document.getElementById("student_logout");
+
+logoutLink.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    // Perform logout action
+    $.ajax({
+        url: '/studentLogout', // Replace with your backend logout endpoint
+        type: 'POST',
+        success: function () {
+            // Redirect to the student login page upon successful logout
+            window.location.href = "studentLogin.html";
+        },
+        error: function (xhr, status, error) {
+            console.error('Error during logout:', error);
+            alert('An error occurred while logging out. Please try again.');
+        }
+    });
 });
