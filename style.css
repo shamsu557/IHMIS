@@ -514,8 +514,8 @@ display: none;
 }
 
 .profile-picture {
-        width: 160px;
-        height: 170px;
+        width: 140px;
+        height: 150px;
         border-radius: 50%;
         object-fit: cover;
     }
@@ -564,7 +564,9 @@ display: none;
 }
 
 #profile-pic {
-  max-width: 80px;
-  max-height: 100px;
+  max-width: 100px;
+  max-height: 120px;
   border-radius: 45%;
+  object-fit: cover; /* Ensures the image fits inside the boundaries without distortion */
+  overflow: hidden; /* Hides anything outside the circular boundary */
 }
