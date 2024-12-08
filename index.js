@@ -1129,6 +1129,32 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
     });
 });
 
+// Endpoint to fetch student details by StudentID
+app.post('/api/fetchStudentByID', (req, res) => {
+    const { studentID } = req.body;
+
+    // Check if studentID is provided
+    if (!studentID) {
+        return res.status(400).json({ error: "Student ID is required." });
+    }
+
+    const query = 'SELECT * FROM students WHERE StudentID = ?'; // Replace with your actual table name
+    db.query(query, [studentID], (err, results) => {
+        if (err) {
+            console.error('Error fetching student details:', err);
+            return res.status(500).send('Server Error');
+        }
+
+        // Check if results contain a student
+        if (results.length > 0) {
+            const student = results[0];
+            res.json({ student });
+        } else {
+            res.json({ student: null }); // No student found
+        }
+    });
+});
+
 // for view students page
 // Endpoint to get students by class
 app.post('/api/fetchStudents', (req, res) => {
