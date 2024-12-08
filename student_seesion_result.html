@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Results</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="session.css">
+</head>
+<body>
+   <!-- First Navbar (Images and Admin Dashboard Text) -->
+   <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+    <span class="navbar-brand mx-auto text-dark">Students&nbsp;&nbsp;Management</span>
+    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  </nav>
+  
+  <!-- Second Navbar (Navbar Items) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+    <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="student_management.html">Students Management</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" id="resultManagementLink" href="staff_management.html">Staff Management</a>
+            </li>
+        </ul>
+    </div>
+  </nav>
+
+  <div class="center-container bg-light mt-auto">
+      <!-- Student ID Input -->
+      <div id="studentInputSection" class="card shadow mt-4 p-4">
+          <div class="form-group">
+              <label for="student-id-input">Enter Student ID:</label>
+              <input type="text" id="student-id-input" class="form-control" placeholder="Enter Student ID" required>
+          </div>
+          <div class="form-group">
+              <label for="sessionSelect">Session:</label>
+              <select class="form-control" id="sessionSelect" required>
+                  <option value="2024/2025">2024/2025</option>
+                  <option value="2025/2026">2025/2026</option>
+                  <option value="2026/2027">2026/2027</option>
+              </select>
+          </div>
+          <button id="fetch-student" class="btn btn-success btn-block">View Student</button>
+      </div>
+
+      <!-- Student Details Section -->
+      <div id="studentDetailsSection" class="mt-4" style="display: none;">
+          <button id="back-button" type="button" class="btn btn-success mt-3">Back To Selection</button>
+          <h4 id="student-header" class="text-center">Student Details</h4>
+          <ul id="student-details" class="list-group"></ul>
+      </div>
+      <button class="close-btn text-center" onclick="goBack()">Close</button>
+  </div>
+
+  <br><br>
+  <!-- Footer -->
+  <div class="footer bg-light mt-5">
+     <div class="row text-center py-3">
+       <div class="col-md-4">
+         <p><strong>Imam Hafsin Model International School</strong></p>
+         <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+         <p>Email: imamhafsin@gmail.com</p>
+         <p>Phone: 08030999939939399</p>
+       </div>
+       <div class="col-md-4">
+         <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+           <i class="fab fa-facebook"></i> Facebook
+         </a>
+         <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+           <i class="fab fa-instagram"></i> Instagram
+         </a>
+         <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+           <i class="fab fa-twitter"></i> Twitter
+         </a>
+         <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+           <i class="fab fa-whatsapp"></i> WhatsApp
+         </a>
+       </div>
+       <div class="col-md-4">
+         <p>&copy; IHMIS 2024</p>
+         <p>All rights reserved.</p>
+       </div>
+     </div>
+   </div>
+   <!-- Back to top button -->
+   <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+   
+   <!-- Bootstrap JS, Popper.js, and jQuery -->
+   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+   <script src="student_seesion.js"></script>
+</body>
+</html>
