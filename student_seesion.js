@@ -15,6 +15,24 @@ function toggleNavbar() {
     }
 }
 
+// Populate Student ID Field on Login
+function populateStudentID() {
+    $.ajax({
+        url: "/api/getLoggedInStudent", // Replace with the endpoint to fetch logged-in student details
+        method: "GET",
+        success: function (response) {
+            if (response && response.studentID) {
+                $("#studentID").val(response.studentID); // Populate the readonly Student ID field
+            } else {
+                console.error("Student ID not found in response.");
+            }
+        },
+        error: function () {
+            console.error("Error fetching logged-in student details.");
+        },
+    });
+}
+
 // Fetch Student Details
 function fetchStudentDetails(studentID, session) {
     if (!studentID || !session) {
@@ -119,9 +137,12 @@ function goBack() {
 
 // Initialize on Page Load
 $(document).ready(function () {
+    // Populate Student ID field on page load
+    populateStudentID();
+
     // Handle "Fetch Student" button click
     $("#fetch-student").click(function () {
-        const studentID = $("#student-id-input").val().trim();
+        const studentID = $("#studentID").val().trim(); // Use populated Student ID
         const session = $("#sessionSelect").val();
         fetchStudentDetails(studentID, session);
     });
