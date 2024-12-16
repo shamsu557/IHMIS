@@ -92,6 +92,15 @@ $(document).ready(function () {
         }
     });
 
+    // Automatically populate and disable the student ID field
+    $("#student-term-result-link").click(function () {
+        const sessionStudentID = sessionStorage.getItem("studentID");
+        if (sessionStudentID) {
+            $("#studentID").val(sessionStudentID).prop("disabled", true); // Populate and disable
+        }
+        window.location.href = "student_term_result.html";
+    });
+
     // Event listener for resetting to selection
     $("#back-to-selection").click(resetToSelection);
 
@@ -109,5 +118,5 @@ function topFunction() {
 }
 // Close button functionality
 function goBack() {
-window.history.back();
+    window.history.back();
 }

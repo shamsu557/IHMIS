@@ -48,6 +48,14 @@ const upload = multer({ storage: storage });
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+//term result
+app.get('/student_term_result.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'student_term_result.html'));
+});
+//session result
+app.get('/student_session_result.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'student_session_result.html'));
+});
 // User Signup page
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'signup.html'));
@@ -877,6 +885,16 @@ app.get('/populateStudentDetails', (req, res) => {
             studentPicture: student.studentPicture || 'Profile-Black.png' // Default if no picture
         });
     });
+});
+//loggedIn students
+app.get('/getLoggedInStudent', (req, res) => {
+    if (req.session.studentID) {
+        // Return the logged-in student's ID
+        return res.json({ success: true, studentID: req.session.studentID });
+    } else {
+        // No student is logged in
+        return res.json({ success: false, message: "No student logged in" });
+    }
 });
 
 app.post('/studentLogout', (req, res) => {
