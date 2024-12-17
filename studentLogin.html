@@ -65,6 +65,73 @@
       </form>
   </div>
   </div>
+<!-- Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Welcome!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Welcome Message -->
+        <div id="welcomeMessage" class="text-center">
+          Welcome to the Student Login Portal. Click on "Find Login Details" to find your login details, or close and log in with your credentials if they are known to you.
+          <div class="mt-3">
+            <button class="btn btn-primary btn-lg mb-3" onclick="openFindDetailsForm()">Find Login Details</button>
+          </div>
+        </div>
+
+        <!-- Hidden Content -->
+        <div id="hiddenContent" style="display: none;">
+          <!-- Find Login Details Form -->
+          <form action="/find-details" method="post">
+            <div class="form-group">
+              <label for="firstname">First Name:</label>
+              <input type="text" class="form-control" id="firstname" name="firstname" required>
+            </div>
+            <div class="form-group">
+              <label for="surname">Surname:</label>
+              <input type="text" class="form-control" id="surname" name="surname" required>
+            </div>
+            <div class="form-group">
+              <label for="othername">Other Name:</label>
+              <input type="text" class="form-control" id="othername" name="othername" required>
+            </div>
+            <div class="form-group">
+              <label for="class">Class:</label>
+              <select class="form-control" id="class" name="class" required>
+                <option value="" disabled selected>Select Class</option>
+                <option value="Pre-Nursery">Pre-Nursery</option>
+                <option value="Nursery One">Nursery 1</option>
+                <option value="Nursery Two">Nursery 2</option>
+                <option value="Primary One">Primary 1</option>
+                <option value="Primary Two">Primary 2</option>
+                <option value="Primary Three">Primary 3</option>
+                <option value="Primary Four">Primary 4</option>
+                <option value="Primary Five">Primary 5</option>
+                <option value="Primary Six">Primary 6</option>
+                <option value="JSS One">JSS 1</option>
+                <option value="JSS Two">JSS 2</option>
+                <option value="JSS Three">JSS 3</option>
+                <option value="SSS One">SSS 1</option>
+                <option value="SSS Two">SSS 2</option>
+                <option value="SSS Three">SSS 3</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <br> <!-- Footer -->
   <div class="footer bg-light mt-5">
    <div class="row text-center py-3">
@@ -102,5 +169,29 @@
  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
  <script src="login.js"></script>
- </body>
- </html>
+
+ <script>
+   // Trigger modal after 3 seconds
+   $(document).ready(function() {
+     setTimeout(function() {
+       $('#loginModal').modal('show');
+     }, 1000);
+   });
+   function showModal() {
+      $('#loginModal').modal('show');
+    }
+
+    function openFindDetailsForm() {
+    // Hide the welcome message
+    document.getElementById('welcomeMessage').style.display = 'none';
+    // Show the hidden content (Find Login Details form)
+    document.getElementById('hiddenContent').style.display = 'block';
+  }
+  function convertNamesToUppercase() {
+    document.getElementById('firstname').value = document.getElementById('firstname').value.toUpperCase();
+    document.getElementById('surname').value = document.getElementById('surname').value.toUpperCase();
+    document.getElementById('othername').value = document.getElementById('othername').value.toUpperCase();
+  }
+ </script>
+</body>
+</html>

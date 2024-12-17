@@ -897,6 +897,55 @@ app.get('/getLoggedInStudent', (req, res) => {
     }
 });
 
+// Route to handle form submission for find login details
+app.post('/find-details', (req, res) => {
+    const { firstname, surname, othername, class: studentClass } = req.body;
+  
+    // Convert inputs to uppercase (optional if already handled in frontend)
+    const upperFirstName = firstname.toUpperCase();
+    const upperSurname = surname.toUpperCase();
+    const upperOtherName = othername ? othername.toUpperCase() : '';
+  
+    // SQL Query to check if the names exist
+    let query = `
+      SELECT studentID 
+      FROM students 
+      WHERE firstname = ? 
+        AND surname = ? 
+        AND (othername = ? OR othername IS NULL) 
+        AND class = ?
+    `;
+  
+    db.query(
+      query,
+      [upperFirstName, upperSurname, upperOtherName, studentClass],
+      (err, results) => {
+        if (err) {
+          console.error('Database Error:', err);
+          return res.status(500).send('Internal Server Error');
+        }
+  
+        if (results.length > 0) {
+          // If a match is found, display the studentID as username and password
+          const studentID = results[0].studentID;
+          res.send(`
+            <h3>Login Details Found</h3>
+            <p><strong>Username:</strong> ${studentID}</p>
+            <p><strong>Password:</strong> ${studentID}</p>
+            <a href="/studentLogin" class="btn btn-primary">Go to Login</a>
+          `);
+        } else {
+          // If no match is found
+          res.send(`
+            <h3>No Matching Records Found</h3>
+            <p>Please check your details and try again.</p>
+            <a href="/" class="btn btn-secondary">Back</a>
+          `);
+        }
+      }
+    );
+  });
+  
 app.post('/studentLogout', (req, res) => {
     // Destroy the session for the student
     req.session.destroy((err) => {
