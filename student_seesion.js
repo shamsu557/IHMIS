@@ -61,10 +61,12 @@ function fetchStudentDetails(studentID, session) {
                             <a href="#" class="download-result" data-id="${student.studentID}">Download</a>
                         </div>
                     </li>
-                `);
-
+                `); 
                 studentDetailsSection.show();
                 $("#studentInputSection").hide();
+                $("#studentIDSelection").hide();
+                $("#sessionSelect").hide();
+                $("#select-class-header").hide();
             } else {
                 alert("No student details found.");
             }
@@ -111,6 +113,9 @@ function setupBackButton() {
     $("#back-button").click(function () {
         $("#studentDetailsSection").hide();
         $("#studentInputSection").show();
+        $("#studentIDSelection").show();
+        $("#sessionSelect").show();
+        $("#select-class-header").show();
     });
 }
 
