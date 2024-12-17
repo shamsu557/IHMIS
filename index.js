@@ -939,7 +939,7 @@ app.post('/find-details', (req, res) => {
           res.send(`
             <h3>No Matching Records Found</h3>
             <p>Please check your details and try again.</p>
-            <a href="/" class="btn btn-secondary">Back</a>
+            <a href="/studentLogin" class="btn btn-secondary">Back</a>
           `);
         }
       }
