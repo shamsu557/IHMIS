@@ -78,11 +78,12 @@
       <div class="modal-body">
         <!-- Welcome Message -->
         <div id="welcomeMessage" class="text-center">
-          Welcome to the Student Login Portal. Click on "Find Login Details" to find your login details, or close and log in with your credentials if they are known to you.
+          Welcome to the Student Login Portal. Click "Find Login Details" to retrieve your login information, or close this message and log in with your credentials if you already know them.
           <div class="mt-3">
-            <button class="btn btn-primary btn-lg mb-3" onclick="openFindDetailsForm()">Find Login Details</button>
+              <button class="btn btn-primary btn-lg mb-3" onclick="openFindDetailsForm()">Find Login Details</button>
           </div>
-        </div>
+      </div>
+      
 
         <!-- Hidden Content -->
         <div id="hiddenContent" style="display: none;">
@@ -169,35 +170,5 @@
  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
  <script src="login.js"></script>
-
- <script>
-   // Trigger modal after 3 seconds
-   $(document).ready(function() {
-     setTimeout(function() {
-       $('#loginModal').modal('show');
-     }, 1000);
-   });
-   function showModal() {
-      $('#loginModal').modal('show');
-    }
-
-    function openFindDetailsForm() {
-    // Hide the welcome message
-    document.getElementById('welcomeMessage').style.display = 'none';
-    // Show the hidden content (Find Login Details form)
-    document.getElementById('hiddenContent').style.display = 'block';
-  }
-  //names to uppercase and trim()
-  function convertNamesToUppercase() {
-    const firstnameField = document.getElementById('firstname');
-    const surnameField = document.getElementById('surname');
-    const othernameField = document.getElementById('othername');
-
-    firstnameField.value = firstnameField.value.trim().toUpperCase();
-    surnameField.value = surnameField.value.trim().toUpperCase();
-    othernameField.value = othernameField.value.trim().toUpperCase();
-}
-
- </script>
 </body>
 </html>
