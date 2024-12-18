@@ -36,6 +36,10 @@ padding: 0 10px;
 background-color: #f8f9fa; /* Light background */
 }
 
+/* Remove caret space entirely */
+.nav-item .dropdown-toggle::after {
+    display: none; /* Hide the default caret */
+    }
 /* Second Navbar - Contains menu items */
 .second-navbar {
 position: fixed;
@@ -75,6 +79,16 @@ transition: color 0.3s ease, background-color 0.3s ease;
 color: #e4e8ec !important; /* Slightly darker on hover */
 background-color: rgba(255, 254, 254, 0.5) !important;
 }
+
+#student-links a {
+    text-decoration: none;
+    color: #202122;
+  }
+  
+  #student-links a:hover {
+    text-decoration: none;
+    color:#a6a6a9
+  }
 /* Mobile view - Keep background light */
 @media (max-width: 992px) {
 .navbar-collapse {
