@@ -142,6 +142,16 @@ filter: invert(1); /* Dark toggler icon for light background */
 .nav-item .dropdown-toggle::after {
 display: none; /* Hide the default caret */
 }
+#student-links a {
+  text-decoration: none;
+  color: #202122;
+}
+
+#student-links a:hover {
+  text-decoration: none;
+  color:#a6a6a9
+}
+
 
 /* Adjust padding if necessary */
 .nav-item .dropdown-toggle {
