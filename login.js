@@ -59,6 +59,34 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // Trigger modal after 3 seconds
+  $(document).ready(function() {
+    setTimeout(function() {
+      $('#loginModal').modal('show');
+    }, 500);
+  });
+  function showModal() {
+     $('#loginModal').modal('show');
+   }
+
+   function openFindDetailsForm() {
+   // Hide the welcome message
+   document.getElementById('welcomeMessage').style.display = 'none';
+   // Show the hidden content (Find Login Details form)
+   document.getElementById('hiddenContent').style.display = 'block';
+ }
+ //names to uppercase and trim()
+ function convertNamesToUppercase() {
+   const firstnameField = document.getElementById('firstname');
+   const surnameField = document.getElementById('surname');
+   const othernameField = document.getElementById('othername');
+
+   firstnameField.value = firstnameField.value.trim().toUpperCase();
+   surnameField.value = surnameField.value.trim().toUpperCase();
+   othernameField.value = othernameField.value.trim().toUpperCase();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
     

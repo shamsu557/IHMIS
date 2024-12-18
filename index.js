@@ -897,16 +897,15 @@ app.get('/getLoggedInStudent', (req, res) => {
     }
 });
 
-// Route to handle form submission for find login details
 app.post('/find-details', (req, res) => {
     const { firstname, surname, othername, class: studentClass } = req.body;
   
     // Convert inputs to uppercase (optional if already handled in frontend)
-    const upperFirstName = firstname.toUpperCase();
-    const upperSurname = surname.toUpperCase();
-    const upperOtherName = othername ? othername.toUpperCase() : '';
+    const upperFirstName = firstname.trim().toUpperCase();
+    const upperSurname = surname.trim().toUpperCase();
+    const upperOtherName = othername ? othername.trim().toUpperCase() : '';
   
-    // SQL Query to check if the names exist
+    // SQL Query to check if the names existconst
     let query = `
       SELECT studentID 
       FROM students 
@@ -929,6 +928,25 @@ app.post('/find-details', (req, res) => {
           // If a match is found, display the studentID as username and password
           const studentID = results[0].studentID;
           res.send(`
+            <style>
+              a {
+                text-decoration: none; /* Remove underline */
+              }
+              .btn {
+                padding: 10px 15px;
+                border-radius: 5px;
+                display: inline-block;
+                color: white;
+              }
+              .btn-primary {
+                background-color: #007bff;
+                border: none;
+              }
+              .btn-success {
+                background-color: #28a745;
+                border: none;
+              }
+            </style>
             <h3>Login Details Found</h3>
             <p><strong>Username:</strong> ${studentID}</p>
             <p><strong>Password:</strong> ${studentID}</p>
@@ -937,14 +955,34 @@ app.post('/find-details', (req, res) => {
         } else {
           // If no match is found
           res.send(`
+            <style>
+              a {
+                text-decoration: none; /* Remove underline */
+              }
+              .btn {
+                padding: 10px 15px;
+                border-radius: 5px;
+                display: inline-block;
+                color: white;
+              }
+              .btn-primary {
+                background-color: #007bff;
+                border: none;
+              }
+              .btn-success {
+                background-color: #28a745;
+                border: none;
+              }
+            </style>
             <h3>No Matching Records Found</h3>
             <p>Please check your details and try again.</p>
-            <a href="/studentLogin" class="btn btn-secondary">Back</a>
+            <a href="/studentLogin" class="btn btn-success">Back</a>
           `);
         }
       }
     );
   });
+  
   
 app.post('/studentLogout', (req, res) => {
     // Destroy the session for the student

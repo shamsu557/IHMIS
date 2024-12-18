@@ -98,7 +98,7 @@
             </div>
             <div class="form-group">
               <label for="othername">Other Name:</label>
-              <input type="text" class="form-control" id="othername" name="othername" required>
+              <input type="text" class="form-control" id="othername" name="othername">
             </div>
             <div class="form-group">
               <label for="class">Class:</label>
@@ -187,11 +187,17 @@
     // Show the hidden content (Find Login Details form)
     document.getElementById('hiddenContent').style.display = 'block';
   }
+  //names to uppercase and trim()
   function convertNamesToUppercase() {
-    document.getElementById('firstname').value = document.getElementById('firstname').value.toUpperCase();
-    document.getElementById('surname').value = document.getElementById('surname').value.toUpperCase();
-    document.getElementById('othername').value = document.getElementById('othername').value.toUpperCase();
-  }
+    const firstnameField = document.getElementById('firstname');
+    const surnameField = document.getElementById('surname');
+    const othernameField = document.getElementById('othername');
+
+    firstnameField.value = firstnameField.value.trim().toUpperCase();
+    surnameField.value = surnameField.value.trim().toUpperCase();
+    othernameField.value = othernameField.value.trim().toUpperCase();
+}
+
  </script>
 </body>
 </html>
