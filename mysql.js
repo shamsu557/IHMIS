@@ -1,24 +1,23 @@
 const mysql = require('mysql');
 
 // MySQL database connection configuration
-// const dbConfig = {
-//     host: process.env.DB_HOST || 'localhost',  // Use environment variable or default
-//     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
-//     user: process.env.DB_USER || 'root',               // MySQL username from environment
-//     password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
-//     database: process.env.DB_NAME || 'school_database'            // Database name from environment
-// };
+const dbConfig = {
+    host: process.env.DB_HOST || 'mysql-shamsu557.alwaysdata.net',  // Use environment variable or default
+    port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
+    user: process.env.DB_USER || 'shamsu557',               // MySQL username from environment
+    password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
+    database: process.env.DB_NAME || 'shamsu557_school_database'            // Database name from environment
+};
 
 
 // MySQL database connection configuration
-const dbConfig = {
-    host: process.env.DB_HOST || 'sql3.freesqldatabase.com',  // Use environment variable or default
-    port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
-    user: process.env.DB_USER || 'sql3749419',               // MySQL username from environment
-    password: process.env.DB_PASSWORD || 'tSZTsnx4qx',       // MySQL password from environment
-    database: process.env.DB_NAME || 'sql3749419'            // Database name from environment
-};
-
+// const dbConfig = {
+//     host: process.env.DB_HOST || 'sql3.freesqldatabase.com',  // Use environment variable or default
+//     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
+//     user: process.env.DB_USER || 'sql3749419',               // MySQL username from environment
+//     password: process.env.DB_PASSWORD || 'tSZTsnx4qx',       // MySQL password from environment
+//     database: process.env.DB_NAME || 'sql3749419'            // Database name from environment
+// };
 
 // Create MySQL connection
 const db = mysql.createConnection(dbConfig);
@@ -56,9 +55,9 @@ module.exports = db;
 //     email VARCHAR(255) NOT NULL UNIQUE,
 //     password VARCHAR(255) NOT NULL,
 //     role VARCHAR(100) NOT NULL,
-        // security_question VARCHAR(255)
-        // security_answer VARCHAR(255)
- //    phone VARCHAR(20) NOT NUL UNIQUE, -- Phone number must be unique
+//     security_question VARCHAR(255),
+//     security_answer VARCHAR(255),
+//     phone VARCHAR(20) NOT NULL UNIQUE, -- Phone number must be unique
 //     formClass VARCHAR(50),
 //     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
 //     profile_picture VARCHAR(50) NOT NULL,
@@ -93,7 +92,7 @@ module.exports = db;
 //     thirdCA INT DEFAULT 0,          -- Default for Third Continuous Assessment
 //     exams INT DEFAULT 0,            -- Default for Exam score
 //     total INT DEFAULT 0,            -- Default for Total score
-//     examGrade VARCHAR(2) DEFAULT 'N/A',  -- Default to 'N/A' if no grade is assigned
+//     examGrade VARCHAR(3) DEFAULT 'N/A',  -- Default to 'N/A' if no grade is assigned
 //     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
 
@@ -103,7 +102,7 @@ module.exports = db;
 //     password VARCHAR(255) NOT NULL, -- Password storage should allow for hashed passwords
 //     email VARCHAR(100) NOT NULL UNIQUE, -- Email must be unique
 //     fullName VARCHAR(100) NOT NULL, -- Full name of the admin
-//     phone VARCHAR(20)  -- Phone number must be uniqu
+//     phone VARCHAR(20),  -- Phone number must be uniqu
 //     role VARCHAR(50) NOT NULL;
 // );
 // // -- Insert email addresses with valid qualifications
@@ -133,9 +132,8 @@ module.exports = db;
 //     -- Foreign key constraint for studentID
 //     CONSTRAINT fk_student FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
-   // CREATE TABLE sessions (
+            // CREATE TABLE sessions (
             //     id VARCHAR(128) NOT NULL PRIMARY KEY,  -- Session ID (128-character string)
             //     expires DATETIME NOT NULL,            -- Expiration date and time for the session
             //     data TEXT NOT NULL                    -- Session data stored as a JSON string
             // );
-
