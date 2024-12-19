@@ -1514,7 +1514,8 @@ function generateStudentReport(req, res, saveToFile = false) {
                             doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
                             doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
                             doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
-
+                            doc.text('(100%)', startX + 300, currentY, { width: cellWidth, align: 'center' });
+             
                             // Move to the first row position
                             currentY += 10;
                             doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
