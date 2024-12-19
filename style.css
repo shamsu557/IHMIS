@@ -333,7 +333,7 @@ height: 40px;
 
 .navbar-toggler {
 left: 50%;
-transform: translateX(-50%);
+transform: translateX(250%);
 }
 
 .cancel-btn {
@@ -374,7 +374,7 @@ font-size: 14px;
 /* Larger screen styles */
 @media (min-width: 992px) {
 .navbar-collapse {
-justify-content: center;
+justify-content: end;
 }
 
 /* Hide navbar toggler on large screens */
