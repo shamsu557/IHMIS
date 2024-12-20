@@ -192,3 +192,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
         alert('Failed to submit assessments');
     }
 });
+// Close button functionality
+function goBack() {
+    window.history.back();
+    }

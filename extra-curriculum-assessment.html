@@ -24,9 +24,9 @@
     <!-- Second Navbar (Navbar Items) -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
         <!-- Toggler for mobile view -->
-        <button class="navbar-toggler" type="button" onclick="toggleNavbar()">
+        <div class="navbar-toggler" type="button" onclick="toggleNavbar()">
             <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
-        </button>
+        </div>
         <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
     
         <!-- Collapsible navbar items -->
@@ -88,7 +88,6 @@
             </div>
             <button id="loadStudentsBtn" class="btn btn-secondary btn-block">Load Students</button>
         </div>
-
         <!-- Student List and Assessments -->
         <div id="studentList" style="display: none;">
             <p class="text-center">Please evaluate each student on a scale of 1 to 5, considering their conduct and overall development.</p>
@@ -97,6 +96,8 @@
             </div>
             <button id="submitBtn" class="btn btn-success btn-block mt-3">Submit Assessments</button>
         </div>
+       <button class="close-btn text-center" onclick="goBack()">Close</button>
+
     </div><br><br>
 
     <!-- Footer -->
