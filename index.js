@@ -1857,7 +1857,7 @@ subjectsResult.forEach((subject, index) => {
        .text(subject.secondCA, startX + termWidth + subjectWidth + caWidth, currentY + 3, { width: caWidth, align: 'center' })
        .text(subject.thirdCA, startX + termWidth + subjectWidth + 2 * caWidth, currentY + 3, { width: caWidth, align: 'center' })
        .text(subject.exams, startX + termWidth + subjectWidth + 3 * caWidth, currentY + 3, { width: examWidth, align: 'center' })
-       .text(total.toFixed(2), startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
+       .text(subject.total, startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
        .text(grade, startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY + 3, { width: gradeWidth, align: 'center' });
 
     currentY += cellHeight;
