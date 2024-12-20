@@ -286,6 +286,20 @@ background-color: #555;
   font-size: 16px;
   cursor: pointer;
 }
+/* Welcome Card */
+.welcome-card {
+  padding: 30px;
+  background-color: white;
+  border-radius: 10px;
+  margin-top: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.welcome-message {
+  font-size: 1.3rem;
+  color: #333;
+}
 /* Mobile adjustments for layout */
 @media (max-width: 576px) {
 /* Adjust body for mobile screens */
@@ -332,17 +346,17 @@ height: 40px;
 }
 
 .navbar-toggler {
-left: 50%;
-transform: translateX(250%);
-}
-
-.cancel-btn {
-position: absolute;
-top: 8px;
-right: 8px;
-font-size: 1.25rem;
-}
-
+  left: 50%;
+  transform: translateX(250%);
+  }
+  
+  .cancel-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 1.25rem;
+  }
+  
 /* Footer adjustments */
 .footer {
 padding: 8px;
