@@ -121,20 +121,5 @@
    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
    <script src="student_term.js"></script>
-   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const studentIDField = document.getElementById("studentID");
-        const storedStudentID = sessionStorage.getItem("studentID");
-
-        if (storedStudentID) {
-            studentIDField.value = storedStudentID; // Populate the field with the stored Student ID
-            studentIDField.disabled = true; // Disable the field to prevent editing
-        } else {
-            alert("No Student ID found. Please return to the previous page.");
-            window.history.back(); // Go back if no Student ID is found
-        }
-    });
-</script>
-
 </body>
 </html>

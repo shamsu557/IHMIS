@@ -165,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.history.back(); // Go back if no Student ID is found
     }
 });
+
 // Back to Top Button
 window.onscroll = function() { scrollFunction(); };
 function scrollFunction() {
