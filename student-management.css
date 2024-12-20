@@ -134,9 +134,24 @@ ul {
 
 /* Show the cancel button in mobile view */
 @media (max-width: 992px) {
-    .cancel-btn {
-        display: block; /* Show when navbar is toggled */
+  .second-navbar {
+    top: 60px;
+    padding: 15px 10px;
+    height: 40px;
     }
+    
+    .navbar-toggler {
+      left: 50%;
+      transform: translateX(250%);
+      }
+      
+      .cancel-btn {
+      display: block; /* Show when navbar is toggled */
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 1.25rem;
+      }
 }
 /* Hide the menu icon by default when navbar is shown */
 .navbar-toggler-icon.hidden {
