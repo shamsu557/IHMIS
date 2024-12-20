@@ -290,22 +290,22 @@ button {
     }
 
     .second-navbar {
-        top: 50px;
+        top: 60px;
         padding: 15px 10px;
         height: 40px;
-    }
-
-    .navbar-toggler {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .cancel-btn {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        font-size: 1.25rem;
-    }
+        }
+        
+        .navbar-toggler {
+          left: 50%;
+          transform: translateX(250%);
+          }
+          
+          .cancel-btn {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          font-size: 1.25rem;
+          }
 
     /* Footer adjustments */
     .footer {
