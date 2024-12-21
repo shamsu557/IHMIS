@@ -213,6 +213,7 @@ $(document).ready(function () {
                 .show();
             $('#back-to-selection').show();
             $('#search-button').show();
+            $('#filter-students').show(); // Show the search input for filtering
         } else {
             alert('Please select a class.');
         }
@@ -225,8 +226,17 @@ $(document).ready(function () {
         $('#select-class-header, #view-students, #class-label, #class-selection').show();
         $('#back-to-selection').hide();
         $('#search-button').hide();
+        $('#filter-students').hide(); // Hide the search input
         $('#student-list').empty(); // Clear student list
-        
+    });
+
+    // Event handler for filtering students
+    $('#filter-students').on('input', function () {
+        const filterValue = $(this).val().toLowerCase();
+        $('#student-list li').each(function () {
+            const studentText = $(this).text().toLowerCase();
+            $(this).toggle(studentText.includes(filterValue));
+        });
     });
 });
 window.onscroll = function() { scrollFunction() };
