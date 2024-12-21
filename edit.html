@@ -65,12 +65,30 @@
 
     <button id="view-students" type="button" class="btn btn-success w-100">View Students</button>
 
-    <!-- New button to go back to class selection -->
-     <!-- Back to Class Selection button -->
-     <button id="back-to-selection" type="button" class="btn btn-success mt-3" style="display: none;">Back to Class Selection</button>
+  <!-- New button to go back to class selection -->
+<div class="row mt-3">
+    <div class="col-6" id="back-to-selection" style="display:none;">
+      <!-- Back to Class Selection button -->
+      <button type="button" class="btn btn-success">Back to Selection</button>
+    </div>
+    <div class="col-6" id="search-button" style="display:none;">
+      <!-- Search Section -->
+<div class="search-container">
+    <div class="form-group">
+        <input type="text" id="filter-students" placeholder="Search students by name or ID..." style="display:none; width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+</div>
+<!-- No results message -->
+<div id="noResults" style="display: none; color: red;">No students found.</div>
+    </div>
+  </div>
+  
+ 
 
-    <!-- Placeholder for the selected class name -->
-    <h4 id="selected-class-header" class="mt-4"></h4>
+<!-- Placeholder for the selected class name -->
+<h1 class="text-center  bg-white" id="selected-class-header" class="mt-4"></h1>
+
+    
 
     <!-- List of students will appear here -->
     <ul id="student-list" class="list-unstyled"></ul>
