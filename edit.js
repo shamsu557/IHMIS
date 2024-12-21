@@ -191,6 +191,7 @@ const updatedStudent = {
     picture: $('#studentPicture').prop('files')[0]
 };
 
+
 $(document).ready(function () {
     // Load class options into the dropdown
     loadClassOptions();
@@ -208,7 +209,7 @@ $(document).ready(function () {
             $('#select-class-header, #view-students, #class-label, #class-selection').hide();
             $('#selected-class-header')
                 .addClass('small text-muted')
-                 .text(`List of Students in ${selectedClassText}: `)
+                .text(`List of Students in ${selectedClassText}: `)
                 .show();
             $('#back-to-selection').show();
             $('#search-button').show();
@@ -226,16 +227,8 @@ $(document).ready(function () {
         $('#search-button').hide();
         $('#student-list').empty(); // Clear student list
         
-     // Event handler for filtering students
-    $('#filter-students').on('input', function () {
-        const filterValue = $(this).val().toLowerCase();
-        $('#student-list li').each(function () {
-            const studentText = $(this).text().toLowerCase();
-            $(this).toggle(studentText.includes(filterValue));
-        });
     });
 });
-
 window.onscroll = function() { scrollFunction() };
 
 function scrollFunction() {
