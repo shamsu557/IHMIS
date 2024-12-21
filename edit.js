@@ -65,7 +65,6 @@ function loadStudents(className) {
         }
     });
 }
-
 $(document).on('click', '.delete-btn', function() {
     studentToDelete = $(this).data('id');
     $('#confirmation-modal').show();
@@ -191,7 +190,6 @@ const updatedStudent = {
     picture: $('#studentPicture').prop('files')[0]
 };
 
-
 $(document).ready(function () {
     // Load class options into the dropdown
     loadClassOptions();
@@ -209,7 +207,7 @@ $(document).ready(function () {
             $('#select-class-header, #view-students, #class-label, #class-selection').hide();
             $('#selected-class-header')
                 .addClass('small text-muted')
-                .text(`List of Students in ${selectedClassText}: `)
+                .text(`List of The Students In ${selectedClassText}: `)
                 .show();
             $('#back-to-selection').show();
             $('#search-button').show();
@@ -239,6 +237,7 @@ $(document).ready(function () {
         });
     });
 });
+
 window.onscroll = function() { scrollFunction() };
 
 function scrollFunction() {
