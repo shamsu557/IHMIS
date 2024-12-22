@@ -66,10 +66,10 @@ function loadStudents(className, term, session) {
 }
 
 // Event Listeners
-$(document).ready(function() {
+$(document).ready(function () {
     loadClassOptions();
 
-    $('#view-students').click(function() {
+    $('#view-students').click(function () {
         const classSelection = $('#class-selection').val();
         const termSelection = $('#termSelect').val();
         const sessionSelection = $('#sessionSelect').val();
@@ -78,20 +78,33 @@ $(document).ready(function() {
             loadStudents(classSelection, termSelection, sessionSelection);
             $('#classSelection, #select-class-header, #view-students').hide();
             $('#selected-class-header')
-                .addClass('small text-muted')  
+                .addClass('small text-muted')
                 .text(`Class: ${classSelection}, Term: ${termSelection}, Session: ${sessionSelection}`)
                 .show();
             $('#back-to-selection').show();
+            $('#search-button').show();
+            $('#filter-students').show(); // Show the search input for filtering
         } else {
             alert('Please select class, term, and session.');
         }
     });
 
-    $('#back-to-selection').click(function() {
+    $('#back-to-selection').click(function () {
         $('#selected-class-header').hide().removeClass('small text-muted');
         $('#classSelection, #select-class-header, #view-students').show();
         $('#back-to-selection').hide();
+        $('#search-button').hide();
+        $('#filter-students').hide(); // Hide the search input
         $('#student-list').empty();
+    });
+
+    // Event handler for filtering students
+    $('#filter-students').on('input', function () {
+        const filterValue = $(this).val().toLowerCase();
+        $('#student-list li').each(function () {
+            const studentText = $(this).text().toLowerCase();
+            $(this).toggle(studentText.includes(filterValue));
+        });
     });
 });
 
@@ -107,3 +120,4 @@ function topFunction() {
 function goBack() {
 window.history.back();
 }
+
