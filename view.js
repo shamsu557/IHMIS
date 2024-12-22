@@ -47,12 +47,17 @@ function loadStudents(className, term, session) {
             if (students.length > 0) {
                 students.forEach(student => {
                     studentList.append(`
-                        <li>
+                       <li class="student-item">
+                        <span class="student-name">
                             ${student.studentID} - ${student.firstname} ${student.surname} ${student.othername ? student.othername + ' ' : ''}
+                        </span>
+                        <div class="student-actions">
                             <a href="/api/viewResult/${student.studentID}?term=${term}&session=${session}" class="view-link">View Result</a>
                             |
                             <a href="/api/downloadResult/${student.studentID}?term=${term}&session=${session}" class="download-link">Download Result</a>
-                        </li>
+                        </div>
+                    </li>
+
                     `);
                 });
             } else {

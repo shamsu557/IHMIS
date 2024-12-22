@@ -151,6 +151,7 @@ display: none !important; /* Forcefully hide the element */
           right: 8px;
           font-size: 1.25rem;
           }
+          
 }
 /* Hide the menu icon by default when navbar is shown */
 .navbar-toggler-icon.hidden {
@@ -232,18 +233,54 @@ border-radius: 4px;
 #myBtn:hover {
 background-color: #555;
 }
-/* Styling for the links and hover effects */
+/* Styling for the student list and content alignment */
+/* Styling for the student list and content alignment */
+#student-list li {
+    display: flex; /* Align items horizontally */
+    justify-content: space-between; /* Pushes items to opposite ends */
+    align-items: center; /* Vertically centers the content */
+    padding: 10px 0; /* Adds spacing between list items */
+    border-bottom: 1px solid #ccc; /* Optional: Divider between list items */
+}
+/* Styling for the student list items */
+#student-list .student-item {
+    display: flex; /* Aligns name and actions horizontally */
+    justify-content: space-between; /* Pushes actions to the right */
+    align-items: center; /* Vertically centers the content */
+    padding: 10px 0; /* Adds spacing between list items */
+    border-bottom: 1px solid #ccc; /* Divider between list items */
+}
+
+/* Styling for the student name */
+.student-name {
+    text-align: left; /* Aligns the name to the left */
+    white-space: nowrap; /* Prevents name from wrapping */
+    overflow: hidden; /* Hides overflowing text */
+    text-overflow: ellipsis; /* Adds ellipsis for long text */
+    margin-right: 10px; /* Adds a small space before actions */
+    flex-grow: 1; /* Occupies all available space */
+}
+
+/* Container for links */
+.student-actions {
+    display: flex; /* Aligns View and Download links inline */
+    align-items: center; /* Vertically aligns the links */
+}
+
+/* Styling for the links */
 .view-link, .download-link {
-color: #479ae2;
-text-decoration: none;
-font-weight: bold;
-margin-left: 10px; /* Adds space between the student's name and the links */
+    color: #479ae2;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 5px; /* Adds a small space between links */
 }
 
 .view-link:hover, .download-link:hover {
-color:#c2ddf8 ;
-text-decoration: none;
+    color: #c2ddf8;
+    text-decoration: none;
 }
+
+
   /* Close button styling */
   .close-btn {
     display: block;
