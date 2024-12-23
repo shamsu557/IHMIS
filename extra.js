@@ -89,6 +89,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 document.getElementById('loadStudentsBtn').addEventListener('click', () => {
     document.getElementById('classSelection').style.display = 'none';
     document.getElementById('studentList').style.display = 'block';
+    document.getElementById('filter-students').style.display = 'block';
+    document.getElementById('search-container').style.display = 'block';
+    
+
 });
 
 function loadStudents(students) {
@@ -192,6 +196,21 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
         alert('Failed to submit assessments');
     }
 });
+// Filter functionality for students
+document.getElementById('filter-students').addEventListener('input', function () {
+    const filterText = this.value.toLowerCase();
+    const studentDivs = document.querySelectorAll('#studentsContainer > div');
+
+    studentDivs.forEach(studentDiv => {
+        const studentLabel = studentDiv.querySelector('label').textContent.toLowerCase();
+        if (studentLabel.includes(filterText)) {
+            studentDiv.style.display = 'block';
+        } else {
+            studentDiv.style.display = 'none';
+        }
+    });
+});
+
 // Close button functionality
 function goBack() {
     window.history.back();
