@@ -190,6 +190,10 @@ async function loadStudents() {
             $('#view-students, #subjectSelect, #termSelect, #classSelect, #resultManagementHeader, #sessionSelect').hide();
             $('#submit-scores').show();
             $('#back-to-selection').show();
+            $('#filter-students').show(); // Show the search input for filtering
+            $('#search-button').show(); // Show the search input for filtering
+           
+
         } else {
             noStudentsMessage.show();
         }
@@ -203,6 +207,8 @@ async function loadStudents() {
         // Hide student table and associated headers
         $('#student-info').hide();
         $('#submit-scores').hide();
+        $('#filter-students').hide();
+
 
         // Show class selection fields
         $('#view-students, #subjectSelect, #termSelect, #classSelect, #resultManagementHeader, #sessionSelect').show();
@@ -217,6 +223,16 @@ async function loadStudents() {
         $('#back-to-selection').hide();
     });
 }
+
+
+// Filter Students by Name or ID
+$('#filter-students').on('input', function () {
+    const filterValue = $(this).val().toLowerCase(); // Get the filter value
+    $('#student-tbody tr').each(function () {
+        const studentData = $(this).text().toLowerCase(); // Get the row text
+        $(this).toggle(studentData.includes(filterValue)); // Show or hide based on the filter
+    });
+});
 
 $(document).ready(function () {
     loadClassOptions();

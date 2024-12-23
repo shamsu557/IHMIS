@@ -88,7 +88,13 @@
     
     <!-- Div to Display Student List -->
     <div id="student-list">
-      <button id="back-to-selection" type="button" class="btn btn-info" style="display: none;">Back to Class Selection</button><br><br>
+      <!-- New button to go back to class selection -->
+  <div class="row mt-3">
+    <div class="col-6" id="back-to-selection" style="display:none;">
+      <!-- Back to Class Selection button -->
+      <button type="button" class="btn btn-success">Back to Selection</button>
+    </div>
+  </div><br><br>
         <!-- This section will be populated dynamically via JavaScript -->
         <div id="student-info" style="display: none;">
             <h3 id="class-name" style="font-size: 14px;"></h3>
@@ -107,6 +113,16 @@
                         <th>Exam</th>
                     </tr>
                 </thead>
+                <div class="row mt-3">
+                <div class="col-6" id="search-button" style="display:none;">
+                  <!-- Search Section -->
+            <div class="search-container">
+                <div class="form-group text-center">
+                    <input type="text" id="filter-students" placeholder="Search students by name or ID..." style="display:none; width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+            </div>
+                </div>
+              </div>
                 <tbody id="student-tbody">
                     <!-- Rows will be appended here via JavaScript -->
                 </tbody>
