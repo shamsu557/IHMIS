@@ -48,6 +48,14 @@ const upload = multer({ storage: storage });
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+//term result
+app.get('/student_term_result.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'student_term_result.html'));
+});
+//session result
+app.get('/student_session_result.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'student_session_result.html'));
+});
 // User Signup page
 app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'signup.html'));
@@ -802,7 +810,15 @@ app.post('/creation', (req, res) => {
         });
     });
 });
-
+app.get('/Student_dashboard', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/StudentLogin');
+    }
+    res.sendFile(path.join(__dirname, 'student_dashbaord.html'));
+});
+app.get('/studentLogin', (req,res)=>{
+    res.sendFile(path.join(__dirname, 'studentLogin.html'));
+})
 // Handle student login
 app.post("/studentLogin", (req, res) => {
     const { studentID, password } = req.body;
@@ -870,7 +886,104 @@ app.get('/populateStudentDetails', (req, res) => {
         });
     });
 });
+//loggedIn students
+app.get('/getLoggedInStudent', (req, res) => {
+    if (req.session.studentID) {
+        // Return the logged-in student's ID
+        return res.json({ success: true, studentID: req.session.studentID });
+    } else {
+        // No student is logged in
+        return res.json({ success: false, message: "No student logged in" });
+    }
+});
 
+app.post('/find-details', (req, res) => {
+    const { firstname, surname, othername, class: studentClass } = req.body;
+  
+    // Convert inputs to uppercase (optional if already handled in frontend)
+    const upperFirstName = firstname.trim().toUpperCase();
+    const upperSurname = surname.trim().toUpperCase();
+    const upperOtherName = othername ? othername.trim().toUpperCase() : '';
+  
+    // SQL Query to check if the names existconst
+    let query = `
+      SELECT studentID 
+      FROM students 
+      WHERE firstname = ? 
+        AND surname = ? 
+        AND (othername = ? OR othername IS NULL) 
+        AND class = ?
+    `;
+  
+    db.query(
+      query,
+      [upperFirstName, upperSurname, upperOtherName, studentClass],
+      (err, results) => {
+        if (err) {
+          console.error('Database Error:', err);
+          return res.status(500).send('Internal Server Error');
+        }
+  
+        if (results.length > 0) {
+          // If a match is found, display the studentID as username and password
+          const studentID = results[0].studentID;
+          res.send(`
+            <style>
+              a {
+                text-decoration: none; /* Remove underline */
+              }
+              .btn {
+                padding: 10px 15px;
+                border-radius: 5px;
+                display: inline-block;
+                color: white;
+              }
+              .btn-primary {
+                background-color: #007bff;
+                border: none;
+              }
+              .btn-success {
+                background-color: #28a745;
+                border: none;
+              }
+            </style>
+            <h3>Login Details Found</h3>
+            <p><strong>Username:</strong> ${studentID}</p>
+            <p><strong>Password:</strong> ${studentID}</p>
+            <a href="/studentLogin" class="btn btn-primary">Go to Login</a>
+          `);
+        } else {
+          // If no match is found
+          res.send(`
+            <style>
+              a {
+                text-decoration: none; /* Remove underline */
+              }
+              .btn {
+                padding: 10px 15px;
+                border-radius: 5px;
+                display: inline-block;
+                color: white;
+              }
+              .btn-primary {
+                background-color: #007bff;
+                border: none;
+              }
+              .btn-success {
+                background-color: #28a745;
+                border: none;
+              }
+            </style>
+            <h3>No Matching Records Found</h3>
+            <p>Please check your details and try again.</p>
+            <a href="/studentLogin" class="btn btn-success">Back</a>
+          `);
+        }
+      }
+    );
+  });
+  
+  
 app.post('/studentLogout', (req, res) => {
     // Destroy the session for the student
     req.session.destroy((err) => {
@@ -1118,6 +1231,32 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
                 .then(() => res.json({ success: true, message: 'Teacher data updated successfully.' }))
                 .catch(err => res.status(500).json({ success: false, message: 'Failed to update subjects or classes.' }));
         });
+    });
+});
+
+// Endpoint to fetch student details by StudentID
+app.post('/api/fetchStudentByID', (req, res) => {
+    const { studentID } = req.body;
+
+    // Check if studentID is provided
+    if (!studentID) {
+        return res.status(400).json({ error: "Student ID is required." });
+    }
+
+    const query = 'SELECT * FROM students WHERE StudentID = ?'; // Replace with your actual table name
+    db.query(query, [studentID], (err, results) => {
+        if (err) {
+            console.error('Error fetching student details:', err);
+            return res.status(500).send('Server Error');
+        }
+
+        // Check if results contain a student
+        if (results.length > 0) {
+            const student = results[0];
+            res.json({ student });
+        } else {
+            res.json({ student: null }); // No student found
+        }
     });
 });
 
@@ -1375,7 +1514,8 @@ function generateStudentReport(req, res, saveToFile = false) {
                             doc.text('(10%)', startX + 150, currentY, { width: cellWidth, align: 'center' });
                             doc.text('(10%)', startX + 200, currentY, { width: cellWidth, align: 'center' });
                             doc.text('(70%)', startX + 250, currentY, { width: cellWidth, align: 'center' });
-
+                            doc.text('(100%)', startX + 300, currentY, { width: cellWidth, align: 'center' });
+             
                             // Move to the first row position
                             currentY += 10;
                             doc.moveTo(startX, currentY).lineTo(startX + 500, currentY).stroke();
@@ -1717,7 +1857,7 @@ subjectsResult.forEach((subject, index) => {
        .text(subject.secondCA, startX + termWidth + subjectWidth + caWidth, currentY + 3, { width: caWidth, align: 'center' })
        .text(subject.thirdCA, startX + termWidth + subjectWidth + 2 * caWidth, currentY + 3, { width: caWidth, align: 'center' })
        .text(subject.exams, startX + termWidth + subjectWidth + 3 * caWidth, currentY + 3, { width: examWidth, align: 'center' })
-       .text(total.toFixed(2), startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
+       .text(subject.total, startX + termWidth + subjectWidth + 3 * caWidth + examWidth, currentY + 3, { width: totalWidth, align: 'center' })
        .text(grade, startX + termWidth + subjectWidth + 3 * caWidth + examWidth + totalWidth, currentY + 3, { width: gradeWidth, align: 'center' });
 
     currentY += cellHeight;
