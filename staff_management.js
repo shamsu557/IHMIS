@@ -52,6 +52,24 @@ function fetchAdmins() {
     });
 }
 
+// Filter Staff
+$('#filter-staff').on('input', function () {
+    const filterValue = $(this).val().toLowerCase();
+    $('#staffList li').each(function () {
+        const staffText = $(this).text().toLowerCase();
+        $(this).toggle(staffText.includes(filterValue));
+    });
+});
+
+// Filter Admins
+$('#filter-admins').on('input', function () {
+    const filterValue = $(this).val().toLowerCase();
+    $('#adminList li').each(function () {
+        const adminText = $(this).text().toLowerCase();
+        $(this).toggle(adminText.includes(filterValue));
+    });
+});
+
         // Delete Entity and Confirmation
         window.deleteEntity = function(type, id) {
             $('#entityToDelete').val(id);
