@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session Results</title>
+    <title>View Students</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="session.css">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="view.css"> <!-- Link to your CSS file -->
 </head>
 <body>
    <!-- First Navbar (Images and Admin Dashboard Text) -->
@@ -50,14 +50,13 @@
         <button class="cancel-btn" style="display: none;" onclick="toggleNavbar()">✖</button> <!-- Cancel icon -->
     </div>
   </nav>
-
 <div class="center-container bg-light mt-auto">
-    <!-- Class and Student Selection -->
+    <h5 id="select-class-header" class="text-center">Select Class and View Students</h5>
+
     <div id="classSelection" class="card shadow mt-4 p-4">
         <div class="form-group">
-            <label for="class-selection">Class:</label>
-            <select id="class-selection" class="form-control" required>
-                <option value="" disabled selected>Select Class</option>
+            <select id="class-selection" name="class" class="form-control" required>
+                <option value="" selected disabled>Select Class</option>
             </select>
         </div>
         <div class="form-group">
@@ -69,58 +68,73 @@
             </select>
         </div>
 
-
-        <button id="load-students" class="btn btn-success btn-block">Load Students</button>
+        <button id="view-students" type="button" class="btn btn-success">View Students</button>
+        
     </div>
-
-    <!-- Students List -->
-    <div id="students-section" class="mt-4" style="display: none;">
-          <!-- back to class selection -->
-          <button id="back-button" type="button" class="btn btn-success mt-3">Back to Class Selection</button>
-        <h4 id="class-header" class="text-center"></h4>
-        <ul id="students-list" class="list-group"></ul>
+  <!-- New button to go back to class selection -->
+  <div class="row mt-3">
+    <div class="col-6" id="back-to-selection" style="display:none;">
+      <!-- Back to Class Selection button -->
+      <button type="button" class="btn btn-success">Back to Selection</button>
     </div>
+    <div class="col-6" id="search-button" style="display:none;">
+      <!-- Search Section -->
+<div class="search-container">
+    <div class="form-group">
+        <input type="text" id="filter-students" placeholder="Search students by name or ID..." style="display:none; width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+</div>
+    </div>
+  </div>
+  
+ 
+
+<!-- Placeholder for the selected class name -->
+
+
+    <!-- List of students will appear here -->
+    <h1 class="text-center  bg-white" id="selected-class-header" class="mt-4"></h1>
+    <ul id="student-list" class="list-unstyled"></ul>
+    
     <button class="close-btn text-center" onclick="goBack()">Close</button>
+
 </div>
-</div>
-<br><br>
 <!-- Footer -->
 <div class="footer bg-light mt-5">
-   <div class="row text-center py-3">
-     <div class="col-md-4">
-       <p><strong>Imam Hafsin Model International School</strong></p>
-       <p>622, Yakasai Street, Tal'udu G/Kaya</p>
-       <p>Email: imamhafsin@gmail.com</p>
-       <p>Phone: 08030999939939399</p>
-     </div>
-     <div class="col-md-4">
-       <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-facebook"></i> Facebook
-       </a>
-       <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-instagram"></i> Instagram
-       </a>
-       <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-twitter"></i> Twitter
-       </a>
-       <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
-         <i class="fab fa-whatsapp"></i> WhatsApp
-       </a>
-     </div>
-     <div class="col-md-4">
-       <p>&copy; IHMIS 2024</p>
-       <p>All rights reserved.</p>
-     </div>
-   </div>
- </div>
- <!-- Back to top button -->
- <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
- 
-   <!-- Bootstrap JS, Popper.js, and jQuery -->
-   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="row text-center py-3">
+        <div class="col-md-4">
+            <p><strong>Imam Hafsin Model International School</strong></p>
+            <p>622, Yakasai Street, Tal'udu G/Kaya</p>
+            <p>Email: imamhafsin@gmail.com</p>
+            <p>Phone: 08030999939939399</p>
+        </div>
+        <div class="col-md-4">
+            <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-instagram"></i> Instagram
+            </a>
+            <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+            <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+        <div class="col-md-4">
+            <p>&copy; IHMIS 2024</p>
+            <p>All rights reserved.</p>
+        </div>
+    </div>
+</div>
 
+<!-- Back to Top Button -->
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+<!-- Bootstrap and JS Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="sessional.js"></script>
-
 </body>
 </html>
