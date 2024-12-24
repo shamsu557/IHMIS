@@ -88,6 +88,7 @@
                                     </div>
                                 </div>
                             </div>
+                          
                             <!-- Role selection: Teacher or Form Master -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -101,50 +102,63 @@
                                 </select>
                             </div>
                             </div>
-                                                       <!-- Highest Qualification Dropdown -->
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                        <label for="qualification" class="form-label">Highest Qualification</label>
-                                                        <select class="form-select" id="qualification" name="qualification" required>
-                                                            <option value="" disabled selected>Select Qualification</option>
-                                                            <option value="Diploma">Diploma</option>
-                                                            <option value="HND">HND</option>
-                                                            <option value="BSc">BSc</option>
-                                                            <option value="Master">Master</option>
-                                                            <option value="NCE">NCE</option>
-                                                            <option value="PhD">PhD</option>
-                                                        </select>
-                                                        <!-- Additional Specification Field -->
-                                                        <!-- Input field for other qualification -->
-                                                    </div>
-                                                </div>
-                                                </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                            <div class="mb-3" id="class-selection" style="display: none;">
+                                <label for="class" class="form-label">Class (Form Master)</label>
+                                <select class="form-select" id="formClass" name="formClass">
+                                    <option value="" disabled selected>Select Class</option>
+                                    <option value="Pre-Nursery">Pre-Nursery</option>
+                                    <option value="Nursery One">Nursery 1</option>
+                                    <option value="Nursery Two">Nursery 2</option>
+                                    <option value="Primary One">Primary 1</option>
+                                    <option value="Primary Two">Primary 2</option>
+                                    <option value="Primary Three">Primary 3</option>
+                                    <option value="Primary Four">Primary 4</option>
+                                    <option value="Primary Five">Primary 5</option>
+                                    <option value="Primary Six">Primary 6</option>
+                                    <option value="JSS One">JSS 1</option>
+                                    <option value="JSS Two">JSS 2</option>
+                                    <option value="JSS Three">JSS 3</option>
+                                    <option value="SSS One">SSS 1</option>
+                                    <option value="SSS Two">SSS 2</option>
+                                    <option value="SSS Three">SSS 3</option>
+                                </select>
+                            </div>
+                            </div>
+                        </div>
                        
-<div class="col-md-6">
-    <div class="form-group">
-<div class="mb-3" id="class-selection" style="display: none;">
-    <label for="class" class="form-label">Class (Form Master)</label>
-    <select class="form-select" id="formClass" name="formClass">
-        <option value="" disabled selected>Select Class</option>
-        <option value="Pre-Nursery">Pre-Nursery</option>
-        <option value="Nursery One">Nursery 1</option>
-        <option value="Nursery Two">Nursery 2</option>
-        <option value="Primary One">Primary 1</option>
-        <option value="Primary Two">Primary 2</option>
-        <option value="Primary Three">Primary 3</option>
-        <option value="Primary Four">Primary 4</option>
-        <option value="Primary Five">Primary 5</option>
-        <option value="Primary Six">Primary 6</option>
-        <option value="JSS One">JSS 1</option>
-        <option value="JSS Two">JSS 2</option>
-        <option value="JSS Three">JSS 3</option>
-        <option value="SSS One">SSS 1</option>
-        <option value="SSS Two">SSS 2</option>
-        <option value="SSS Three">SSS 3</option>
-    </select>
-</div>
-</div>
-</div>
+                            </div>
+<!-- Highest Qualification and Gender Dropdowns -->
+<div class="row">
+    <!-- Highest Qualification -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="qualification" class="form-label">Highest Qualification</label>
+        <select class="form-select" id="qualification" name="qualification" required>
+          <option value="" disabled selected>Select Qualification</option>
+          <option value="Diploma">Diploma</option>
+          <option value="HND">HND</option>
+          <option value="BSc">BSc</option>
+          <option value="Master">Master</option>
+          <option value="NCE">NCE</option>
+          <option value="PhD">PhD</option>
+        </select>
+      </div>
+    </div>
+  
+    <!-- Gender -->
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="gender" class="form-label">Gender</label><br>
+        <select class="form-select" id="gender" name="gender" required>
+          <option value="" disabled selected>Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+    </div>
+  </div>
+  </div>
 <div class="row mb-3">
     <!-- Subjects Teaching Section -->
     <div class="col-md-6">
