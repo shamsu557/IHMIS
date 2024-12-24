@@ -89,46 +89,50 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
         res.json(teacher);
     });
 });
-// Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; // Include phone in destructuring 
-    const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
+    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; 
+    const profilePicture = req.file ? req.file.filename : null; 
 
-    // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
+    // Generate a staff ID in the format IHMISYYNN
     const currentYear = new Date().getFullYear();
-    const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
-    const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
-    const staffId = `IHMIS/STF/${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
+    const yearSuffix = currentYear.toString().slice(-2); 
+    const randomNumber = Math.floor(Math.random() * 100) + 1; 
+    const staffId = `IHMIS/STF/${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; 
 
-    // Check if the email exists in the teachers table
+    // Step 1: Check if the email already exists in the database
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         if (err) {
             console.error('Error querying database for email verification:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // If the email is not found in the teachers table, prevent signup
+        // Step 2: If the email does not exist, return an error
         if (results.length === 0) {
             return res.status(400).json({ success: false, message: 'Email not authorized for signup.' });
         }
 
-        // Hash the password
+        // Step 3: If the email exists but is already registered (i.e., `registered` field is set to 1), prevent re-registration
+        if (results[0].registered === 1) {
+            return res.status(400).json({ success: false, message: 'This email has already been registered.' });
+        }
+
+        // Step 4: Proceed with password hashing and other user data handling if the email is not yet registered
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
             if (err) {
                 console.error('Error hashing password:', err);
                 return res.status(500).json({ success: false, message: 'Server error' });
             }
 
-            // Build the SQL query to update the teacher's information
-            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'gender','phone']; // Add 'phone' to columns 
-            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, gender, phone]; // Add 'phone' to values
+            // Prepare the columns and values to update the teacher's information
+            const columns = ['name', 'password', 'security_question', 'security_answer', 'role', 'qualification', 'profile_picture', 'staff_id', 'gender', 'phone']; 
+            const values = [name, hashedPassword, security_question, security_answer, role, qualification, profilePicture, staffId, gender, phone]; 
 
             if (role === 'Form Master') {
-                columns.push('formClass'); // Include formClass if role is 'Form Master'
+                columns.push('formClass');
                 values.push(formClass);
             }
 
-            // Update teacher's information in the database
+            // Step 5: Update the teacher's information in the database
             const query = `UPDATE teachers SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE email = ?`;
 
             db.query(query, [...values, email], (err, result) => {
@@ -137,43 +141,49 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
                     return res.status(500).json({ success: false, message: 'Server error' });
                 }
 
-                // Use the teacher's ID from the results
-                const teacherId = results[0].id; // Get the ID of the existing teacher
-
-                // Helper function to insert subjects or classes
-                const insertItems = (table, itemList) => {
-                    if (Array.isArray(itemList) && itemList.length > 0) {
-                        const columnName = table === 'teacher_subjects' ? 'subject' : 'class'; // Correctly define column name based on the table
-                        const queries = itemList.map(item => 
-                            new Promise((resolve, reject) => {
-                                db.query(`INSERT INTO ${table} (teacher_id, ${columnName}) VALUES (?, ?)`, [teacherId, item.trim()], (err) => {
-                                    if (err) reject(err);
-                                    else resolve();
-                                });
-                            })
-                        );
-                        return Promise.all(queries);
+                // Step 6: Mark the email as registered by setting `registered = 1`
+                db.query('UPDATE teachers SET registered = 1 WHERE email = ?', [email], (err, updateResult) => {
+                    if (err) {
+                        console.error('Error marking email as registered:', err);
+                        return res.status(500).json({ success: false, message: 'Server error' });
                     }
-                    return Promise.resolve(); // No items to insert
-                };
 
-                // Insert subjects and classes
-                Promise.all([
-                    insertItems('teacher_subjects', subjects),
-                    insertItems('teacher_classes', classes)
-                ])
-                .then(() => {
-                    res.json({ success: true, message: 'Teacher registered successfully.', staffId: staffId });
-                })
-                .catch(err => {
-                    console.error('Error inserting subjects or classes:', err);
-                    res.status(500).json({ success: false, message: 'Failed to register some subjects or classes.' });
+                    // Step 7: Use the teacher's ID and insert subjects/classes
+                    const teacherId = results[0].id;
+
+                    const insertItems = (table, itemList) => {
+                        if (Array.isArray(itemList) && itemList.length > 0) {
+                            const columnName = table === 'teacher_subjects' ? 'subject' : 'class';
+                            const queries = itemList.map(item => 
+                                new Promise((resolve, reject) => {
+                                    db.query(`INSERT INTO ${table} (teacher_id, ${columnName}) VALUES (?, ?)`, [teacherId, item.trim()], (err) => {
+                                        if (err) reject(err);
+                                        else resolve();
+                                    });
+                                })
+                            );
+                            return Promise.all(queries);
+                        }
+                        return Promise.resolve();
+                    };
+
+                    // Insert subjects and classes
+                    Promise.all([
+                        insertItems('teacher_subjects', subjects),
+                        insertItems('teacher_classes', classes)
+                    ])
+                    .then(() => {
+                        res.json({ success: true, message: 'Teacher registered successfully.', staffId: staffId });
+                    })
+                    .catch(err => {
+                        console.error('Error inserting subjects or classes:', err);
+                        res.status(500).json({ success: false, message: 'Failed to register some subjects or classes.' });
+                    });
                 });
             });
         });
     });
 });
-
 
 // Middleware to check if the user is logged in
 function isAuthenticated(req, res, next) {
