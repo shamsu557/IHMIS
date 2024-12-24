@@ -33,6 +33,7 @@ document.getElementById('add-student-form').addEventListener('submit', function(
     const surname = document.getElementById('surname').value.trim().toUpperCase(); // Trim and convert to uppercase
     const othername = (document.getElementById('othername').value.trim() || '').toUpperCase(); // Trim and convert to uppercase if available
     const studentClass = document.getElementById('class').value;
+    const gender = document.getElementById('gender').value;
     const subjects = Array.from(document.querySelectorAll('input[name="subjects"]:checked')).map(input => input.value);
     const guardianPhone = document.getElementById('guardianPhone').value;
     const studentPicture = document.getElementById('studentPicture').files[0];
@@ -44,6 +45,7 @@ document.getElementById('add-student-form').addEventListener('submit', function(
     formData.append('surname', surname);
     formData.append('othername', othername); // Even if it's optional, it will be sent as empty string if not filled
     formData.append('class', studentClass);
+    formData.append('gender', gender);
     formData.append('subjects', JSON.stringify(subjects)); // Send subjects as JSON string
     formData.append('guardianPhone', guardianPhone);
     formData.append('studentPicture', studentPicture);

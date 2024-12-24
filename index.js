@@ -365,6 +365,7 @@ app.post('/add-student', upload.single('studentPicture'), (req, res) => {
     const surname = req.body.surname;
     const othername = req.body.othername;
     const studentClass = req.body.class;
+    const gender = req.body.gender;
     const guardianPhone = req.body.guardianPhone;
     const studentPicture = req.file.filename; // File name stored in the server
 
@@ -384,8 +385,8 @@ app.post('/add-student', upload.single('studentPicture'), (req, res) => {
         }
 
         // Insert student data into students table
-        const insertStudentQuery = 'INSERT INTO students (studentID, firstname, surname, othername, class, guardianPhone, studentPicture) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const studentValues = [studentID, firstname, surname, othername, studentClass, guardianPhone, studentPicture];
+        const insertStudentQuery = 'INSERT INTO students (studentID, firstname, surname, othername, class,gender, guardianPhone, studentPicture) VALUES (?, ?,?, ?, ?, ?, ?, ?)';
+        const studentValues = [studentID, firstname, surname, othername, studentClass,gender, guardianPhone, studentPicture];
 
         db.query(insertStudentQuery, studentValues, (err, result) => {
             if (err) {
