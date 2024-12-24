@@ -91,14 +91,14 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
 });
 // Handle User Signup with profile picture
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, phone } = req.body; // Include phone in destructuring 
+    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; // Include phone in destructuring 
     const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
 
     // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
     const currentYear = new Date().getFullYear();
     const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
     const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
-    const staffId = `IHMISS${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
+    const staffId = `IHMIS/STF/${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
 
     // Check if the email exists in the teachers table
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
@@ -120,8 +120,8 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
             }
 
             // Build the SQL query to update the teacher's information
-            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'phone']; // Add 'phone' to columns 
-            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, phone]; // Add 'phone' to values
+            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'gender','phone']; // Add 'phone' to columns 
+            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, gender, phone]; // Add 'phone' to values
 
             if (role === 'Form Master') {
                 columns.push('formClass'); // Include formClass if role is 'Form Master'
@@ -778,18 +778,47 @@ app.get('/creation', (req, res) => {
 app.post('/creation', (req, res) => {
     const { username, password, email, fullName, phone, role } = req.body;
 
-    // Check if the email already exists
-    db.query('SELECT email FROM admins WHERE email = ?', [email], (err, results) => {
+    // Check if the email exists and ensure the phone field is empty
+db.query('SELECT email, phone FROM admins WHERE email = ?', [email], (err, results) => {
+    if (err) {
+        console.error('Error querying database for signup:', err);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+
+    // Check if email exists
+db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
+    if (err) {
+        console.error('Error querying database for signup:', err);
+        return res.status(500).json({ success: false, message: 'Server error' });
+    }
+
+    // Ensure the email exists in the database
+    if (results.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'Email not authorized for registration.'
+        });
+    }
+
+    // Check if the phone number already exists in the database
+    const checkPhoneQuery = 'SELECT * FROM teachers WHERE phone = ?';
+    db.query(checkPhoneQuery, [phone], (err, phoneResults) => {
         if (err) {
-            console.error('Error querying database for signup:', err);
+            console.error('Error checking phone number in database:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // Check if the email is already taken
-        if (results.length > 0) {
-            return res.status(400).json({ success: false, message: 'Email already exists' });
+        // If phone number already exists in the database, prevent signup
+        if (phoneResults.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'This phone number is already registered.'
+            });
         }
+    });
+});
 
+   
         // Hash the password
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
             if (err) {
