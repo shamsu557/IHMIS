@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Management</title>
+    <title>Management Control Panel</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -16,7 +16,7 @@
     <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
     
     <!-- Navbar brand (Admin Dashboard text) centered -->
-    <span class="navbar-brand mx-auto text-dark">Staff&nbsp;&nbsp;Management</span>
+    <span class="navbar-brand mx-auto text-dark">Management&nbsp;&nbsp;Cpanel</span>
     
     <!-- Right image logo -->
     <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
@@ -43,6 +43,9 @@
             <li class="nav-item">
               <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-danger" id="report" style="display:none"  href="overview.html">Report</a>
+              </li>
         </ul>
     </div>
   </nav>
@@ -51,13 +54,13 @@
             <div class="col-lg-6 col-md-8 col-sm-12">
                 <div class="card">
                     <div class="card-header text-center">
-                        <h3>Staff Management</h3>
+                        <h3>Management Control Panel</h3>
                     </div>
                     <div class="card-body">
 
     <!-- Login Form for Admin -->
     <div id="loginSection">
-        <h2 class="text-center">Admin Login</h2>
+        <h2 class="text-center">Authorized Admin</h2>
         <form id="adminLoginForm">
             <div class="form-group">
                 <label for="adminUsername">Username</label>

@@ -9,6 +9,7 @@ $(document).ready(function() {
             if (response.isValid && (response.role === 'Super Admin' || response.role === 'Assistant Super Admin')) {
                 $('#loginSection').hide();
                 $('#staffManagementSection').show();
+                $('#report').show();
                 fetchStaff();
                 fetchAdmins();
             } else {
@@ -163,69 +164,71 @@ $(document).ready(function() {
     };
 
     // Handle form submission in the modal
-    $('#editTeacherForm').on('submit', function (e) {
-        e.preventDefault();
+$('#editTeacherForm').on('submit', function (e) {
+    e.preventDefault();
 
-        const teacherData = {
-            staff_id: $('#staffId').val(),
-            name: $('#name').val().trim().toUpperCase(),
-            email: $('#email').val(),
-            phone: $('#phone').val(),
-            role: $('#role').val(),
-            qualification: $('#qualification').val()
-        };
+    const teacherData = {
+        staff_id: $('#staffId').val(),
+        name: $('#name').val().trim().toUpperCase(),
+        email: $('#email').val(),
+        phone: $('#phone').val(),
+        role: $('#role').val(),
+        qualification: $('#qualification').val()
+    };
 
-        if (teacherData.role === 'Form Master') {
-            teacherData.formClass = $('#formClass').val();
+    if (teacherData.role === 'Form Master') {
+        teacherData.formClass = $('#formClass').val();
+    }
+
+    const selectedSubjects = $("input[name='subjects[]']:checked").map(function () {
+        return $(this).val();
+    }).get();
+    if (selectedSubjects.length) teacherData.subjects = selectedSubjects;
+
+    const selectedClasses = $("input[name='classes[]']:checked").map(function () {
+        return $(this).val();
+    }).get();
+    if (selectedClasses.length) teacherData.classes = selectedClasses;
+
+    const formData = new FormData();
+    formData.append('teacherData', JSON.stringify(teacherData));
+
+    const profilePictureFile = $('#profilePicture')[0].files[0];
+    if (profilePictureFile) {
+        formData.append('profilePicture', profilePictureFile);
+    }
+
+    // Encode the staff_id to handle forward slashes in the URL
+    const encodedStaffId = encodeURIComponent(teacherData.staff_id);
+
+    fetch(`/update-teacher/${encodedStaffId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            // If the response status is not OK (not 2xx), throw an error
+            return response.text().then(text => {
+                throw new Error(`Server responded with status ${response.status}: ${text}`);
+            });
         }
-
-        const selectedSubjects = $("input[name='subjects[]']:checked").map(function () {
-            return $(this).val();
-        }).get();
-        if (selectedSubjects.length) teacherData.subjects = selectedSubjects;
-
-        const selectedClasses = $("input[name='classes[]']:checked").map(function () {
-            return $(this).val();
-        }).get();
-        if (selectedClasses.length) teacherData.classes = selectedClasses;
-
-        const formData = new FormData();
-        formData.append('teacherData', JSON.stringify(teacherData));
-
-        const profilePictureFile = $('#profilePicture')[0].files[0];
-        if (profilePictureFile) {
-            formData.append('profilePicture', profilePictureFile);
+        return response.json();  // Only parse as JSON if the response is OK
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Teacher details updated successfully!');
+            $('#editStaffModal').modal('hide');
+            fetchStaff();
+        } else {
+            alert('Failed to update teacher details: ' + (data.message || 'Unknown error'));
         }
-
-        fetch(`/update-teacher/${teacherData.staff_id}`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                // If the response status is not OK (not 2xx), throw an error
-                return response.text().then(text => {
-                    throw new Error(`Server responded with status ${response.status}: ${text}`);
-                });
-            }
-            return response.json();  // Only parse as JSON if the response is OK
-        })
-        .then(data => {
-            if (data.success) {
-                alert('Teacher details updated successfully!');
-                $('#editStaffModal').modal('hide');
-                fetchStaff();
-            } else {
-                alert('Failed to update teacher details: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error updating teacher data:', error);
-            alert('An error occurred while updating teacher details. Please try again later.');
-        });
+    })
+    .catch(error => {
+        console.error('Error updating teacher data:', error);
+        alert('An error occurred while updating teacher details. Please try again later.');
     });
 });
-
+});
 function toggleNavbar() {
     const navbarNav = document.getElementById("navbarNav");
     const cancelButton = document.querySelector(".cancel-btn");
