@@ -164,3 +164,8 @@ $(document).ready(function () {
     }
     document.getElementById("myBtn").addEventListener("click", topFunction);
 });
+// Close button functionality
+function goBack() {
+    window.history.back();
+    }
+    
