@@ -1966,6 +1966,107 @@ Message: ${message}`,
     });
 });
 
+app.get('/stats', (req, res) => {
+    const sqlStudentsCount = 'SELECT COUNT(*) AS count FROM students';
+    const sqlClassesCount = 'SELECT COUNT(DISTINCT class) AS count FROM students';
+    const sqlSubjectsCount = 'SELECT COUNT(DISTINCT subjectName) AS count FROM subjects';
+    const sqlTeachersCount = 'SELECT COUNT(*) AS count FROM teachers';
+
+    // Count male and female students
+    const sqlMaleStudentsCount = 'SELECT COUNT(*) AS count FROM students WHERE gender = "Male"';
+    const sqlFemaleStudentsCount = 'SELECT COUNT(*) AS count FROM students WHERE gender = "Female"';
+
+    // Count male and female teachers
+    const sqlMaleTeachersCount = 'SELECT COUNT(*) AS count FROM teachers WHERE gender = "Male"';
+    const sqlFemaleTeachersCount = 'SELECT COUNT(*) AS count FROM teachers WHERE gender = "Female"';
+
+    // Fetch students count by class and gender
+    const sqlStudentsPerClass = `
+        SELECT class, 
+               SUM(CASE WHEN gender = "Male" THEN 1 ELSE 0 END) AS male_count, 
+               SUM(CASE WHEN gender = "Female" THEN 1 ELSE 0 END) AS female_count, 
+               COUNT(*) AS total_count 
+        FROM students
+        GROUP BY class
+    `;
+
+    db.query(sqlStudentsCount, (err, studentResult) => {
+        if (err) {
+            console.error('Error fetching student count:', err);
+            return res.status(500).json({ error: 'Failed to fetch student count' });
+        }
+
+        db.query(sqlClassesCount, (err, classResult) => {
+            if (err) {
+                console.error('Error fetching class count:', err);
+                return res.status(500).json({ error: 'Failed to fetch class count' });
+            }
+
+            db.query(sqlSubjectsCount, (err, subjectResult) => {
+                if (err) {
+                    console.error('Error fetching subject count:', err);
+                    return res.status(500).json({ error: 'Failed to fetch subject count' });
+                }
+
+                db.query(sqlTeachersCount, (err, teacherResult) => {
+                    if (err) {
+                        console.error('Error fetching teacher count:', err);
+                        return res.status(500).json({ error: 'Failed to fetch teacher count' });
+                    }
+
+                    db.query(sqlMaleStudentsCount, (err, maleStudentsResult) => {
+                        if (err) {
+                            console.error('Error fetching male student count:', err);
+                            return res.status(500).json({ error: 'Failed to fetch male student count' });
+                        }
+
+                        db.query(sqlFemaleStudentsCount, (err, femaleStudentsResult) => {
+                            if (err) {
+                                console.error('Error fetching female student count:', err);
+                                return res.status(500).json({ error: 'Failed to fetch female student count' });
+                            }
+
+                            db.query(sqlMaleTeachersCount, (err, maleTeachersResult) => {
+                                if (err) {
+                                    console.error('Error fetching male teacher count:', err);
+                                    return res.status(500).json({ error: 'Failed to fetch male teacher count' });
+                                }
+
+                                db.query(sqlFemaleTeachersCount, (err, femaleTeachersResult) => {
+                                    if (err) {
+                                        console.error('Error fetching female teacher count:', err);
+                                        return res.status(500).json({ error: 'Failed to fetch female teacher count' });
+                                    }
+
+                                    // Fetch students per class (male, female, and total)
+                                    db.query(sqlStudentsPerClass, (err, studentsPerClassResult) => {
+                                        if (err) {
+                                            console.error('Error fetching students per class:', err);
+                                            return res.status(500).json({ error: 'Failed to fetch students per class' });
+                                        }
+
+                                        // Send all the counts as JSON response
+                                        res.json({
+                                            studentsCount: studentResult[0].count,
+                                            classesCount: classResult[0].count,
+                                            subjectsCount: subjectResult[0].count,
+                                            teachersCount: teacherResult[0].count,
+                                            maleStudentsCount: maleStudentsResult[0].count,
+                                            femaleStudentsCount: femaleStudentsResult[0].count,
+                                            maleTeachersCount: maleTeachersResult[0].count,
+                                            femaleTeachersCount: femaleTeachersResult[0].count,
+                                            studentsPerClass: studentsPerClassResult // New data added here
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;

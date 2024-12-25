@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="dashboard.css"> <!-- Custom CSS (if any) -->
+</head>
+
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Report Dashboard</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <link rel="stylesheet" href="staff_management.css">
+    </head>
+    <body>
+         <!-- First Navbar (Images and Admin Dashboard Text) -->
+    <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
+        <!-- Left image (Education Cap) -->
+        <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+        
+        <!-- Navbar brand (Admin Dashboard text) centered -->
+        <span class="navbar-brand mx-auto text-dark">Reports&nbsp;&nbsp;Dashboard</span>
+        
+        <!-- Right image logo -->
+        <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+      </nav>
+      
+      <!-- Second Navbar (Navbar Items) -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
+        <!-- Toggler for mobile view -->
+        <div class="navbar-toggler" type="button" onclick="toggleNavbar()">
+            <span class="navbar-toggler-icon"></span> <!-- Menu Icon -->
+        </div>
+        <button class="cancel-btn" style="display:none;" onclick="toggleNavbar()">×</button> <!-- Cancel Icon -->
+        
+      
+        <!-- Collapsible navbar items -->
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="admin-dashboard.html">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-danger" id="resultManagementLink"  href="student_management.html">Students Management</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-danger" id="resultManagementLink"  href="staff_management.html">Staff Management</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" id="report"  href="overview.html">Report</a>
+                  </li>
+            </ul>
+        </div>
+      </nav>
+    <!-- Main Content Section -->
+    <main>
+        <!-- Admin Dashboard Stats Section -->
+        <div id="stats" class="container mt-4">
+            <h2 class="text-center">Report Control Panel</h2>
+            <div class="row stats-container">
+                <!-- Student Count -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Registered Students</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Students Count</h5>
+                            <p class="card-text"><span id="studentsCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Class Count -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Classes</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Classes Count</h5>
+                            <p class="card-text"><span id="classesCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Subject Count -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Subjects</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Subjects Count</h5>
+                            <p class="card-text"><span id="subjectsCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Teacher Count -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Teachers</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Teachers Count</h5>
+                            <p class="card-text"><span id="teachersCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Male and Female Teacher Counts -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Teachers by Gender</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Male Teachers</h5>
+                            <p class="card-text"><span id="maleTeachersCount">0</span></p>
+                            <h5 class="card-title">Female Teachers</h5>
+                            <p class="card-text"><span id="femaleTeachersCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Male and Female Student Counts -->
+                <div class="col-md-3">
+                    <div class="card mb-3">
+                        <div class="card-header">Students by Gender</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Male Students</h5>
+                            <p class="card-text"><span id="maleStudentsCount">0</span></p>
+                            <h5 class="card-title">Female Students</h5>
+                            <p class="card-text"><span id="femaleStudentsCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- New Container for Students Per Class -->
+<div class="container mt-4">
+    <h2 class="text-center">Students Per Class</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-3">
+                <div class="card-header">Student Distribution by Class</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Male Students</th>
+                                <th>Female Students</th>
+                                <th>Total Students</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsPerClass">
+                            <!-- Data will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="row">
+            <div class="col-md-3">
+                <p>Professor Ibeawuchi Amagwu Francis</p>
+                <p>Email: Frank.Amagwu@gmail.com</p>
+                <p>Phone: +234 803 328 4372</p>
+            </div>
+            <div class="col-md-3">
+                <p>Micro and Development Finance</p>
+                <p>National Open University of Nigeria</p>
+                <a href="https://www.facebook.com/prof.johndoe" target="_blank">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+            </div>
+            <div class="col-md-3 text-center">
+                <p>&copy; 2024 Professor Ibeawuchi Amagwu</p>
+                <p>All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Bootstrap and jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Admin Dashboard JS -->
+  <script src="report.js"></script>
+</body>
+
+</html>
