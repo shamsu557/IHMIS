@@ -1164,7 +1164,7 @@ app.get('/teacher/:id', (req, res) => {
 app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
     const staffId = req.params.staff_id;
     const teacherData = JSON.parse(req.body.teacherData);
-    const { name, email, phone, role, qualification, formClass, subjects, classes } = teacherData;
+    const { name, email, phone, role, gender,qualification, formClass, subjects, classes } = teacherData;
     const profilePicture = req.file ? req.file.filename : null;
 
     // Prepare the update columns and values
@@ -1175,6 +1175,7 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
     if (email) updateColumns.push('email'), updateValues.push(email);
     if (phone) updateColumns.push('phone'), updateValues.push(phone);
     if (role) updateColumns.push('role'), updateValues.push(role);
+    if (gender) updateColumns.push('gender'), updateValues.push(gender);
     if (qualification) updateColumns.push('qualification'), updateValues.push(qualification);
     if (formClass) updateColumns.push('formClass'), updateValues.push(formClass);
     if (profilePicture) updateColumns.push('profile_picture'), updateValues.push(profilePicture);
