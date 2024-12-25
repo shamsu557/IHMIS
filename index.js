@@ -89,6 +89,7 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
         res.json(teacher);
     });
 });
+//staff signup
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
     const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; 
     const profilePicture = req.file ? req.file.filename : null; 
@@ -97,7 +98,7 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
     const currentYear = new Date().getFullYear();
     const yearSuffix = currentYear.toString().slice(-2); 
     const randomNumber = Math.floor(Math.random() * 100) + 1; 
-    const staffId = `IHMIS/STF/${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; 
+    const staffId = `IHMISSTF${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; 
 
     // Step 1: Check if the email already exists in the database
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
@@ -788,48 +789,21 @@ app.get('/creation', (req, res) => {
 // Handle admin signup
 app.post('/creation', (req, res) => {
     const { username, password, email, fullName, phone, role } = req.body;
-
-    // Check if the email exists and ensure the phone field is empty
-db.query('SELECT email, phone FROM admins WHERE email = ?', [email], (err, results) => {
-    if (err) {
-        console.error('Error querying database for signup:', err);
-        return res.status(500).json({ success: false, message: 'Server error' });
-    }
-
-    // Check if email exists
-db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
-    if (err) {
-        console.error('Error querying database for signup:', err);
-        return res.status(500).json({ success: false, message: 'Server error' });
-    }
-
-    // Ensure the email exists in the database
-    if (results.length === 0) {
-        return res.status(400).json({
-            success: false,
-            message: 'Email not authorized for registration.'
-        });
-    }
-
-    // Check if the phone number already exists in the database
-    const checkPhoneQuery = 'SELECT * FROM teachers WHERE phone = ?';
-    db.query(checkPhoneQuery, [phone], (err, phoneResults) => {
+    // Check if the email exists
+    db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         if (err) {
-            console.error('Error checking phone number in database:', err);
+            console.error('Error querying database for signup:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // If phone number already exists in the database, prevent signup
-        if (phoneResults.length > 0) {
+        // Ensure the email exists in the database
+        if (results.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'This phone number is already registered.'
+                message: 'Email not authorized for registration.'
             });
         }
-    });
-});
 
-   
         // Hash the password
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
             if (err) {
@@ -850,6 +824,7 @@ db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         });
     });
 });
+
 app.get('/Student_dashboard', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/StudentLogin');
