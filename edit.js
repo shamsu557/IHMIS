@@ -147,7 +147,7 @@ $('#confirm-edit-save').click(function() {
 
         editStudent(updatedStudent, confirmationInput, passwordInput);
     } else {
-        alert('Please enter your Staff ID/Email and Password.');
+        alert('Please enter Admin username/email  and Password.');
     }
 });
 
