@@ -154,6 +154,7 @@
                     <input type="text" id="edit-othername" class="form-control mb-2" placeholder="Other Name">
                     <input type="text" id="edit-surname" class="form-control mb-2" placeholder="Surname" required>
                     <input type="text" id="edit-guardian-phone" class="form-control mb-2" placeholder="Guardian Phone" required>
+                    
 
                     <label for="formClass">Class</label>
                     <select class="form-control mb-2" id="formClass" required>
@@ -174,7 +175,14 @@
                         <option value="SSS Two">SSS 2</option>
                         <option value="SSS Three">SSS 3</option>
                     </select>
-
+                    <div class="form-group">
+                        <label for="gender" class="form-label">Gender</label><br>
+                        <select class="form-select" id="gender" name="gender" required> 
+                          <option value="" disabled selected>Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                    </div>
 
                     <div class="form-group">
                         <label for="subjects">Subjects</label>
