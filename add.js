@@ -19,7 +19,7 @@ function toggleNavbar() {
 function generateStudentID() {
     const year = new Date().getFullYear().toString().slice(-2); // last 2 digits of the year
     const randomNum = Math.floor(Math.random() * 1000) + 1; // number between 1 and 1000
-    return `IHS${year}${randomNum}`;
+    return `IHMISTD${year}${randomNum}`;
 }
 
 // Handle form submission
