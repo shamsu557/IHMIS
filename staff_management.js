@@ -131,6 +131,7 @@ $(document).ready(function() {
                     $('#email').val(teacher.email);
                     $('#phone').val(teacher.phone);
                     $('#role').val(teacher.role);
+                    $('#gender').val(teacher.gender);
                     $('#qualification').val(teacher.qualification);
 
                     // Show or hide form class based on role
