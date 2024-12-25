@@ -89,46 +89,51 @@ app.get('/api/teacher-details', isAuthenticated, (req, res) => {
         res.json(teacher);
     });
 });
-// Handle User Signup with profile picture
+//staff signup
 app.post('/signup', upload.single('profilePicture'), (req, res) => {
-    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; // Include phone in destructuring 
-    const profilePicture = req.file ? req.file.filename : null; // Save the uploaded profile picture file name
+    const { name, email, password, security_question, security_answer, role, formClass, subjects, classes, qualification, gender, phone } = req.body; 
+    const profilePicture = req.file ? req.file.filename : null; 
 
-    // Generate a staff ID in the format IHMISYYNN, where YY is the last two digits of the year and NN is a random number between 1 and 100
+    // Generate a staff ID in the format IHMISYYNN
     const currentYear = new Date().getFullYear();
-    const yearSuffix = currentYear.toString().slice(-2); // Get last two digits of the year
-    const randomNumber = Math.floor(Math.random() * 100) + 1; // Random number between 1 and 100
-    const staffId = `IHMIS/STF/${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; // Format staff ID
+    const yearSuffix = currentYear.toString().slice(-2); 
+    const randomNumber = Math.floor(Math.random() * 100) + 1; 
+    const staffId = `IHMISSTF${yearSuffix}${randomNumber.toString().padStart(2, '0')}`; 
 
-    // Check if the email exists in the teachers table
+    // Step 1: Check if the email already exists in the database
     db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         if (err) {
             console.error('Error querying database for email verification:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // If the email is not found in the teachers table, prevent signup
+        // Step 2: If the email does not exist, return an error
         if (results.length === 0) {
             return res.status(400).json({ success: false, message: 'Email not authorized for signup.' });
         }
 
-        // Hash the password
+        // Step 3: If the email exists but is already registered (i.e., `registered` field is set to 1), prevent re-registration
+        if (results[0].registered === 1) {
+            return res.status(400).json({ success: false, message: 'This email has already been registered.' });
+        }
+
+        // Step 4: Proceed with password hashing and other user data handling if the email is not yet registered
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
             if (err) {
                 console.error('Error hashing password:', err);
                 return res.status(500).json({ success: false, message: 'Server error' });
             }
 
-            // Build the SQL query to update the teacher's information
-            const columns = ['name', 'password', 'security_question','security_answer',  'role', 'qualification', 'profile_picture', 'staff_id', 'gender','phone']; // Add 'phone' to columns 
-            const values = [name, hashedPassword,security_question, security_answer, role, qualification, profilePicture, staffId, gender, phone]; // Add 'phone' to values
+            // Prepare the columns and values to update the teacher's information
+            const columns = ['name', 'password', 'security_question', 'security_answer', 'role', 'qualification', 'profile_picture', 'staff_id', 'gender', 'phone']; 
+            const values = [name, hashedPassword, security_question, security_answer, role, qualification, profilePicture, staffId, gender, phone]; 
 
             if (role === 'Form Master') {
-                columns.push('formClass'); // Include formClass if role is 'Form Master'
+                columns.push('formClass');
                 values.push(formClass);
             }
 
-            // Update teacher's information in the database
+            // Step 5: Update the teacher's information in the database
             const query = `UPDATE teachers SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE email = ?`;
 
             db.query(query, [...values, email], (err, result) => {
@@ -137,43 +142,49 @@ app.post('/signup', upload.single('profilePicture'), (req, res) => {
                     return res.status(500).json({ success: false, message: 'Server error' });
                 }
 
-                // Use the teacher's ID from the results
-                const teacherId = results[0].id; // Get the ID of the existing teacher
-
-                // Helper function to insert subjects or classes
-                const insertItems = (table, itemList) => {
-                    if (Array.isArray(itemList) && itemList.length > 0) {
-                        const columnName = table === 'teacher_subjects' ? 'subject' : 'class'; // Correctly define column name based on the table
-                        const queries = itemList.map(item => 
-                            new Promise((resolve, reject) => {
-                                db.query(`INSERT INTO ${table} (teacher_id, ${columnName}) VALUES (?, ?)`, [teacherId, item.trim()], (err) => {
-                                    if (err) reject(err);
-                                    else resolve();
-                                });
-                            })
-                        );
-                        return Promise.all(queries);
+                // Step 6: Mark the email as registered by setting `registered = 1`
+                db.query('UPDATE teachers SET registered = 1 WHERE email = ?', [email], (err, updateResult) => {
+                    if (err) {
+                        console.error('Error marking email as registered:', err);
+                        return res.status(500).json({ success: false, message: 'Server error' });
                     }
-                    return Promise.resolve(); // No items to insert
-                };
 
-                // Insert subjects and classes
-                Promise.all([
-                    insertItems('teacher_subjects', subjects),
-                    insertItems('teacher_classes', classes)
-                ])
-                .then(() => {
-                    res.json({ success: true, message: 'Teacher registered successfully.', staffId: staffId });
-                })
-                .catch(err => {
-                    console.error('Error inserting subjects or classes:', err);
-                    res.status(500).json({ success: false, message: 'Failed to register some subjects or classes.' });
+                    // Step 7: Use the teacher's ID and insert subjects/classes
+                    const teacherId = results[0].id;
+
+                    const insertItems = (table, itemList) => {
+                        if (Array.isArray(itemList) && itemList.length > 0) {
+                            const columnName = table === 'teacher_subjects' ? 'subject' : 'class';
+                            const queries = itemList.map(item => 
+                                new Promise((resolve, reject) => {
+                                    db.query(`INSERT INTO ${table} (teacher_id, ${columnName}) VALUES (?, ?)`, [teacherId, item.trim()], (err) => {
+                                        if (err) reject(err);
+                                        else resolve();
+                                    });
+                                })
+                            );
+                            return Promise.all(queries);
+                        }
+                        return Promise.resolve();
+                    };
+
+                    // Insert subjects and classes
+                    Promise.all([
+                        insertItems('teacher_subjects', subjects),
+                        insertItems('teacher_classes', classes)
+                    ])
+                    .then(() => {
+                        res.json({ success: true, message: 'Teacher registered successfully.', staffId: staffId });
+                    })
+                    .catch(err => {
+                        console.error('Error inserting subjects or classes:', err);
+                        res.status(500).json({ success: false, message: 'Failed to register some subjects or classes.' });
+                    });
                 });
             });
         });
     });
 });
-
 
 // Middleware to check if the user is logged in
 function isAuthenticated(req, res, next) {
@@ -355,6 +366,7 @@ app.post('/add-student', upload.single('studentPicture'), (req, res) => {
     const surname = req.body.surname;
     const othername = req.body.othername;
     const studentClass = req.body.class;
+    const gender = req.body.gender;
     const guardianPhone = req.body.guardianPhone;
     const studentPicture = req.file.filename; // File name stored in the server
 
@@ -374,8 +386,8 @@ app.post('/add-student', upload.single('studentPicture'), (req, res) => {
         }
 
         // Insert student data into students table
-        const insertStudentQuery = 'INSERT INTO students (studentID, firstname, surname, othername, class, guardianPhone, studentPicture) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const studentValues = [studentID, firstname, surname, othername, studentClass, guardianPhone, studentPicture];
+        const insertStudentQuery = 'INSERT INTO students (studentID, firstname, surname, othername, class,gender, guardianPhone, studentPicture) VALUES (?, ?,?, ?, ?, ?, ?, ?)';
+        const studentValues = [studentID, firstname, surname, othername, studentClass,gender, guardianPhone, studentPicture];
 
         db.query(insertStudentQuery, studentValues, (err, result) => {
             if (err) {
@@ -498,17 +510,19 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
 //edit student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
     const {
-        id, firstname, othername, surname, guardianPhone, studentClass,
+        id, firstname, othername, surname, guardianPhone, studentClass, gender,
         subjects, staffEmailOrID, password
     } = req.body;
 
     const studentPicture = req.file ? req.file.filename : null;
 
-    // Start with a base query
+    if (!id) {
+        return res.status(400).json({ error: 'Student ID is required' });
+    }
+
     let updateStudentQuery = `UPDATE students SET `;
     let queryValues = [];
 
-    // Conditionally add fields to the query
     if (firstname) {
         updateStudentQuery += `firstname = ?, `;
         queryValues.push(firstname);
@@ -529,10 +543,27 @@ app.post('/api/editStudent', upload.single('picture'), (req, res) => {
         updateStudentQuery += `class = ?, `;
         queryValues.push(studentClass);
     }
+    if (gender) {
+        updateStudentQuery += `gender = ?, `;
+        queryValues.push(gender);
+    }
     if (studentPicture) {
         updateStudentQuery += `studentPicture = ?, `;
         queryValues.push(studentPicture);
     }
+
+    // Remove trailing comma
+    updateStudentQuery = updateStudentQuery.slice(0, -2);
+    updateStudentQuery += ` WHERE id = ?`;
+    queryValues.push(id);
+
+    db.query(updateStudentQuery, queryValues, (err, result) => {
+        if (err) {
+            console.error('Database Error:', err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        res.status(200).json({ message: 'Student updated successfully' });
+    });
 
     // Trim the trailing comma and space from the query
     updateStudentQuery = updateStudentQuery.slice(0, -2);
@@ -777,48 +808,21 @@ app.get('/creation', (req, res) => {
 // Handle admin signup
 app.post('/creation', (req, res) => {
     const { username, password, email, fullName, phone, role } = req.body;
-
-    // Check if the email exists and ensure the phone field is empty
-db.query('SELECT email, phone FROM admins WHERE email = ?', [email], (err, results) => {
-    if (err) {
-        console.error('Error querying database for signup:', err);
-        return res.status(500).json({ success: false, message: 'Server error' });
-    }
-
-    // Check if email exists
-db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
-    if (err) {
-        console.error('Error querying database for signup:', err);
-        return res.status(500).json({ success: false, message: 'Server error' });
-    }
-
-    // Ensure the email exists in the database
-    if (results.length === 0) {
-        return res.status(400).json({
-            success: false,
-            message: 'Email not authorized for registration.'
-        });
-    }
-
-    // Check if the phone number already exists in the database
-    const checkPhoneQuery = 'SELECT * FROM teachers WHERE phone = ?';
-    db.query(checkPhoneQuery, [phone], (err, phoneResults) => {
+    // Check if the email exists
+    db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         if (err) {
-            console.error('Error checking phone number in database:', err);
+            console.error('Error querying database for signup:', err);
             return res.status(500).json({ success: false, message: 'Server error' });
         }
 
-        // If phone number already exists in the database, prevent signup
-        if (phoneResults.length > 0) {
+        // Ensure the email exists in the database
+        if (results.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'This phone number is already registered.'
+                message: 'Email not authorized for registration.'
             });
         }
-    });
-});
 
-   
         // Hash the password
         bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
             if (err) {
@@ -839,6 +843,7 @@ db.query('SELECT * FROM teachers WHERE email = ?', [email], (err, results) => {
         });
     });
 });
+
 app.get('/Student_dashboard', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/StudentLogin');
@@ -1177,8 +1182,8 @@ app.get('/teacher/:id', (req, res) => {
 // Edit staff with separate handling for subjects and classes
 app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
     const staffId = req.params.staff_id;
-    const teacherData = JSON.parse(req.body.teacherData);
-    const { name, email, phone, role, qualification, formClass, subjects, classes } = teacherData;
+    const teacherData = JSON.parse(req.body.teacherData || '{}');
+    const { name, email, phone, role, gender, qualification, formClass, subjects, classes } = teacherData;
     const profilePicture = req.file ? req.file.filename : null;
 
     // Prepare the update columns and values
@@ -1189,6 +1194,7 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
     if (email) updateColumns.push('email'), updateValues.push(email);
     if (phone) updateColumns.push('phone'), updateValues.push(phone);
     if (role) updateColumns.push('role'), updateValues.push(role);
+    if (gender) updateColumns.push('gender'), updateValues.push(gender);
     if (qualification) updateColumns.push('qualification'), updateValues.push(qualification);
     if (formClass) updateColumns.push('formClass'), updateValues.push(formClass);
     if (profilePicture) updateColumns.push('profile_picture'), updateValues.push(profilePicture);
@@ -1262,6 +1268,7 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
         });
     });
 });
+
 
 // Endpoint to fetch student details by StudentID
 app.post('/api/fetchStudentByID', (req, res) => {
@@ -1980,6 +1987,107 @@ Message: ${message}`,
     });
 });
 
+app.get('/stats', (req, res) => {
+    const sqlStudentsCount = 'SELECT COUNT(*) AS count FROM students';
+    const sqlClassesCount = 'SELECT COUNT(DISTINCT class) AS count FROM students';
+    const sqlSubjectsCount = 'SELECT COUNT(DISTINCT subjectName) AS count FROM subjects';
+    const sqlTeachersCount = 'SELECT COUNT(*) AS count FROM teachers';
+
+    // Count male and female students
+    const sqlMaleStudentsCount = 'SELECT COUNT(*) AS count FROM students WHERE gender = "Male"';
+    const sqlFemaleStudentsCount = 'SELECT COUNT(*) AS count FROM students WHERE gender = "Female"';
+
+    // Count male and female teachers
+    const sqlMaleTeachersCount = 'SELECT COUNT(*) AS count FROM teachers WHERE gender = "Male"';
+    const sqlFemaleTeachersCount = 'SELECT COUNT(*) AS count FROM teachers WHERE gender = "Female"';
+
+    // Fetch students count by class and gender
+    const sqlStudentsPerClass = `
+        SELECT class, 
+               SUM(CASE WHEN gender = "Male" THEN 1 ELSE 0 END) AS male_count, 
+               SUM(CASE WHEN gender = "Female" THEN 1 ELSE 0 END) AS female_count, 
+               COUNT(*) AS total_count 
+        FROM students
+        GROUP BY class
+    `;
+
+    db.query(sqlStudentsCount, (err, studentResult) => {
+        if (err) {
+            console.error('Error fetching student count:', err);
+            return res.status(500).json({ error: 'Failed to fetch student count' });
+        }
+
+        db.query(sqlClassesCount, (err, classResult) => {
+            if (err) {
+                console.error('Error fetching class count:', err);
+                return res.status(500).json({ error: 'Failed to fetch class count' });
+            }
+
+            db.query(sqlSubjectsCount, (err, subjectResult) => {
+                if (err) {
+                    console.error('Error fetching subject count:', err);
+                    return res.status(500).json({ error: 'Failed to fetch subject count' });
+                }
+
+                db.query(sqlTeachersCount, (err, teacherResult) => {
+                    if (err) {
+                        console.error('Error fetching teacher count:', err);
+                        return res.status(500).json({ error: 'Failed to fetch teacher count' });
+                    }
+
+                    db.query(sqlMaleStudentsCount, (err, maleStudentsResult) => {
+                        if (err) {
+                            console.error('Error fetching male student count:', err);
+                            return res.status(500).json({ error: 'Failed to fetch male student count' });
+                        }
+
+                        db.query(sqlFemaleStudentsCount, (err, femaleStudentsResult) => {
+                            if (err) {
+                                console.error('Error fetching female student count:', err);
+                                return res.status(500).json({ error: 'Failed to fetch female student count' });
+                            }
+
+                            db.query(sqlMaleTeachersCount, (err, maleTeachersResult) => {
+                                if (err) {
+                                    console.error('Error fetching male teacher count:', err);
+                                    return res.status(500).json({ error: 'Failed to fetch male teacher count' });
+                                }
+
+                                db.query(sqlFemaleTeachersCount, (err, femaleTeachersResult) => {
+                                    if (err) {
+                                        console.error('Error fetching female teacher count:', err);
+                                        return res.status(500).json({ error: 'Failed to fetch female teacher count' });
+                                    }
+
+                                    // Fetch students per class (male, female, and total)
+                                    db.query(sqlStudentsPerClass, (err, studentsPerClassResult) => {
+                                        if (err) {
+                                            console.error('Error fetching students per class:', err);
+                                            return res.status(500).json({ error: 'Failed to fetch students per class' });
+                                        }
+
+                                        // Send all the counts as JSON response
+                                        res.json({
+                                            studentsCount: studentResult[0].count,
+                                            classesCount: classResult[0].count,
+                                            subjectsCount: subjectResult[0].count,
+                                            teachersCount: teacherResult[0].count,
+                                            maleStudentsCount: maleStudentsResult[0].count,
+                                            femaleStudentsCount: femaleStudentsResult[0].count,
+                                            maleTeachersCount: maleTeachersResult[0].count,
+                                            femaleTeachersCount: femaleTeachersResult[0].count,
+                                            studentsPerClass: studentsPerClassResult // New data added here
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;

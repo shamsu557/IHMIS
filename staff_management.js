@@ -120,49 +120,54 @@ $(document).ready(function() {
     });
 
     // Function to open and populate the Edit Staff modal
-    window.editStaff = function (staffId) {
-        fetch(`/teacher/${staffId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const teacher = data.teacher;
-                    $('#staffId').val(teacher.staff_id);
-                    $('#name').val(teacher.name);
-                    $('#email').val(teacher.email);
-                    $('#phone').val(teacher.phone);
-                    $('#role').val(teacher.role);
-                    $('#gender').val(teacher.gender);
-                    $('#qualification').val(teacher.qualification);
+window.editStaff = function (staffId) {
+    fetch(`/teacher/${staffId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const teacher = data.teacher;
 
-                    // Show or hide form class based on role
-                    if (teacher.role === 'Form Master') {
-                        $('#class-selection').show();
-                        $('#formClass').val(teacher.formClass || '');
-                    } else {
-                        $('#class-selection').hide();
-                        $('#formClass').val('');
-                    }
+                $('#staffId').val(teacher.staff_id);
+                $('#name').val(teacher.name);
+                $('#email').val(teacher.email);
+                $('#phone').val(teacher.phone);
+                $('#role').val(teacher.role);
+                
+                // Populate gender with validation
+                console.log('Gender:', teacher.gender); // Debugging
+                $('#gender').val(teacher.gender ? teacher.gender.trim() : '');
 
-                    // Populate subjects
-                    const subjectSelect = $('#subjects').empty();
-                    (teacher.subjects || []).forEach(subject => {
-                        subjectSelect.append(`<option value="${subject}" selected>${subject}</option>`);
-                    });
+                $('#qualification').val(teacher.qualification);
 
-                    // Populate classes
-                    const classSelect = $('#classes').empty();
-                    (teacher.classes || []).forEach(classItem => {
-                        classSelect.append(`<option value="${classItem}" selected>${classItem}</option>`);
-                    });
-
-                    // Show the modal
-                    $('#editStaffModal').modal('show');
+                // Show or hide form class based on role
+                if (teacher.role === 'Form Master') {
+                    $('#class-selection').show();
+                    $('#formClass').val(teacher.formClass || '');
                 } else {
-                    alert('Could not load staff data for editing.');
+                    $('#class-selection').hide();
+                    $('#formClass').val('');
                 }
-            })
-            .catch(error => console.error('Error loading staff data:', error));
-    };
+
+                // Populate subjects
+                const subjectSelect = $('#subjects').empty();
+                (teacher.subjects || []).forEach(subject => {
+                    subjectSelect.append(`<option value="${subject}" selected>${subject}</option>`);
+                });
+
+                // Populate classes
+                const classSelect = $('#classes').empty();
+                (teacher.classes || []).forEach(classItem => {
+                    classSelect.append(`<option value="${classItem}" selected>${classItem}</option>`);
+                });
+
+                // Show the modal after all fields are set
+                $('#editStaffModal').modal('show');
+            } else {
+                alert('Could not load staff data for editing.');
+            }
+        })
+        .catch(error => console.error('Error loading staff data:', error));
+};
 
     // Handle form submission in the modal
 $('#editTeacherForm').on('submit', function (e) {
@@ -174,6 +179,7 @@ $('#editTeacherForm').on('submit', function (e) {
         email: $('#email').val(),
         phone: $('#phone').val(),
         role: $('#role').val(),
+        role: $('#gender').val(),
         qualification: $('#qualification').val()
     };
 
