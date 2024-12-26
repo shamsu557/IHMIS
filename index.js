@@ -507,123 +507,63 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
-//edit student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
-    const {
-        id, firstname, othername, surname, guardianPhone, studentClass,
-        subjects, staffEmailOrID, password
-    } = req.body;
-
+    const { id, firstname, othername, surname, guardianPhone, studentClass, subjects, staffEmailOrID, password, gender } = req.body;
     const studentPicture = req.file ? req.file.filename : null;
 
-    // Start with a base query
-    let updateStudentQuery = `UPDATE students SET `;
-    let queryValues = [];
+    let updateColumns = [];
+    let updateValues = [];
 
-    // Conditionally add fields to the query
-    if (firstname) {
-        updateStudentQuery += `firstname = ?, `;
-        queryValues.push(firstname);
-    }
-    if (othername) {
-        updateStudentQuery += `othername = ?, `;
-        queryValues.push(othername);
-    }
-    if (surname) {
-        updateStudentQuery += `surname = ?, `;
-        queryValues.push(surname);
-    }
-    if (guardianPhone) {
-        updateStudentQuery += `guardianPhone = ?, `;
-        queryValues.push(guardianPhone);
-    }
-    if (studentClass) {
-        updateStudentQuery += `class = ?, `;
-        queryValues.push(studentClass);
-    }
-    if (studentPicture) {
-        updateStudentQuery += `studentPicture = ?, `;
-        queryValues.push(studentPicture);
+    if (firstname) updateColumns.push('firstname'), updateValues.push(firstname);
+    if (othername) updateColumns.push('othername'), updateValues.push(othername);
+    if (surname) updateColumns.push('surname'), updateValues.push(surname);
+    if (guardianPhone) updateColumns.push('guardianPhone'), updateValues.push(guardianPhone);
+    if (studentClass) updateColumns.push('class'), updateValues.push(studentClass);
+    if (gender) updateColumns.push('gender'), updateValues.push(gender);
+    if (studentPicture) updateColumns.push('studentPicture'), updateValues.push(studentPicture);
+
+    if (updateColumns.length === 0) {
+        return res.status(400).json({ message: 'No fields to update.' });
     }
 
-    // Trim the trailing comma and space from the query
-    updateStudentQuery = updateStudentQuery.slice(0, -2);
+    const updateQuery = `UPDATE students SET ${updateColumns.map(col => `${col} = ?`).join(', ')} WHERE studentID = ?`;
+    updateValues.push(id);
 
-    // Add the WHERE clause to update the specific student
-    updateStudentQuery += ` WHERE studentID = ?`;
-    queryValues.push(id);
-
-    const checkAdminQuery = `
-        SELECT * FROM admins
-        WHERE (username = ? OR email = ?)
-    `;
+    const checkAdminQuery = `SELECT * FROM admins WHERE (username = ? OR email = ?)`;
 
     db.query(checkAdminQuery, [staffEmailOrID, staffEmailOrID], (err, adminResults) => {
-        if (err) {
-            console.error('Error verifying admin:', err);
-            return res.status(500).json({ message: 'Error verifying admin credentials' });
-        }
-
-        if (adminResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
-        }
+        if (err) return res.status(500).json({ message: 'Error verifying admin credentials' });
+        if (adminResults.length === 0) return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
 
         const admin = adminResults[0];
-
         bcrypt.compare(password, admin.password, (err, isMatch) => {
-            if (err) {
-                console.error('Error comparing passwords:', err);
-                return res.status(500).json({ message: 'Error verifying password' });
-            }
+            if (err) return res.status(500).json({ message: 'Error verifying password' });
+            if (!isMatch) return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
 
-            if (!isMatch) {
-                return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
-            }
+            // Update student
+            db.query(updateQuery, updateValues, (err) => {
+                if (err) return res.status(500).json({ message: 'Error updating student.' });
 
-            // Proceed to update the student if credentials are correct
-            db.query(updateStudentQuery, queryValues, (err) => {
-                if (err) {
-                    console.error('Error updating student in database:', err);
-                    return res.status(500).json({ message: 'Error updating student.' });
-                }
-
-                // If subjects are provided, update them
                 if (subjects) {
-                    const subjectsArray = subjects.split(',').map(subj => subj.trim());
-
-                    // Delete existing subjects for the student
+                    const subjectsArray = subjects.split(',').map(sub => sub.trim());
                     db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
-                        if (err) {
-                            console.error('Error clearing subjects from database:', err);
-                            return res.status(500).json({ message: 'Error updating subjects.' });
-                        }
+                        if (err) return res.status(500).json({ message: 'Error clearing subjects.' });
 
-                        // Insert new subjects for the student
-                        const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
-                        const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
-                            db.query(insertSubjectQuery, [id, subject], (err) => {
-                                if (err) {
-                                    console.error(`Error inserting subject "${subject}" for studentID ${id}:`, err);
-                                    reject(err);
-                                } else {
-                                    resolve();
-                                }
+                        const insertQueries = subjectsArray.map(subject => {
+                            return new Promise((resolve, reject) => {
+                                db.query('INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)', [id, subject], (err) => {
+                                    if (err) reject(err);
+                                    else resolve();
+                                });
                             });
-                        }));
+                        });
 
-                        // Wait for all insertions to complete
-                        Promise.all(insertPromises)
-                            .then(() => {
-                                res.status(200).json({ message: 'Student updated successfully with new subjects.' });
-                            })
-                            .catch(err => {
-                                console.error('Error updating subjects:', err);
-                                res.status(500).json({ message: 'Error updating subjects.' });
-                            });
+                        Promise.all(insertQueries)
+                            .then(() => res.status(200).json({ message: 'Student updated successfully with new subjects.' }))
+                            .catch(err => res.status(500).json({ message: 'Error updating subjects.' }));
                     });
                 } else {
-                    // If no subjects were provided, just update the student without modifying subjects
-                    res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
+                    res.status(200).json({ message: 'Student updated successfully.' });
                 }
             });
         });
@@ -1159,7 +1099,6 @@ app.get('/teacher/:id', (req, res) => {
         }
     });
 });
-//edit staff
 // Edit staff with separate handling for subjects and classes
 app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
     const staffId = req.params.staff_id;
