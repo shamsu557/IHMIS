@@ -179,7 +179,7 @@ $('#editTeacherForm').on('submit', function (e) {
         email: $('#email').val(),
         phone: $('#phone').val(),
         role: $('#role').val(),
-        role: $('#gender').val(),
+        gender: $('#gender').val(),
         qualification: $('#qualification').val()
     };
 
