@@ -1,0 +1,32 @@
+Exercise 1: Create a Responsive Container
+Create a webpage with:
+A container that includes a heading: "Welcome to Bootstrap Containers".
+Below it, add a paragraph: "This is a fixed-width container."
+Add another container-fluid below with a heading: "Welcome to Fluid Containers".
+Include a paragraph: "This container takes up the full width of the screen."
+Use different background colors for the two sections for visual distinction.
+Exercise 2: Customize Text Colors
+Create a page with three paragraphs:
+The first paragraph should use Bootstrap's text-primary class.
+The second paragraph should use text-danger class.
+The third paragraph should use text-success class.
+Add a heading above each paragraph, describing the text color it represents.
+Exercise 3: Styling the Background
+Create a page with three sections:
+The first section should have a bg-light class.
+The second section should have a bg-info class.
+The third section should have a bg-dark class with text styled in white (text-white).
+Add some text inside each section to describe its background color.
+Exercise 4: Combine Container, Text, and Background
+Design a webpage with the following:
+A container with a bg-primary background and text-white text. Add a heading and a paragraph inside.
+Inside the same container, create a row with two columns:
+One column with bg-danger and text-light.
+The other column with bg-success and text-dark.
+Add sample text in both columns.
+Exercise 5: Personal Portfolio Practice
+Create a mock personal portfolio page:
+Use a fluid container for the main layout.
+Add a bg-dark navbar with links styled in text-light.
+Include a hero section with a heading and paragraph inside a bg-info container.
+Add a "Contact Me" section with a form styled with a bg-light container and text in text-dark.
