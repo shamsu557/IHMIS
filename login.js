@@ -58,14 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-//login for admin
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const redirectTo = urlParams.get('redirectTo');
-    if (redirectTo) {
-      document.getElementById('redirectTo').value = redirectTo;
-    }
-  });
+
    // Back to top button functionality
  window.onscroll = function() {scrollFunction()};
 
