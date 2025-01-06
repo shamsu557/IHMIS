@@ -17,6 +17,14 @@ background: white;
   border-radius: 10px;
   background: white;
   }
+  .container-fluid {
+    max-width: 775px; /* Fixed width for larger screens */
+    margin: auto;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background: white;
+    }
   
 /* Ensure table is responsive */
 table {
@@ -470,6 +478,9 @@ display: none;
 }
 .news-section {
   padding: 20px;
+}
+.new-section, li{
+  list-style: none;
 }
 .hero-section {
   background: url('students.jfif') no-repeat center center/cover;
