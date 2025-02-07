@@ -179,7 +179,7 @@ display: none;
 /* Cancel button styles */
 .cancel-btn {
 display: none; /* Hidden by default */
-background: darkgray;
+background: rgb(92, 146, 234);
 border: none;
 font-size: 1.5rem; /* Adjust size as needed */
 color: #141516; /* Color of the icon */
@@ -223,7 +223,7 @@ button {
   font-size: 16px;
 }
 button:hover {
-  background-color: #a6a6a9;
+  background-color: #437fda;
 }
 .footer {
 background: #f8f9fa;
@@ -269,7 +269,7 @@ right: 30px;
 z-index: 99;
 border: none;
 outline: none;
-background-color: rgb(210, 210, 233);
+background-color: #89b6e9;
 color: white;
 cursor: pointer;
 padding: 15px;
@@ -277,7 +277,7 @@ border-radius: 4px;
 }
 
 #myBtn:hover {
-background-color: #555;
+background-color:rgb(84, 140, 237);
 }
 
 /* Close button styling */
@@ -308,63 +308,33 @@ background-color: #555;
   font-size: 1.3rem;
   color: #333;
 }
-/* Mobile adjustments for layout */
 @media (max-width: 576px) {
-/* Adjust body for mobile screens */
-body {
-background-color: white;
-padding-top: 100px;
-}
-
-/*  container for small screens */
-.container {
-  max-width: 450px; /* Fixed width for larger screens */
-  margin: auto;
-  padding: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  background: white;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  .navbar-collapse {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers items horizontally */
+    text-align: center; /* Ensures text is centered */
   }
 
-/* Scrollable modal */
-.modal-body-scroll {
-max-height: 300px;
-overflow-y: auto;
-}
-
-/* Adjust circular images */
-.fixed-image, .circular-img {
-width: 40px;
-height: 40px;
-object-fit: cover;
-border-radius: 50%;
-}
-
-/* Navbar adjustments for small screens */
-.first-navbar {
-top: 0;
-padding: 0 8px;
-}
-
-.second-navbar {
-top: 50px;
-padding: 15px 10px;
-height: 40px;
-}
-
-.navbar-toggler {
-  left: 50%;
-  transform: translateX(250%);
+  .navbar-nav {
+    width: 100%; /* Ensures full width for centering */
   }
-  
-  .cancel-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 1.25rem;
+
+  .navbar-nav .nav-item {
+    width: 100%; /* Makes each item take full width */
   }
-  
+
+  .navbar-nav .nav-link {
+    display: block;
+    padding: 10px 0;
+  }
+  .navbar-toggler {
+    left: 50%;
+    transform: translateX(250%);
+    }
+    
+}
+
 /* Footer adjustments */
 .footer {
 padding: 8px;
@@ -390,7 +360,6 @@ bottom: 10px;
 right: 10px;
 padding: 10px;
 font-size: 14px;
-}
 }
 
 /* Larger screen styles */
@@ -482,25 +451,68 @@ display: none;
 .new-section, li{
   list-style: none;
 }
+/* Hero Section */
 .hero-section {
-  background: url('students.jfif') no-repeat center center/cover;
-  height: 350px;
+  position: relative;
+  width: 100%;
+  height: 70vh; /* Proper height for large screens */
+  display: flex;
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* Apply Background Image Dynamically */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Dark overlay for contrast */
+  z-index: 1;
+}
+
+/* Default caption behavior */
+.carousel-caption {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 800px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.6); /* Dark background for readability */
   color: white;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+  box-sizing: border-box;
+  border-radius: 10px;
 }
-.hero-section h1 {
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 15px 25px;
-  border-radius: 5px;
+
+/* Headings and Paragraph styles inside the caption */
+.carousel-caption h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #fff;
 }
-.section-title {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #17a2b8;
+
+.carousel-caption p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ddd;
+  max-width: 90%;
+  margin: 0;
 }
+
 .achievements-container li{
   list-style: none;
 }
@@ -604,4 +616,12 @@ display: none;
   border-radius: 45%;
   object-fit: cover; /* Ensures the image fits inside the boundaries without distortion */
   overflow: hidden; /* Hides anything outside the circular boundary */
+}
+/* Ensure images are centered but not cropped from the top */
+img.rounded-circle {
+  width: 150px;  /* Set a fixed width for all images */
+  height: 150px;  /* Set a fixed height for all images */
+  object-fit: cover;  /* Ensure the images are cropped to fill the circle */
+  object-position: top;  /* Align the top of the image with the circle's top edge */
+  margin-bottom: 10px;  /* Add space below images */
 }
