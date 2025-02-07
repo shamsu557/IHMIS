@@ -4,15 +4,15 @@ function toggleNavbar() {
   const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
 
   if (navbarNav.classList.contains("show")) {
-      // If navbar is open, close it
-      navbarNav.classList.remove("show");
-      cancelButton.style.display = "none"; // Hide cancel button
-      menuIcon.classList.remove("hidden"); // Show menu icon
+    // If navbar is open, close it
+    navbarNav.classList.remove("show");
+    cancelButton.style.display = "none"; // Hide cancel button
+    menuIcon.classList.remove("hidden"); // Show menu icon
   } else {
-      // If navbar is closed, open it
-      navbarNav.classList.add("show");
-      cancelButton.style.display = "block"; // Show cancel button
-      menuIcon.classList.add("hidden"); // Hide menu icon completely
+    // If navbar is closed, open it
+    navbarNav.classList.add("show");
+    cancelButton.style.display = "block"; // Show cancel button
+    menuIcon.classList.add("hidden"); // Hide menu icon completely
   }
 }
 
@@ -40,12 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.remove('show');
   });
 
-  // Navigate to the correct page and hide dropdown when an item is clicked
+  // Navigate to the correct page and collapse the navbar when an item is clicked
   dropdownItems.forEach(item => {
     item.addEventListener('click', (event) => {
       const targetPage = item.getAttribute('href'); // Get the target URL
       if (targetPage) {
-        dropdownMenu.classList.remove('show'); // Hide the dropdown
+        const navbarNav = document.getElementById("navbarNav");
+        navbarNav.classList.remove('show'); // Close the navbar
         window.location.href = targetPage; // Navigate to the target page
       }
     });
