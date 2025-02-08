@@ -81,35 +81,35 @@ border-radius: 50%;
 /* First Navbar - Contains images and text */
 /* First Navbar - Contains images and text */
 .first-navbar {
-position: fixed;
-top: 0;
-width: 100%;
-z-index: 1030; /* Ensures it stays above other content */
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0 10px;
-background-color: #f8f9fa; /* Light background */
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1030; /* Ensures it stays above other content */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: #f8f9fa; /* Light background */
 }
 
 /* Second Navbar - Contains menu items */
 .second-navbar {
-position: fixed;
-top: 60px; /* Positioned right below the first navbar */
-width: 100%;
-z-index: 1029; /* Slightly lower than the first navbar */
-display: flex;
-padding: 24px 14px;
-background-color: #f8f9fa; /* Light background */
-height: 50px;
+  position: fixed;
+  top: 60px; /* Positioned right below the first navbar */
+  width: 100%;
+  z-index: 1029; /* Slightly lower than the first navbar */
+  display: flex;
+  padding: 24px 14px;
+  background-color: #f8f9fa; /* Light background */
+  height: 50px;
 }
 
 .second-navbar .navbar-nav .nav-item {
-margin-right: 20px; /* Adds space between each nav item */
+  margin-right: 20px; /* Adds space between each nav item */
 }
 
 .second-navbar .navbar-nav .nav-item:last-child {
-margin-right: 0; /* Removes margin from the last item for alignment */
+  margin-right: 0; /* Removes margin from the last item for alignment */
 }
 
 .navbar-brand-name {
@@ -121,30 +121,35 @@ margin-right: 0; /* Removes margin from the last item for alignment */
   font-family: 'Caveat', cursive; /* Using the Caveat font for handwritten style */
   font-style: italic; /* Optional: if you still want the italic style */
 }
+
 /* Center align menu toggler on mobile */
 .navbar-toggler {
-position: absolute;
-left: 50%;
-transform: translateX(-50%);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Menu link styles */
 .navbar-nav .nav-item .nav-link {
-color: #343a40 !important; /* Dark text color */
-line-height: 1.8;
-transition: color 0.3s ease, background-color 0.3s ease;
+  color: #343a40 !important; /* Dark text color */
+  line-height: 1.8;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 /* Hover effect for link */
 .navbar-nav .nav-item .nav-link:hover {
-color: #e4e8ec !important; /* Slightly darker on hover */
-background-color: rgba(255, 254, 254, 0.5) !important;
+  color: #e4e8ec !important; /* Slightly darker on hover */
+  background-color: rgba(255, 254, 254, 0.5) !important;
+}
+
+/* Remove caret from dropdown */
+.navbar-nav .dropdown-toggle::after {
+  display: none !important; /* Remove caret */
 }
 
 /* Mobile view - Change background to info */
 @media (max-width: 992px) {
- /* Mobile view - Transparent info background with increased height */
-@media (max-width: 992px) {
+  /* Mobile view - Transparent info background with increased height */
   .navbar-collapse {
     background-color: rgba(23, 162, 184, 0.9) !important; /* Less transparent */
     padding: 20px 10px; /* Increase the padding for higher height */
@@ -152,7 +157,6 @@ background-color: rgba(255, 254, 254, 0.5) !important;
     opacity: 1; /* Fully opaque */
     height: 300px; /* Fixed height, adjust as needed */
   }
-}
 
   .navbar-nav .nav-item .nav-link {
     color: white !important; /* Ensure text is readable on blue background */
@@ -160,6 +164,11 @@ background-color: rgba(255, 254, 254, 0.5) !important;
 
   .navbar-toggler-icon {
     filter: invert(1); /* Keep the toggler icon visible */
+  }
+
+  /* Show dropdown on hover */
+  .navbar-nav .dropdown:hover .dropdown-menu {
+    display: block;
   }
 }
 
@@ -177,38 +186,41 @@ background-color: rgba(255, 254, 254, 0.5) !important;
 
 /* Cancel button styles */
 .cancel-btn {
-display: none; /* Hidden by default */
-background: rgb(77, 180, 248);
-border: none;
-font-size: 1.5rem; /* Adjust size as needed */
-color: #feffff; /* Color of the icon */
-position: absolute;
-top: 10px; /* Adjust top position */
-right: 10px; /* Adjust right position */
-cursor: pointer;
+  display: none; /* Hidden by default */
+  background: rgb(77, 180, 248);
+  border: none;
+  font-size: 1.5rem; /* Adjust size as needed */
+  color: #feffff; /* Color of the icon */
+  position: absolute;
+  top: 10px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  cursor: pointer;
 }
-/*to hide the menu icon*/
+
+/* To hide the menu icon */
 .hidden {
-display: none !important; /* Forcefully hide the element */
+  display: none !important; /* Forcefully hide the element */
 }
 
 /* Show the cancel button in mobile view */
 @media (max-width: 992px) {
-.cancel-btn {
-display: block; /* Show when navbar is toggled */
+  .cancel-btn {
+    display: block; /* Show when navbar is toggled */
+  }
 }
-}
+
 /* Hide the menu icon by default when navbar is shown */
 .navbar-toggler-icon.hidden {
-display: none;
+  display: none;
 }
+
 .hidden {
-display: none !important; /* Forcefully hide the element */
+  display: none !important; /* Forcefully hide the element */
 }
 
 /* Additional spacing for page content */
 body {
-padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
+  padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
 }
 
 
@@ -636,4 +648,20 @@ img.rounded-circle {
   object-fit: cover;  /* Ensure the images are cropped to fill the circle */
   object-position: top;  /* Align the top of the image with the circle's top edge */
   margin-bottom: 10px;  /* Add space below images */
+}
+#staffManagementSection {
+  display: none;
+}
+ul {
+list-style-type: none; /* Removes bullet points */
+padding: 0;           /* Optional: removes default padding */
+margin: 0;            /* Optional: removes default margin */
+}    
+.center-cont {
+  max-width: 600px; /* Adjust to maintain uniform width */
+  margin: auto;
+  padding: 30px; /* Increased padding for height balance */
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+  background: white;
+  border-radius: 10px; /* Optional: Adds soft edges */
 }
