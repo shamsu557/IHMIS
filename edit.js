@@ -1,3 +1,18 @@
+function toggleNavbar() {
+    const navbarNav = document.getElementById("navbarNav");
+    const cancelButton = document.querySelector(".cancel-btn");
+    const menuIcon = document.querySelector(".navbar-toggler-icon");
+
+    if (navbarNav.classList.contains("show")) {
+        navbarNav.classList.remove("show");
+        cancelButton.style.display = "none";
+        menuIcon.classList.remove("hidden");
+    } else {
+        navbarNav.classList.add("show");
+        cancelButton.style.display = "block";
+        menuIcon.classList.add("hidden");
+    }
+}
 
 let studentToDelete = null;
 
