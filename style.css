@@ -140,51 +140,39 @@ transition: color 0.3s ease, background-color 0.3s ease;
 color: #e4e8ec !important; /* Slightly darker on hover */
 background-color: rgba(255, 254, 254, 0.5) !important;
 }
-/* Mobile view - Keep background light */
-@media (max-width: 992px) {
-.navbar-collapse {
-background-color: #f8f9fa; /* Light background for mobile menu */
-}
-
-.navbar-nav .nav-item .nav-link {
-color: #343a40 !important; /* Dark text color */
-}
-
-.navbar-toggler-icon {
-filter: invert(1); /* Dark toggler icon for light background */
-}
-}
-
 /* Remove caret space entirely */
 .nav-item .dropdown-toggle::after {
-display: none; /* Hide the default caret */
-}
-#student-links a {
-  text-decoration: none;
-  color: #202122;
+  display: none; /* Hide the default caret */
+  }
+/* Mobile view - Change background to info */
+@media (max-width: 992px) {
+  .navbar-collapse {
+    background-color: #17a2b8 !important; /* Bootstrap info color */
+    padding: 10px; /* Add spacing for better look */
+    border-radius: 5px; /* Optional: smooth rounded corners */
+  }
+
+  .navbar-nav .nav-item .nav-link {
+    color: white !important; /* Ensure text is readable on blue background */
+  }
+
+  .navbar-toggler-icon {
+    filter: invert(1); /* Keep the toggler icon visible */
+  }
 }
 
-#student-links a:hover {
-  text-decoration: none;
-  color:#a6a6a9
-}
-
-
-/* Adjust padding if necessary */
-.nav-item .dropdown-toggle {
-padding-right: 0;
-}
 /* Large screen styles */
 @media (min-width: 992px) {
-.navbar-collapse {
-justify-content: center;
+  .navbar-collapse {
+    justify-content: center;
+  }
+
+  /* Hide the toggler on large screens */
+  .navbar-toggler {
+    display: none;
+  }
 }
 
-/* Hide the toggler on large screens */
-.navbar-toggler {
-display: none;
-}
-}
 /* Cancel button styles */
 .cancel-btn {
 display: none; /* Hidden by default */
