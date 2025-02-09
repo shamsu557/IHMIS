@@ -174,12 +174,13 @@ border-radius: 50%;
       margin-right: 0; /* Remove right margin for better alignment */
       margin-bottom: 10px; /* Add space between items */
   }
-}
+
 
 /* Remove caret space entirely */
 .nav-item .dropdown-toggle::after {
   display: none; /* Hide the default caret */
 }
+
 
 /* Adjust padding if necessary */
 .nav-item .dropdown-toggle {
