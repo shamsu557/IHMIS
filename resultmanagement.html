@@ -5,26 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Results Management</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="result.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
- <!-- First Navbar (Images and Admin Dashboard Text) -->
- <nav class="navbar navbar-light bg-white text-dark fixed-top first-navbar">
-    <!-- Left image (Education Cap) -->
-    <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
-    
-    <!-- Navbar brand (Admin Dashboard text) centered -->
-    <span class="navbar-brand mx-auto text-dark">Staff&nbsp;&nbsp;Dashboard</span>
-    
-    <!-- Right image logo -->
-    <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
-  </nav>
-  
+  <!-- First Navbar -->
+<nav class="navbar navbar-light bg-info text-dark fixed-top first-navbar">
+  <img src="educap.jfif" alt="Education Cap" class="circular-img fixed-left-img">
+  <span class="navbar-brand-name text-white">Result Mangement</span>
+  <img src="logo.jpg" alt="Professor" class="circular-img fixed-right-img">
+  <!--RC:1320997-->
+</nav>
   <!-- Second Navbar (Navbar Items) -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-light text-dark second-navbar">
     <!-- Toggler for mobile view -->
@@ -63,7 +59,9 @@
         <div id="loginForm" class="mb-4">
             <input type="text" id="staffIdentifier" class="form-control mb-2" placeholder="Enter Staff ID">
             <input type="password" id="password" class="form-control mb-2" placeholder="Enter Password">
-            <button onclick="validateStaff()" class="btn btn-primary btn-block">Login</button>
+            <div class="text-center">
+            <button onclick="validateStaff()" class="btn btn-success">Login</button>
+            </div>
             <p id="loginError" class="text-danger"></p>
         </div>
         <div id="selectionForm" style="display: none;">
@@ -83,9 +81,10 @@
                 <option value="2025/2026">2025/2026</option>
                 <option value="2026/2027">2026/2027</option>
             </select>
+            <div class="text-center">
             <!-- Button to View Students -->
-    <button id="view-students" type="button" class="btn btn-success btn-block">View Students</button>
-    
+    <button id="view-students" type="button" class="btn btn-success">View Students</button>
+            </div>
     <!-- Div to Display Student List -->
     <div id="student-list">
       <!-- New button to go back to class selection -->
@@ -127,51 +126,70 @@
                     <!-- Rows will be appended here via JavaScript -->
                 </tbody>
             </table>
+            <div class="text-center">
             <!-- Submit Scores Button -->
-            <button id="submit-scores" class="btn btn-success" style="margin-top: 20px; margin-left: 33%;" onclick="submitScores()">Submit Scores</button>
+            <button id="submit-scores" class="btn btn-success"  onclick="submitScores()">Submit Scores</button>
+            </div>
         </div>
         <div id="no-students-message" style="display: none;">
             <p>No students found in this class.</p>
         </div>
     </div>
 </div></div>
+<div class="text-center">
 <button class="close-btn text-center" onclick="goBack()">Close</button>
-
+</div>
 </div>
 <br>
  
 <br>
-<!-- Footer -->
-<div class="footer bg-light mt-5">
-   <div class="row text-center py-3">
-     <div class="col-md-4">
-       <p><strong>Imam Hafsin Model International School</strong></p>
-       <p>622, Yakasai Street, Tal'udu G/Kaya</p>
-       <p>Email: imamhafsin@gmail.com</p>
-       <p>Phone: 08030999939939399</p>
-     </div>
-     <div class="col-md-4">
-       <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-facebook"></i> Facebook
-       </a>
-       <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-instagram"></i> Instagram
-       </a>
-       <a href="https://twitter.com/prof_johndoe" target="_blank" class="d-block mb-2">
-         <i class="fab fa-twitter"></i> Twitter
-       </a>
-       <a href="https://wa.me/1234567890" target="_blank" class="d-block mb-2">
-         <i class="fab fa-whatsapp"></i> WhatsApp
-       </a>
-     </div>
-     <div class="col-md-4">
-       <p>&copy; IHMIS 2024</p>
-       <p>All rights reserved.</p>
-     </div>
-   </div>
- </div>
- <!-- Back to top button -->
- <button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+ <!-- Footer -->
+ <footer class="footer bg-info text-dark mt-5 py-3">
+  <div class="container">
+      <div class="text-center mb-2">
+          <h6 class="mb-1">Dedicated to Excellence in Education</h6>
+          <p class="small mb-2">Join us in providing quality education that shapes tomorrow's leaders.</p>
+      </div>
+  </div>
+
+  <div class="row text-center">
+      <div class="col-md-4">
+          <h6 class="mb-1">Call Us</h6>
+          <p class="small mb-0"><i class="fas fa-phone"></i> <a href="tel:08142458654" class="text-light">08142458654</a></p>
+      </div>
+      <div class="col-md-4">
+          <h6 class="mb-1">Email Us</h6>
+          <p class="small mb-0 text-dark"><i class="fas fa-envelope"></i> <a href="mailto:info@imamhafsin.com.ng" class="text-light">info@imamhafsin.com.ng</a></p>
+      </div>
+      <div class="col-md-4">
+          <h6 class="mb-1">Visit Us</h6>
+          <p class="small mb-0 text-white">Imam Hafsin Model International School</p>
+          <p class="small mb-0 text-white">No.60 Sani Yakasai Street, Tal'udu G/Kaya, Gwale LGA</p>
+          <p class="small mb-0 text-white">Kano State, Nigeria</p>
+      </div>
+  </div>
+
+  <div class="social-icons text-center mt-2">
+      <a href="https://www.facebook.com/prof.johndoe" target="_blank" class="text-dark me-2" aria-label="Facebook">
+          <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://www.instagram.com/prof.johndoe" target="_blank" class="text-dark me-2" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://twitter.com/prof_johndoe" target="_blank" class="text-dark me-2" aria-label="Twitter">
+          <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://wa.me/1234567890" target="_blank" class="text-dark" aria-label="WhatsApp">
+          <i class="fab fa-whatsapp"></i>
+      </a>
+  </div>
+
+  <div class="text-center mt-2">
+      <p class="small mb-0">&copy; IHMIS & SAFS Technologies 2025. All rights reserved.</p>
+  </div>
+</footer>
+<button onclick="topFunction()" id="myBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+
  
    <!-- Bootstrap JS, Popper.js, and jQuery -->
    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
