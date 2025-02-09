@@ -232,7 +232,15 @@ border-radius: 50%;
 body {
   padding-top: 120px;
 }
-
+.navbar-brand-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-left: 20px;
+  text-transform: uppercase;
+  font-family: 'Caveat', cursive; /* Using the Caveat font for handwritten style */
+  font-style: italic; /* Optional: if you still want the italic style */
+}
 
 button {
   padding: 10px 15px;
