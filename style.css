@@ -88,7 +88,8 @@ border-radius: 50%;
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  background-color: #f8f9fa; /* Light background */
+  background-color: rgba(248, 249, 250, 0.95); /* Semi-transparent background */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds slight shadow */
 }
 
 /* Second Navbar - Contains menu items */
@@ -98,17 +99,18 @@ border-radius: 50%;
   width: 100%;
   z-index: 1029; /* Slightly lower than the first navbar */
   display: flex;
-  padding: 24px 14px;
-  background-color: #f8f9fa; /* Light background */
-  height: 50px;
+  padding: 14px 10px;
+  background-color: rgba(248, 249, 250, 0.95); /* Semi-transparent background */
+  height: auto; /* Adjust height dynamically */
 }
 
+/* Navbar items styling */
 .second-navbar .navbar-nav .nav-item {
-  margin-right: 20px; /* Adds space between each nav item */
+  margin-right: 20px;
 }
 
 .second-navbar .navbar-nav .nav-item:last-child {
-  margin-right: 0; /* Removes margin from the last item for alignment */
+  margin-right: 0;
 }
 
 /* Center align menu toggler on mobile */
@@ -120,69 +122,68 @@ border-radius: 50%;
 
 /* Menu link styles */
 .navbar-nav .nav-item .nav-link {
-  color: #343a40 !important; /* Dark text color */
+  color: #343a40 !important;
   line-height: 1.8;
   transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 /* Hover effect for link */
 .navbar-nav .nav-item .nav-link:hover {
-  color: #e4e8ec !important; /* Slightly darker on hover */
+  color: #e4e8ec !important;
   background-color: rgba(255, 254, 254, 0.5) !important;
 }
 
+/* Mobile View - Show Background for Menu */
 @media (max-width: 992px) {
   .navbar-collapse {
-      background-color: rgba(23, 162, 184, 0.9); /* Background color for expanded menu */
+      background-color: rgba(23, 162, 184, 0.95); /* Slight transparency */
       padding: 20px 10px;
       border-radius: 5px;
-      opacity: 1;
-      position: absolute; /* Ensures it overlays properly */
-      top: 100%; /* Position right below navbar */
+      position: absolute;
+      top: 100%;
       left: 0;
-      width: 100%; /* Cover full width */
-      height: auto; /* Adjust height dynamically */
-      z-index: 999; /* Ensure it's above other elements */
+      width: 100%;
+      z-index: 999;
   }
-}
+
+  /* Ensure text remains visible */
   .navbar-nav .nav-item .nav-link {
-    color: white !important; /* Ensure text is readable on blue background */
+    color: white !important;
   }
 
-
+  /* Navbar Toggler Icon */
   .navbar-toggler-icon {
-      filter: invert(1); /* Dark toggler icon for light background */
+      filter: invert(1);
   }
 
+  /* Center navbar items in mobile view */
   .second-navbar {
       display: flex;
-      justify-content: center; /* Center navbar items */
+      justify-content: center;
       align-items: center;
       text-align: center;
-      flex-direction: column; /* Stack items vertically */
-      height: auto; /* Adjust height to fit content */
+      flex-direction: column;
   }
 
   .second-navbar .navbar-nav {
       display: flex;
-      flex-direction: column; /* Stack nav items vertically */
+      flex-direction: column;
       align-items: center;
       width: 100%;
   }
 
   .second-navbar .navbar-nav .nav-item {
-      margin-right: 0; /* Remove right margin for better alignment */
-      margin-bottom: 10px; /* Add space between items */
+      margin-right: 0;
+      margin-bottom: 10px;
   }
-
+}
 
 /* Remove caret space entirely */
 .nav-item .dropdown-toggle::after {
-  display: none; /* Hide the default caret */
+  display: none;
 }
 
-
-/* Adjust padding if necessary */
+/* Adjust padding for dropdown */
 .nav-item .dropdown-toggle {
   padding-right: 0;
 }
@@ -199,48 +200,43 @@ border-radius: 50%;
   }
 }
 
-/* Cancel button styles */
+/* Cancel button styles - Now visible */
 .cancel-btn {
-  display: none; /* Hidden by default */
-  background: rgb(77, 180, 248);
+  display: none;
+  background: #4db4f8;
   border: none;
-  font-size: 1.5rem; /* Adjust size as needed */
-  color: #feffff; /* Color of the icon */
+  font-size: 1.5rem;
+  color: white;
   position: absolute;
-  top: 10px; /* Adjust top position */
-  right: 10px; /* Adjust right position */
+  top: 10px;
+  right: 10px;
+  z-index: 1000; /* Ensures it's above everything */
   cursor: pointer;
-}
-
-/* To hide the menu icon */
-.hidden {
-  display: none !important; /* Forcefully hide the element */
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 
 /* Show the cancel button in mobile view */
 @media (max-width: 992px) {
   .cancel-btn {
-      display: block; /* Show when navbar is toggled */
+      display: block;
   }
 }
 
-/* Hide the menu icon by default when navbar is shown */
+/* Hide the menu icon when navbar is open */
 .navbar-toggler-icon.hidden {
   display: none;
 }
 
-.hidden {
-  display: none !important; /* Forcefully hide the element */
+/* Ensure page content is not hidden under fixed navbars */
+body {
+  padding-top: 120px;
 }
 
-/* Additional spacing for page content */
-body {
-  padding-top: 120px; /* Ensures content doesn’t overlap with fixed navbars */
-}
 
 button {
   padding: 10px 15px;
-  background-color: #202122;
+  background-color:rgb(79, 81, 83);
   color: white;
   border: none;
   border-radius: 4px;
