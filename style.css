@@ -142,9 +142,14 @@ border-radius: 50%;
   background-color: rgba(255, 254, 254, 0.5) !important;
 }
 
-/* Remove caret from dropdown */
-.navbar-nav .dropdown-toggle::after {
-  display: none !important; /* Remove caret */
+/* Remove caret space entirely */
+.nav-item .dropdown-toggle::after {
+  display: none; /* Hide the default caret */
+}
+
+/* Adjust padding if necessary */
+.nav-item .dropdown-toggle {
+  padding-right: 0;
 }
 
 /* Mobile view - Change background to info */
