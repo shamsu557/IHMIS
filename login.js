@@ -16,59 +16,48 @@ function toggleNavbar() {
     }
 }
 
-// Ensure the navbar collapses when a menu item is clicked
 document.addEventListener('DOMContentLoaded', () => {
-    const navbarNav = document.getElementById("navbarNav");
-    const navbarItems = document.querySelectorAll(".navbar-nav .nav-link"); // Select all navbar links
     const dropdownToggle = document.querySelector('#resultManagementDropdown'); // ID of the main dropdown toggle
     const dropdownMenu = document.querySelector('.dropdown-menu[aria-labelledby="resultManagementDropdown"]'); // Menu linked to the toggle
     const dropdownItems = dropdownMenu.querySelectorAll('a.dropdown-item'); // Items inside the dropdown menu
-
-    // Collapse navbar when any item is clicked
-    navbarItems.forEach(item => {
-        item.addEventListener("click", () => {
-            navbarNav.classList.remove("show"); // Hide navbar
-        });
-    });
-
+  
     // Show dropdown on hover over the toggle
     dropdownToggle.addEventListener('mouseover', () => {
-        dropdownMenu.classList.add('show');
+      dropdownMenu.classList.add('show');
     });
-
+  
     // Keep the dropdown visible when hovering over the menu itself
     dropdownMenu.addEventListener('mouseover', () => {
-        dropdownMenu.classList.add('show');
+      dropdownMenu.classList.add('show');
     });
-
+  
     // Hide dropdown when mouse leaves both toggle and menu
     dropdownToggle.addEventListener('mouseout', () => {
-        dropdownMenu.classList.remove('show');
+      dropdownMenu.classList.remove('show');
     });
-
+  
     dropdownMenu.addEventListener('mouseout', () => {
-        dropdownMenu.classList.remove('show');
+      dropdownMenu.classList.remove('show');
     });
-
+  
     // Navigate to the correct page and hide dropdown when an item is clicked
     dropdownItems.forEach(item => {
-        item.addEventListener('click', (event) => {
-            const targetPage = item.getAttribute('href'); // Get the target URL
-            if (targetPage) {
-                dropdownMenu.classList.remove('show'); // Hide the dropdown
-                navbarNav.classList.remove("show"); // Collapse navbar
-                window.location.href = targetPage; // Navigate to the target page
-            }
-        });
+      item.addEventListener('click', (event) => {
+        const targetPage = item.getAttribute('href'); // Get the target URL
+        if (targetPage) {
+          dropdownMenu.classList.remove('show'); // Hide the dropdown
+          window.location.href = targetPage; // Navigate to the target page
+        }
+      });
     });
-
+  
     // Hide dropdown if clicked anywhere outside the button or menu
     document.addEventListener('click', (event) => {
-        if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.classList.remove('show');
-        }
+      if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+        dropdownMenu.classList.remove('show');
+      }
     });
-});
+  });
 // Back to top button functionality
  window.onscroll = function() {scrollFunction()};
 
