@@ -59,25 +59,6 @@ function toggleNavbar() {
       }
     });
   });
-
-  // Function to validate file size
-function validateFileSize(fileInput) {
-  const file = fileInput.files[0];
-  const maxSize = 80 * 1024; // 80KB in bytes
-
-  if (file && file.size > maxSize) {
-      alert('File size exceeds the 80KB limit. Please choose a smaller file.');
-      fileInput.value = ''; // Clear the input
-      return false;
-  }
-  return true;
-}
-
-// Add event listener to the profile picture input
-document.getElementById('profilePicture').addEventListener('change', function () {
-  validateFileSize(this);
-});
-
 // Handle form submission
 document.getElementById("teacherSignupForm").addEventListener("submit", async function (e) {
     e.preventDefault(); // Prevent the default form submission
