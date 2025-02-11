@@ -60,25 +60,6 @@ function toggleNavbar() {
     });
   });
 
-    // Function to validate file size
-function validateFileSize(fileInput) {
-    const file = fileInput.files[0];
-    const maxSize = 80 * 1024; // 80KB in bytes
-  
-    if (file && file.size > maxSize) {
-        alert('File size exceeds the 80KB limit. Please choose a smaller file.');
-        fileInput.value = ''; // Clear the input
-        return false;
-    }
-    return true;
-  }
-  
-  // Add event listener to the profile picture input
-  document.getElementById('studentPicture').addEventListener('change', function () {
-    validateFileSize(this);
-  });
-  
-
 let studentToDelete = null;
 
 function loadClassOptions() {
