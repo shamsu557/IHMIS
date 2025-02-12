@@ -48,7 +48,7 @@ module.exports = db;
 // );
 
 // -- Create teachers table
-// CREATE TABLE teachers (
+// // CREATE TABLE teachers (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     staff_id VARCHAR(50),
 //     name VARCHAR(255) NOT NULL,
@@ -57,10 +57,12 @@ module.exports = db;
 //     role VARCHAR(100) NOT NULL,
 //     security_question VARCHAR(255),
 //     security_answer VARCHAR(255),
-//     phone VARCHAR(20) NOT NULL UNIQUE, -- Phone number must be unique
+//     phone VARCHAR(20) NULL UNIQUE, -- Phone number must be unique
+//     gender ENUM('Male', 'Female') NOT NULL,
 //     formClass VARCHAR(50),
 //     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
 //     profile_picture VARCHAR(50) NOT NULL,
+//     registered TINYINT(1) DEFAULT 0, -- New column for registration status (0 = unregistered, 1 = registered)
 //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 // );
 
@@ -106,10 +108,10 @@ module.exports = db;
 //     role VARCHAR(50) NOT NULL;
 // );
 // // -- Insert email addresses with valid qualifications
-// INSERT INTO teachers (staff_id, name, email, password, role, phone, formClass, qualification, profile_picture, created_at) VALUES
-// ('TEMP001', 'John Doe', '1440shamsusabo@gmail.com', 'placeholderpassword1', 'Teacher', '08030909799', 'Form A', 'BSc', 'default.jpg', NOW()),
-// ('TEMP002', 'Jane Smith', 'fadimatusani2021@gmail.com', 'placeholderpassword2', 'Teacher', '0809990099090', 'Form B', 'HND', 'default.jpg', NOW()),
-// ('TEMP003', 'Alice Johnson', 'shamsusabocom@gmail.com', 'placeholderpassword3', 'Teacher', '08003333333', 'Form C', 'Master', 'default.jpg', NOW());
+// INSERT INTO teachers (staff_id, name, email, password, role, gender, formClass, qualification, profile_picture, created_at) VALUES
+// ('TEMP001', 'John Doe', '1440shamsusabo@gmail.com', 'placeholderpassword1', 'Teacher', 'male','Form A', 'BSc', 'default.jpg', NOW()),
+// ('TEMP002', 'Jane Smith', 'fadimatusani2021@gmail.com', 'placeholderpassword2', 'Teacher','male', 'Form B', 'HND', 'default.jpg', NOW()),
+// ('TEMP003', 'Alice Johnson', 'shamsusabocom@gmail.com', 'placeholderpassword3', 'Teacher','male', 'Form C', 'Master', 'default.jpg', NOW());
 // -- Create form_master_assessments table to store assessments
 // // CREATE TABLE form_master_assessments (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
