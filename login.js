@@ -1,3 +1,5 @@
+// i need to edit the other pages for javascript for the navbar for automatic close when link is clicked but this is ok(login.js) 
+// so care should be taken for other pages js as some have the #resultManagementDropDown not loginDropdown
 function toggleNavbar() {
   const navbarNav = document.getElementById("navbarNav");
   const cancelButton = document.querySelector(".cancel-btn");
