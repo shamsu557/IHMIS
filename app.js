@@ -507,142 +507,63 @@ app.delete('/api/deleteStudent/:studentID', (req, res) => {
         });
     });
 });
-//edit student
 app.post('/api/editStudent', upload.single('picture'), (req, res) => {
-    const {
-        id, firstname, othername, surname, guardianPhone, studentClass, gender,
-        subjects, staffEmailOrID, password
-    } = req.body;
-
+    const { id, firstname, othername, surname, guardianPhone, studentClass, subjects, staffEmailOrID, password, gender } = req.body;
     const studentPicture = req.file ? req.file.filename : null;
 
-    if (!id) {
-        return res.status(400).json({ error: 'Student ID is required' });
+    let updateColumns = [];
+    let updateValues = [];
+
+    if (firstname) updateColumns.push('firstname'), updateValues.push(firstname);
+    if (othername) updateColumns.push('othername'), updateValues.push(othername);
+    if (surname) updateColumns.push('surname'), updateValues.push(surname);
+    if (guardianPhone) updateColumns.push('guardianPhone'), updateValues.push(guardianPhone);
+    if (studentClass) updateColumns.push('class'), updateValues.push(studentClass);
+    if (gender) updateColumns.push('gender'), updateValues.push(gender);
+    if (studentPicture) updateColumns.push('studentPicture'), updateValues.push(studentPicture);
+
+    if (updateColumns.length === 0) {
+        return res.status(400).json({ message: 'No fields to update.' });
     }
 
-    let updateStudentQuery = `UPDATE students SET `;
-    let queryValues = [];
+    const updateQuery = `UPDATE students SET ${updateColumns.map(col => `${col} = ?`).join(', ')} WHERE studentID = ?`;
+    updateValues.push(id);
 
-    if (firstname) {
-        updateStudentQuery += `firstname = ?, `;
-        queryValues.push(firstname);
-    }
-    if (othername) {
-        updateStudentQuery += `othername = ?, `;
-        queryValues.push(othername);
-    }
-    if (surname) {
-        updateStudentQuery += `surname = ?, `;
-        queryValues.push(surname);
-    }
-    if (guardianPhone) {
-        updateStudentQuery += `guardianPhone = ?, `;
-        queryValues.push(guardianPhone);
-    }
-    if (studentClass) {
-        updateStudentQuery += `class = ?, `;
-        queryValues.push(studentClass);
-    }
-    if (gender) {
-        updateStudentQuery += `gender = ?, `;
-        queryValues.push(gender);
-    }
-    if (studentPicture) {
-        updateStudentQuery += `studentPicture = ?, `;
-        queryValues.push(studentPicture);
-    }
-
-    // Remove trailing comma
-    updateStudentQuery = updateStudentQuery.slice(0, -2);
-    updateStudentQuery += ` WHERE id = ?`;
-    queryValues.push(id);
-
-    db.query(updateStudentQuery, queryValues, (err, result) => {
-        if (err) {
-            console.error('Database Error:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
-        res.status(200).json({ message: 'Student updated successfully' });
-    });
-
-    // Trim the trailing comma and space from the query
-    updateStudentQuery = updateStudentQuery.slice(0, -2);
-
-    // Add the WHERE clause to update the specific student
-    updateStudentQuery += ` WHERE studentID = ?`;
-    queryValues.push(id);
-
-    const checkAdminQuery = `
-        SELECT * FROM admins
-        WHERE (username = ? OR email = ?)
-    `;
+    const checkAdminQuery = `SELECT * FROM admins WHERE (username = ? OR email = ?)`;
 
     db.query(checkAdminQuery, [staffEmailOrID, staffEmailOrID], (err, adminResults) => {
-        if (err) {
-            console.error('Error verifying admin:', err);
-            return res.status(500).json({ message: 'Error verifying admin credentials' });
-        }
-
-        if (adminResults.length === 0) {
-            return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
-        }
+        if (err) return res.status(500).json({ message: 'Error verifying admin credentials' });
+        if (adminResults.length === 0) return res.status(403).json({ message: 'Unauthorized: Incorrect username or email' });
 
         const admin = adminResults[0];
-
         bcrypt.compare(password, admin.password, (err, isMatch) => {
-            if (err) {
-                console.error('Error comparing passwords:', err);
-                return res.status(500).json({ message: 'Error verifying password' });
-            }
+            if (err) return res.status(500).json({ message: 'Error verifying password' });
+            if (!isMatch) return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
 
-            if (!isMatch) {
-                return res.status(403).json({ message: 'Unauthorized: Incorrect password' });
-            }
+            // Update student
+            db.query(updateQuery, updateValues, (err) => {
+                if (err) return res.status(500).json({ message: 'Error updating student.' });
 
-            // Proceed to update the student if credentials are correct
-            db.query(updateStudentQuery, queryValues, (err) => {
-                if (err) {
-                    console.error('Error updating student in database:', err);
-                    return res.status(500).json({ message: 'Error updating student.' });
-                }
-
-                // If subjects are provided, update them
                 if (subjects) {
-                    const subjectsArray = subjects.split(',').map(subj => subj.trim());
-
-                    // Delete existing subjects for the student
+                    const subjectsArray = subjects.split(',').map(sub => sub.trim());
                     db.query('DELETE FROM subjects WHERE studentID = ?', [id], (err) => {
-                        if (err) {
-                            console.error('Error clearing subjects from database:', err);
-                            return res.status(500).json({ message: 'Error updating subjects.' });
-                        }
+                        if (err) return res.status(500).json({ message: 'Error clearing subjects.' });
 
-                        // Insert new subjects for the student
-                        const insertSubjectQuery = 'INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)';
-                        const insertPromises = subjectsArray.map(subject => new Promise((resolve, reject) => {
-                            db.query(insertSubjectQuery, [id, subject], (err) => {
-                                if (err) {
-                                    console.error(`Error inserting subject "${subject}" for studentID ${id}:`, err);
-                                    reject(err);
-                                } else {
-                                    resolve();
-                                }
+                        const insertQueries = subjectsArray.map(subject => {
+                            return new Promise((resolve, reject) => {
+                                db.query('INSERT INTO subjects (studentID, subjectName) VALUES (?, ?)', [id, subject], (err) => {
+                                    if (err) reject(err);
+                                    else resolve();
+                                });
                             });
-                        }));
+                        });
 
-                        // Wait for all insertions to complete
-                        Promise.all(insertPromises)
-                            .then(() => {
-                                res.status(200).json({ message: 'Student updated successfully with new subjects.' });
-                            })
-                            .catch(err => {
-                                console.error('Error updating subjects:', err);
-                                res.status(500).json({ message: 'Error updating subjects.' });
-                            });
+                        Promise.all(insertQueries)
+                            .then(() => res.status(200).json({ message: 'Student updated successfully with new subjects.' }))
+                            .catch(err => res.status(500).json({ message: 'Error updating subjects.' }));
                     });
                 } else {
-                    // If no subjects were provided, just update the student without modifying subjects
-                    res.status(200).json({ message: 'Student updated successfully, no subjects changed.' });
+                    res.status(200).json({ message: 'Student updated successfully.' });
                 }
             });
         });
@@ -1034,20 +955,20 @@ app.post('/studentLogout', (req, res) => {
 app.get('/adminLogin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-login.html'));
   });
-  // Handle admin login
   app.post('/adminLogin', (req, res) => {
     const { username, password } = req.body;
-  
-    db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+
+    // Use BINARY for case-sensitive username matching
+    db.query('SELECT * FROM admins WHERE BINARY username = ?', [username], (err, results) => {
         if (err) {
             console.error('Error querying database for admin login:', err);
             return res.status(500).send('Server error');
         }
-  
+
         if (results.length === 0) {
             return res.status(400).send('No admin found');
         }
-  
+
         const user = results[0];
         if (bcrypt.compareSync(password, user.password)) {
             req.session.user = user;
@@ -1056,7 +977,8 @@ app.get('/adminLogin', (req, res) => {
             res.status(400).send('Incorrect password');
         }
     });
-  });
+});
+
   
   // admin Logout route
 app.get('/adminLogout', (req, res) => {
@@ -1087,13 +1009,18 @@ app.get('/auth-check', (req, res) => {
 // Staff Management Validate Admin Credentials
 app.post('/api/validate-admin', (req, res) => {
     const { username, password } = req.body;
-    db.query('SELECT * FROM admins WHERE username = ?', [username], (err, results) => {
+
+    // Enforce case-sensitive username match
+    db.query('SELECT * FROM admins WHERE BINARY username = ?', [username], (err, results) => {
         if (err) return res.status(500).send(err);
+
         if (results.length === 0) {
             return res.json({ isValid: false });
         }
+
         const admin = results[0];
         const isPasswordValid = bcrypt.compareSync(password, admin.password); // Assuming passwords are hashed
+
         if (isPasswordValid) {
             const role = admin.role;
             // Only allow access if the role is Super Admin or Assistant Super Admin
@@ -1103,9 +1030,11 @@ app.post('/api/validate-admin', (req, res) => {
                 return res.json({ isValid: false });
             }
         }
+
         return res.json({ isValid: false });
     });
 });
+
 
 // Fetch Staff List
 app.get('/api/staff', (req, res) => {
@@ -1178,12 +1107,11 @@ app.get('/teacher/:id', (req, res) => {
         }
     });
 });
-//edit staff
 // Edit staff with separate handling for subjects and classes
 app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res) => {
     const staffId = req.params.staff_id;
-    const teacherData = JSON.parse(req.body.teacherData || '{}');
-    const { name, email, phone, role, gender, qualification, formClass, subjects, classes } = teacherData;
+    const teacherData = JSON.parse(req.body.teacherData);
+    const { name, email, phone, role, gender,qualification, formClass, subjects, classes } = teacherData;
     const profilePicture = req.file ? req.file.filename : null;
 
     // Prepare the update columns and values
@@ -1268,7 +1196,6 @@ app.post('/update-teacher/:staff_id', upload.single('profilePicture'), (req, res
         });
     });
 });
-
 
 // Endpoint to fetch student details by StudentID
 app.post('/api/fetchStudentByID', (req, res) => {
@@ -2090,7 +2017,7 @@ app.get('/stats', (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
