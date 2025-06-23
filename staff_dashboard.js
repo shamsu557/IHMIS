@@ -1,37 +1,33 @@
-function toggleNavbar() {
+  function toggleNavbar() {
   const navbarNav = document.getElementById("navbarNav");
   const cancelButton = document.querySelector(".cancel-btn");
-  const menuIcon = document.querySelector(".navbar-toggler-icon"); // Select the menu icon
+  const menuIcon = document.querySelector(".navbar-toggler-icon");
 
-  if (navbarNav.classList.contains("show")) {
-    // If navbar is open, close it
-    navbarNav.classList.remove("show");
-    cancelButton.style.display = "none"; // Hide cancel button
-    menuIcon.classList.remove("hidden"); // Show menu icon
-  } else {
-    // If navbar is closed, open it
-    navbarNav.classList.add("show");
-    cancelButton.style.display = "block"; // Show cancel button
-    menuIcon.classList.add("hidden"); // Hide menu icon completely
-  }
+  const isOpen = navbarNav.classList.contains("show");
+
+  navbarNav.classList.toggle("show", !isOpen);
+  cancelButton.style.display = isOpen ? "none" : "block";
+  menuIcon.classList.toggle("hidden", !isOpen);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const dropdownToggle = document.querySelector('#resultManagementDropdown'); // ID of the main dropdown toggle
-  const dropdownMenu = document.querySelector('.dropdown-menu[aria-labelledby="resultManagementDropdown"]'); // Menu linked to the toggle
-  const dropdownItems = dropdownMenu.querySelectorAll('a.dropdown-item'); // Items inside the dropdown menu
+  const dropdownToggle = document.querySelector('#resultManagementDropdown');
+  const dropdownMenu = document.querySelector('.dropdown-menu[aria-labelledby="resultManagementDropdown"]');
+  if (!dropdownToggle || !dropdownMenu) return;
 
-  // Show dropdown on hover over the toggle
+  const dropdownItems = dropdownMenu.querySelectorAll('a.dropdown-item');
+  const navbarNav = document.getElementById("navbarNav");
+  const cancelButton = document.querySelector(".cancel-btn");
+  const menuIcon = document.querySelector(".navbar-toggler-icon");
+
   dropdownToggle.addEventListener('mouseover', () => {
     dropdownMenu.classList.add('show');
   });
 
-  // Keep the dropdown visible when hovering over the menu itself
   dropdownMenu.addEventListener('mouseover', () => {
     dropdownMenu.classList.add('show');
   });
 
-  // Hide dropdown when mouse leaves both toggle and menu
   dropdownToggle.addEventListener('mouseout', () => {
     dropdownMenu.classList.remove('show');
   });
@@ -40,25 +36,35 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdownMenu.classList.remove('show');
   });
 
-  // Navigate to the correct page and collapse the navbar when an item is clicked
   dropdownItems.forEach(item => {
     item.addEventListener('click', (event) => {
-      const targetPage = item.getAttribute('href'); // Get the target URL
+      const targetPage = item.getAttribute('href');
+      navbarNav.classList.remove('show');
+      cancelButton.style.display = "none";
+      menuIcon.classList.remove("hidden");
+
       if (targetPage) {
-        const navbarNav = document.getElementById("navbarNav");
-        navbarNav.classList.remove('show'); // Close the navbar
-        window.location.href = targetPage; // Navigate to the target page
+        window.location.href = targetPage;
       }
     });
   });
 
-  // Hide dropdown if clicked anywhere outside the button or menu
+  const navLinks = document.querySelectorAll('#navbarNav .nav-link:not(.dropdown-toggle)');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navbarNav.classList.remove('show');
+      cancelButton.style.display = "none";
+      menuIcon.classList.remove("hidden");
+    });
+  });
+
   document.addEventListener('click', (event) => {
     if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
       dropdownMenu.classList.remove('show');
     }
   });
 });
+
 function checkSessionStatus() {
     fetch('/checkSession')
         .then(response => response.json())
