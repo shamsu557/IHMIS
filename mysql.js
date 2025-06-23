@@ -2,11 +2,11 @@ const mysql = require('mysql');
 
 // MySQL database connection configuration
 const dbConfig = {
-    host: process.env.DB_HOST || 'mysql-shamsu557.alwaysdata.net',  // Use environment variable or default
+    host: process.env.DB_HOST || '195.250.27.35',  // Use environment variable or default
     port: process.env.DB_PORT || 3306,                       // Default MySQL port or environment variable
-    user: process.env.DB_USER || 'shamsu557',               // MySQL username from environment
+    user: process.env.DB_USER || 'imamhafs_shamsu557',               // MySQL username from environment
     password: process.env.DB_PASSWORD || '@Shamsu1440',       // MySQL password from environment
-    database: process.env.DB_NAME || 'shamsu557_school_database'            // Database name from environment
+    database: process.env.DB_NAME || 'imamhafs_school'            // Database name from environment
 };
 
 
@@ -42,13 +42,15 @@ module.exports = db;
 //     firstname VARCHAR(50),
 //     surname VARCHAR(50),
 //     othername VARCHAR(50),
-//     class VARCHAR(20),
+//     `class` VARCHAR(20),
+//     gender VARCHAR(10),
 //     guardianPhone VARCHAR(15),
 //     studentPicture VARCHAR(255)
 // );
 
+
 // -- Create teachers table
-// // CREATE TABLE teachers (
+// CREATE TABLE teachers (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     staff_id VARCHAR(50),
 //     name VARCHAR(255) NOT NULL,
@@ -58,11 +60,9 @@ module.exports = db;
 //     security_question VARCHAR(255),
 //     security_answer VARCHAR(255),
 //     phone VARCHAR(20) NULL UNIQUE, -- Phone number must be unique
-//     gender ENUM('Male', 'Female') NOT NULL,
 //     formClass VARCHAR(50),
 //     qualification ENUM('BSc', 'HND', 'NCE', 'Diploma', 'Master', 'PhD') NOT NULL,
 //     profile_picture VARCHAR(50) NOT NULL,
-//     registered TINYINT(1) DEFAULT 0, -- New column for registration status (0 = unregistered, 1 = registered)
 //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 // );
 
