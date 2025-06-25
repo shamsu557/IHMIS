@@ -661,63 +661,64 @@ app.post('/api/getStudentsByClass', (req, res) => {
 });
 
 // Endpoint to submit scores
-app.post('/api/submitScores', (req, res) => {
-    const scores = req.body.scores; // Expecting an array of score objects
+app.post("/api/submitScores", (req, res) => {
+  const scores = req.body.scores
 
-    // Ensure scores is an array
-    if (!Array.isArray(scores)) {
-        return res.status(400).json({ error: 'Scores must be an array' });
+  if (!Array.isArray(scores)) {
+    return res.status(400).json({ error: "Scores must be an array" })
+  }
+
+  // This will INSERT if record doesn't exist, UPDATE if it does exist
+  // But you need to add a UNIQUE constraint first (see SQL below)
+  const sql = `INSERT INTO subjects 
+                 (studentID, subjectName, term, session, firstCA, secondCA, thirdCA, exams, total, examGrade) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE 
+                 firstCA = VALUES(firstCA),
+                 secondCA = VALUES(secondCA),
+                 thirdCA = VALUES(thirdCA),
+                 exams = VALUES(exams),
+                 total = VALUES(total),
+                 examGrade = VALUES(examGrade)`
+
+  const updatePromises = scores.map((score) => {
+    if (score.firstCA > 10 || score.secondCA > 10 || score.thirdCA > 10 || score.exams > 70) {
+      return Promise.reject(`Invalid score detected for student ID: ${score.studentID}`)
     }
 
-    // SQL query to update scores
-    const sql = `UPDATE subjects 
-                 SET term = ?, session = ?, firstCA = ?, secondCA = ?, thirdCA = ?, exams = ?, total = ?, examGrade = ? 
-                 WHERE studentID = ? AND subjectName = ?`;
+    const values = [
+      score.studentID,
+      score.subjectName,
+      score.term,
+      score.session,
+      score.firstCA,
+      score.secondCA,
+      score.thirdCA,
+      score.exams,
+      score.total,
+      score.examGrade,
+    ]
 
-    // Prepare to collect promises for each update
-    const updatePromises = scores.map(score => {
-        // Validate scores
-        if (
-            score.firstCA > 10 || score.secondCA > 10 || score.thirdCA > 10 ||
-            score.exams > 70
-        ) {
-            return Promise.reject(`Invalid score detected for student ID: ${score.studentID}`);
+    return new Promise((resolve, reject) => {
+      db.query(sql, values, (error, results) => {
+        if (error) {
+          console.error("Database error:", error)
+          return reject("Database error")
         }
+        resolve(results)
+      })
+    })
+  })
 
-        const values = [
-            score.term,
-            score.session,
-            score.firstCA,
-            score.secondCA,
-            score.thirdCA,
-            score.exams,
-            score.total,
-            score.examGrade,
-            score.studentID,
-            score.subjectName
-        ];
-
-        return new Promise((resolve, reject) => {
-            db.query(sql, values, (error, results) => {
-                if (error) {
-                    console.error('Database error:', error);
-                    return reject('Database error');
-                }
-                resolve(results);
-            });
-        });
-    });
-
-    // Execute all updates
-    Promise.all(updatePromises)
-        .then(results => {
-            res.status(200).json({ message: 'Scores updated successfully!', results });
-        })
-        .catch(error => {
-            console.error('Error updating scores:', error);
-            res.status(500).json({ error });
-        });
-});
+  Promise.all(updatePromises)
+    .then((results) => {
+      res.status(200).json({ message: "Scores processed successfully!", results })
+    })
+    .catch((error) => {
+      console.error("Error processing scores:", error)
+      res.status(500).json({ error })
+    })
+})
 
 
 //to create admin for the first time as it will be used to login to admin dashboard visit /creation. then create the admin in the dashboard then other admin are created.
