@@ -261,83 +261,311 @@ $(document).ready(function () {
     });
 });
 
+// Global flag to prevent double submission
+let isSubmitting = false
+
 async function submitScores() {
-    const scores = [];
-    const subjectName = document.getElementById("subject-name").innerText.replace('Subject: ', '').trim();
-    const term = document.getElementById("term-name").innerText.replace('Term: ', '').trim();
-    const session = document.getElementById("session-name").innerText.replace('Session: ', '').trim();
+  // Prevent double execution
+  if (isSubmitting) {
+    console.log("Submission already in progress, ignoring duplicate call")
+    return
+  }
 
-    let validScores = true; // Flag to check if all scores are valid
+  isSubmitting = true
 
-    $('#student-tbody tr').each(function () {
-        const checkbox = $(this).find('.student-checkbox')[0];
-        if (checkbox.checked) { // Only proceed if the student is checked
-            const studentID = checkbox.dataset.id;
-            const scoreInputs = $(this).find('.score-input');
+  const scores = []
+  const subjectName = document.getElementById("subject-name").innerText.replace("Subject: ", "").trim()
+  const term = document.getElementById("term-name").innerText.replace("Term: ", "").trim()
+  const session = document.getElementById("session-name").innerText.replace("Session: ", "").trim()
 
-            const caScores = [scoreInputs[0].value, scoreInputs[1].value, scoreInputs[2].value].map(score => parseInt(score) || 0);
-            const examScore = parseInt(scoreInputs[3].value) || 0;
+  // Validate that we have subject, term, and session
+  if (!subjectName || !term || !session) {
+    alert("Missing subject, term, or session information. Please ensure all fields are properly set.")
+    isSubmitting = false // Reset flag
+    return
+  }
 
-            // Validate CA and Exam scores
-            if (caScores.some(score => score > 10) || examScore > 70) {
-                validScores = false;
-                alert(`Invalid scores for student ID: ${studentID}. Please ensure CAs are max 10 and Exam is max 70.`);
-                return false; // Break out of .each loop
-            }
+  let validScores = true // Flag to check if all scores are valid
 
-            const total = caScores.reduce((sum, score) => sum + score, 0) + examScore;
-            const examGrade = calculateGrade(total);
+  // Make sure jQuery is available
+  const $ = window.jQuery // Declare the jQuery variable
+  if (typeof $ === "undefined") {
+    alert("jQuery is not loaded. Please ensure jQuery is included in your page.")
+    isSubmitting = false // Reset flag
+    return
+  }
 
-            scores.push({
-                studentID: studentID,
-                subjectName: subjectName,
-                term: term,
-                session: session,
-                firstCA: caScores[0],
-                secondCA: caScores[1],
-                thirdCA: caScores[2],
-                exams: examScore,
-                total: total,
-                examGrade: examGrade
-            });
-        }
-    });
+  $("#student-tbody tr").each(function () {
+    const checkbox = $(this).find(".student-checkbox")[0]
+    if (checkbox && checkbox.checked) {
+      // Only proceed if the student is checked
+      const studentID = checkbox.dataset.id
 
-    if (!validScores) {
-        return; // Exit function if any score validation fails
+      // Validate studentID exists
+      if (!studentID) {
+        alert("Student ID is missing for one of the selected students.")
+        validScores = false
+        return false // Break out of .each loop
+      }
+
+      const scoreInputs = $(this).find(".score-input")
+
+      // Validate that we have all 4 score inputs (3 CAs + 1 Exam)
+      if (scoreInputs.length < 4) {
+        alert(`Missing score inputs for student ID: ${studentID}`)
+        validScores = false
+        return false
+      }
+
+      const caScores = [
+        Number.parseInt(scoreInputs[0].value) || 0,
+        Number.parseInt(scoreInputs[1].value) || 0,
+        Number.parseInt(scoreInputs[2].value) || 0,
+      ]
+      const examScore = Number.parseInt(scoreInputs[3].value) || 0
+
+      // Validate CA and Exam scores
+      if (caScores.some((score) => score > 10) || examScore > 70) {
+        validScores = false
+        alert(`Invalid scores for student ID: ${studentID}. Please ensure CAs are max 10 and Exam is max 70.`)
+        return false // Break out of .each loop
+      }
+
+      // Additional validation: check for negative scores
+      if (caScores.some((score) => score < 0) || examScore < 0) {
+        validScores = false
+        alert(`Negative scores are not allowed for student ID: ${studentID}.`)
+        return false
+      }
+
+      const total = caScores.reduce((sum, score) => sum + score, 0) + examScore
+      const examGrade = calculateGrade(total)
+
+      scores.push({
+        studentID: studentID,
+        subjectName: subjectName,
+        term: term,
+        session: session,
+        firstCA: caScores[0],
+        secondCA: caScores[1],
+        thirdCA: caScores[2],
+        exams: examScore,
+        total: total,
+        examGrade: examGrade,
+      })
     }
+  })
 
-    if (scores.length === 0) {
-        alert('Please select at least one student to submit scores.');
-        return; // Exit the function if no students are selected
+  if (!validScores) {
+    isSubmitting = false // Reset flag
+    return // Exit function if any score validation fails
+  }
+
+  if (scores.length === 0) {
+    alert("Please select at least one student to submit scores.")
+    isSubmitting = false // Reset flag
+    return // Exit the function if no students are selected
+  }
+
+  // Show confirmation with details
+  const confirmMessage =
+    `You are about to submit scores for:\n` +
+    `Subject: ${subjectName}\n` +
+    `Term: ${term}\n` +
+    `Session: ${session}\n` +
+    `Number of students: ${scores.length}\n\n` +
+    `Do you want to continue?`
+
+  if (!confirm(confirmMessage)) {
+    isSubmitting = false // Reset flag
+    return
+  }
+
+  // Show loading state
+  const submitButton =
+    document.querySelector('button[onclick="submitScores()"]') ||
+    document.querySelector("#submit-btn") ||
+    document.querySelector(".submit-button")
+  const originalButtonText = submitButton ? submitButton.innerText : ""
+  if (submitButton) {
+    submitButton.disabled = true
+    submitButton.innerText = "Submitting..."
+  }
+
+  try {
+    const response = await fetch("/api/submitScores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scores }), // Send scores to the server
+    })
+
+    const responseData = await response.json()
+
+    if (response.ok) {
+      alert("Scores submitted successfully!\n\n" + responseData.message)
+
+      // Optional: Clear the form or reload data
+      clearScoreInputs()
+    } else {
+      throw new Error(responseData.error || "Failed to submit scores.")
     }
-
-    try {
-        const response = await fetch('/api/submitScores', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ scores }) // Send scores to the server
-        });
-
-        if (response.ok) {
-            alert('Scores updated successfully!');
-        } else {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to update scores.');
-        }
-    } catch (error) {
-        console.error('Error updating scores:', error);
-        alert('Failed to update scores: ' + error.message);
+  } catch (error) {
+    console.error("Error submitting scores:", error)
+    alert("Failed to submit scores: " + error.message)
+  } finally {
+    // Restore button state
+    if (submitButton) {
+      submitButton.disabled = false
+      submitButton.innerText = originalButtonText
     }
+    // Reset the submission flag
+    isSubmitting = false
+  }
 }
 
 function calculateGrade(total) {
-    if (total >= 70) return 'A';
-    else if (total >= 60) return 'B';
-    else if (total >= 50) return 'C';
-    else if (total >= 40) return 'D';
-    return 'F';
+  if (total >= 70) return "A"
+  else if (total >= 60) return "B"
+  else if (total >= 50) return "C"
+  else if (total >= 40) return "D"
+  return "F"
 }
+
+// Helper function to clear score inputs after successful submission
+function clearScoreInputs() {
+  const $ = window.jQuery // Declare the jQuery variable
+  $("#student-tbody tr").each(function () {
+    const checkbox = $(this).find(".student-checkbox")[0]
+    if (checkbox && checkbox.checked) {
+      // Uncheck the checkbox
+      checkbox.checked = false
+
+      // Clear the score inputs
+      $(this)
+        .find(".score-input")
+        .each(function () {
+          this.value = ""
+        })
+    }
+  })
+}
+
+// Improved event binding to prevent double calls
+function initializeSubmitButton() {
+  // Remove any existing event listeners first
+  const submitButton =
+    document.querySelector('button[onclick="submitScores()"]') ||
+    document.querySelector("#submit-btn") ||
+    document.querySelector(".submit-button")
+
+  if (submitButton) {
+    // Remove onclick attribute if it exists
+    submitButton.removeAttribute("onclick")
+
+    // Clone the button to remove all event listeners
+    const newButton = submitButton.cloneNode(true)
+    submitButton.parentNode.replaceChild(newButton, submitButton)
+
+    // Add single event listener
+    newButton.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      submitScores()
+    })
+  }
+}
+
+// Helper function to validate all scores before submission
+function validateAllScores() {
+  let isValid = true
+  const errors = []
+
+  const $ = window.jQuery // Declare the jQuery variable
+  $("#student-tbody tr").each(function () {
+    const checkbox = $(this).find(".student-checkbox")[0]
+    if (checkbox && checkbox.checked) {
+      const studentID = checkbox.dataset.id
+      const scoreInputs = $(this).find(".score-input")
+
+      const caScores = [
+        Number.parseInt(scoreInputs[0].value) || 0,
+        Number.parseInt(scoreInputs[1].value) || 0,
+        Number.parseInt(scoreInputs[2].value) || 0,
+      ]
+      const examScore = Number.parseInt(scoreInputs[3].value) || 0
+
+      // Check CA scores
+      caScores.forEach((score, index) => {
+        if (score > 10) {
+          errors.push(`Student ${studentID}: CA${index + 1} score (${score}) exceeds maximum of 10`)
+          isValid = false
+        }
+      })
+
+      // Check exam score
+      if (examScore > 70) {
+        errors.push(`Student ${studentID}: Exam score (${examScore}) exceeds maximum of 70`)
+        isValid = false
+      }
+
+      // Check for negative scores
+      if (caScores.some((score) => score < 0) || examScore < 0) {
+        errors.push(`Student ${studentID}: Negative scores are not allowed`)
+        isValid = false
+      }
+    }
+  })
+
+  if (!isValid) {
+    alert("Validation Errors:\n\n" + errors.join("\n"))
+  }
+
+  return isValid
+}
+
+// Optional: Add real-time validation as user types
+function setupRealTimeValidation() {
+  const $ = window.jQuery // Declare the jQuery variable
+
+  // Remove existing event listeners first
+  $(document).off("input", ".score-input")
+
+  $(document).on("input", ".score-input", function () {
+    const value = Number.parseInt(this.value)
+    const isCA = $(this).hasClass("ca-input") // Assuming CA inputs have this class
+    const isExam = $(this).hasClass("exam-input") // Assuming exam input has this class
+
+    // Remove any existing error styling
+    $(this).removeClass("error")
+
+    if (isCA && value > 10) {
+      $(this).addClass("error")
+      $(this).attr("title", "CA score cannot exceed 10")
+    } else if (isExam && value > 70) {
+      $(this).addClass("error")
+      $(this).attr("title", "Exam score cannot exceed 70")
+    } else if (value < 0) {
+      $(this).addClass("error")
+      $(this).attr("title", "Score cannot be negative")
+    } else {
+      $(this).removeAttr("title")
+    }
+  })
+}
+
+// Initialize everything when document is ready
+window.addEventListener("DOMContentLoaded", () => {
+  // Initialize submit button with proper event handling
+  initializeSubmitButton()
+
+  // Setup real-time validation
+  setupRealTimeValidation()
+})
+
+// Also initialize when window loads (backup)
+window.addEventListener("load", () => {
+  initializeSubmitButton()
+})
 
 function logout() {
     window.location.href = '/logout';
