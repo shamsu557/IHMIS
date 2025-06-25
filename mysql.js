@@ -83,7 +83,7 @@ module.exports = db;
 //     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 // );
    
-// CREATE TABLE subjects (
+// // CREATE TABLE subjects (
 //     id INT AUTO_INCREMENT PRIMARY KEY,
 //     studentID VARCHAR(20),
 //     subjectName VARCHAR(50),
@@ -95,8 +95,14 @@ module.exports = db;
 //     exams INT DEFAULT 0,            -- Default for Exam score
 //     total INT DEFAULT 0,            -- Default for Total score
 //     examGrade VARCHAR(3) DEFAULT 'N/A',  -- Default to 'N/A' if no grade is assigned
+
+//     -- Unique constraint to prevent duplicate entries for same student, subject, term, and session
+//     CONSTRAINT unique_student_subject_term_session UNIQUE (studentID, subjectName, term, session),
+
+//     -- Foreign key to ensure studentID exists in students table
 //     FOREIGN KEY (studentID) REFERENCES students(studentID) ON DELETE CASCADE
 // );
+
 
 // CREATE TABLE admins (
 //     id INT AUTO_INCREMENT PRIMARY KEY, -- Optional: a unique identifier for each admin
